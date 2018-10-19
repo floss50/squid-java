@@ -10,8 +10,8 @@ public class Balance {
     private BigInteger ocn;
 
     public Balance() {
-        this.eth= BigInteger.valueOf(-1);
-        this.ocn= BigInteger.valueOf(-1);
+        this.eth= BigInteger.valueOf(0);
+        this.ocn= BigInteger.valueOf(0);
     }
 
     public Balance(BigInteger eth, BigInteger ocn) {

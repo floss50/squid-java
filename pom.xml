@@ -189,6 +189,8 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+
+
             <!-- Maven integration-test running using mvn verify -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
