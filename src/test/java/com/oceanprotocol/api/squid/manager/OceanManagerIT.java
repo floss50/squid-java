@@ -43,11 +43,6 @@ public class OceanManagerIT {
                 manager.getProviderDto().getClass().isAssignableFrom(ProviderDto.class));
     }
 
-    @Test
-    public void getAccounts() throws IOException {
-        List<Account> accounts= manager.getAccounts();
-        assertTrue(accounts.size()>0);
-    }
 
     @Test
     public void searchAssets() {

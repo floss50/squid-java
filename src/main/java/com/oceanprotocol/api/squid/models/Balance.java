@@ -5,9 +5,9 @@ import java.math.BigInteger;
 
 public class Balance {
 
-    public BigInteger eth;
+    private BigInteger eth;
 
-    public BigInteger ocn;
+    private BigInteger ocn;
 
     public Balance() {
         this.eth= BigInteger.valueOf(-1);
@@ -17,6 +17,14 @@ public class Balance {
     public Balance(BigInteger eth, BigInteger ocn) {
         this.eth = eth;
         this.ocn = ocn;
+    }
+
+    public BigInteger getEth() {
+        return eth;
+    }
+
+    public BigInteger getOcn() {
+        return ocn;
     }
 
     @Override
