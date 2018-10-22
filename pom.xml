@@ -19,7 +19,7 @@
 
 		<web3j.version>3.6.0</web3j.version>
         <ocean.keeper.version>0.1.1</ocean.keeper.version>
-        <ocean.secretstore.version>0.0.2</ocean.secretstore.version>
+        <ocean.secretstore.version>0.0.3</ocean.secretstore.version>
 
         <jackson.version>2.9.7</jackson.version>
 		<log4j.version>2.11.1</log4j.version>
