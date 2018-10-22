@@ -14,3 +14,5 @@ To run the integration tests using maven:
 ```bash
 mvn clean -Dtest=*IT test
 ```
+
+Run the Secret Store methods require to connect to a Parity EVM client, so if you are using Ganache it's not going to work.

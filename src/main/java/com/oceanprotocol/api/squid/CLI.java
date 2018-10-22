@@ -42,12 +42,12 @@ public class CLI {
         }
 
         if (argsParser.getCommand().equals(ArgsParser.commandOptions.register.toString())) {
-            log.debug("Registering a new Asset!");
+            log.debug("Registering a new AssetMetadata!");
 
             //PublisherWorker worker= new PublisherWorker('m ')
 
         } else if (argsParser.getCommand().equals(ArgsParser.commandOptions.get.toString())) {
-            log.debug("Getting an existing Asset!");
+            log.debug("Getting an existing AssetMetadata!");
 
         } else	{
             log.error("Unable to parse arguments");

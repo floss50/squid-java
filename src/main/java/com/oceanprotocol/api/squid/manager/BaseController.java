@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public abstract class BaseManager {
+public abstract class BaseController {
 
     private KeeperDto keeperDto;
     private ProviderDto providerDto;
@@ -27,7 +27,7 @@ public abstract class BaseManager {
     protected OceanRegistry oceanRegistry;
     protected OceanMarket oceanMarket;
 
-    public BaseManager(KeeperDto keeperDto, ProviderDto providerDto) throws IOException, CipherException {
+    public BaseController(KeeperDto keeperDto, ProviderDto providerDto) throws IOException, CipherException {
         this.keeperDto= keeperDto;
         this.providerDto= providerDto;
     }
@@ -36,7 +36,7 @@ public abstract class BaseManager {
         return keeperDto;
     }
 
-    public BaseManager setKeeperDto(KeeperDto keeperDto) {
+    public BaseController setKeeperDto(KeeperDto keeperDto) {
         this.keeperDto = keeperDto;
         return this;
     }
@@ -45,7 +45,7 @@ public abstract class BaseManager {
         return providerDto;
     }
 
-    public BaseManager setProviderDto(ProviderDto providerDto) {
+    public BaseController setProviderDto(ProviderDto providerDto) {
         this.providerDto = providerDto;
         return this;
     }
@@ -54,11 +54,11 @@ public abstract class BaseManager {
     /**
      * Initialize the OceanToken object using the address given as parameter to point to the deployed contract
      * @param address OceanToken contract address
-     * @return AccountsManager instance
+     * @return AccountsController instance
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public BaseManager setTokenContract(String address) throws IOException, CipherException {
+    public BaseController setTokenContract(String address) throws IOException, CipherException {
         this.tokenContract= OceanToken.load(address,
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
@@ -69,9 +69,9 @@ public abstract class BaseManager {
     /**
      * It sets the OceanToken stub instance
      * @param contract OceanToken instance
-     * @return BaseManager instance
+     * @return BaseController instance
      */
-    public BaseManager setTokenContract(OceanToken contract)    {
+    public BaseController setTokenContract(OceanToken contract)    {
         this.tokenContract= contract;
         return this;
     }
@@ -79,9 +79,9 @@ public abstract class BaseManager {
     /**
      * It sets the PLCRVoting stub instance
      * @param contract PLCRVoting instance
-     * @return BaseManager instance
+     * @return BaseController instance
      */
-    public BaseManager setPLCRVotingContract(PLCRVoting contract)    {
+    public BaseController setPLCRVotingContract(PLCRVoting contract)    {
         this.plcr= contract;
         return this;
     }
@@ -89,9 +89,9 @@ public abstract class BaseManager {
     /**
      * It sets the OceanRegistry stub instance
      * @param contract OceanRegistry instance
-     * @return BaseManager instance
+     * @return BaseController instance
      */
-    public BaseManager setOceanRegistryContract(OceanRegistry contract)    {
+    public BaseController setOceanRegistryContract(OceanRegistry contract)    {
         this.oceanRegistry= contract;
         return this;
     }
@@ -99,9 +99,9 @@ public abstract class BaseManager {
     /**
      * It sets the OceanMarket stub instance
      * @param contract OceanMarket instance
-     * @return BaseManager instance
+     * @return BaseController instance
      */
-    public BaseManager setOceanMarketContract(OceanMarket contract)    {
+    public BaseController setOceanMarketContract(OceanMarket contract)    {
         this.oceanMarket= contract;
         return this;
     }
@@ -134,7 +134,7 @@ public abstract class BaseManager {
 
     @Override
     public String toString() {
-        return "BaseManager{" +
+        return "BaseController{" +
                 "keeperDto=" + keeperDto +
                 ", providerDto=" + providerDto +
                 '}';

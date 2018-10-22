@@ -16,7 +16,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
 import org.web3j.protocol.Web3j;
-import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -29,7 +28,7 @@ public class AccountsManagerIT {
 
     private static final Logger log = LogManager.getLogger(AccountsManagerIT.class);
 
-    private static AccountsManager manager;
+    private static AccountsController manager;
     private static KeeperDto keeper;
     private static ProviderDto provider;
 
@@ -47,7 +46,7 @@ public class AccountsManagerIT {
 
         keeper= ManagerHelper.getKeeper(config);
         provider= ManagerHelper.getProvider(config);
-        manager= AccountsManager.getInstance(keeper, provider);
+        manager= AccountsController.getInstance(keeper, provider);
 
         // Deploying OceanToken Smart Contract
         oceanToken= ManagerHelper.deployOceanTokenContract(keeper);

@@ -1,21 +1,26 @@
 package com.oceanprotocol.api.squid.models;
 
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-//@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DID {
 
-//    @JsonProperty
+    @JsonProperty
     public String did;
 
-    public static final String PREFIX= "did:ocn:";
+    public static final String PREFIX= "did:op:";
 
     public DID(String did) throws DIDFormatException {
         setDid(did);
     }
 
     public String getDid() {
+        return did;
+    }
+
+    @Override
+    public String toString() {
         return did;
     }
 

@@ -3,50 +3,55 @@ package com.oceanprotocol.api.squid.manager;
 import com.oceanprotocol.api.squid.dto.KeeperDto;
 import com.oceanprotocol.api.squid.dto.ProviderDto;
 import com.oceanprotocol.api.squid.models.*;
+import com.oceanprotocol.api.squid.models.asset.Asset;
+import com.oceanprotocol.api.squid.models.asset.AssetMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
-import org.web3j.protocol.core.methods.response.EthAccounts;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OceanManager extends BaseManager {
+public class OceanController extends BaseController {
 
-    static final Logger log= LogManager.getLogger(OceanManager.class);
+    static final Logger log= LogManager.getLogger(OceanController.class);
 
-    protected OceanManager(KeeperDto keeperDto, ProviderDto providerDto)
+    protected OceanController(KeeperDto keeperDto, ProviderDto providerDto)
             throws IOException, CipherException {
         super(keeperDto, providerDto);
     }
 
     /**
-     * Given the KeeperDto and ProviderDto, returns a new instance of OceanManager
+     * Given the KeeperDto and ProviderDto, returns a new instance of OceanController
      * using them as attributes
      * @param keeperDto Keeper Dto
      * @param providerDto Provider Dto
-     * @return OceanManager
+     * @return OceanController
      */
-    public static OceanManager getInstance(KeeperDto keeperDto, ProviderDto providerDto)
+    public static OceanController getInstance(KeeperDto keeperDto, ProviderDto providerDto)
             throws IOException, CipherException {
-        return new OceanManager(keeperDto, providerDto);
+        return new OceanController(keeperDto, providerDto);
     }
 
 
-    public List<Asset> searchAssets()   {
+    public List<AssetMetadata> searchAssets()   {
         return new ArrayList<>();
     }
 
-    public List<Asset> searchOrders()   {
+    public List<AssetMetadata> searchOrders()   {
         return new ArrayList<>();
     }
 
-    public Asset register()   {
+    public AssetMetadata register()   {
         return null;
     }
 
-    public DID generateDID() throws DID.DIDFormatException {
+    public Asset resolveDID(DID did) {
+        return null;
+    }
+
+    public DID generateDID(DDO ddo) throws DID.DIDFormatException {
         return new DID(DID.PREFIX + "123");
     }
 

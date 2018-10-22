@@ -6,16 +6,16 @@ import org.web3j.crypto.CipherException;
 
 import java.io.IOException;
 
-public class AssetsManager extends BaseManager {
+public class AssetsController extends BaseController {
 
-    public AssetsManager(KeeperDto keeperDto, ProviderDto providerDto)
+    public AssetsController(KeeperDto keeperDto, ProviderDto providerDto)
             throws IOException, CipherException {
         super(keeperDto, providerDto);
     }
 
-    public static AssetsManager getInstance(KeeperDto keeperDto, ProviderDto providerDto)
+    public static AssetsController getInstance(KeeperDto keeperDto, ProviderDto providerDto)
             throws IOException, CipherException {
-        return new AssetsManager(keeperDto, providerDto);
+        return new AssetsController(keeperDto, providerDto);
     }
 
 

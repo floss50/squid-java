@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -36,7 +35,7 @@ public class AccountsManagerTest {
 
     private static final Logger log = LogManager.getLogger(AccountsManagerTest.class);
 
-    private static OceanManager manager;
+    private static OceanController manager;
     private static KeeperDto keeper;
     private static ProviderDto provider;
     private static final Config config = ConfigFactory.load();
@@ -68,7 +67,7 @@ public class AccountsManagerTest {
         when(_keeper.getWeb3()).thenReturn(_web3j);
         when(_keeper.getCredentials()).thenReturn(_credentials);
 
-        AccountsManager fakeManager= AccountsManager.getInstance(_keeper, provider);
+        AccountsController fakeManager= AccountsController.getInstance(_keeper, provider);
 
         List<Account> accounts= fakeManager.getAccounts();
 
@@ -100,7 +99,7 @@ public class AccountsManagerTest {
         when(_call.send()).thenReturn(oceanBalance);
         Mockito.doReturn(_call).when(_token).balanceOf(any());
 
-        AccountsManager manager= AccountsManager.getInstance(_keeper, provider);
+        AccountsController manager= AccountsController.getInstance(_keeper, provider);
         manager.setTokenContract(_token);
 
         Balance balance= manager.getAccountBalance(address);

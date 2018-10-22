@@ -3,6 +3,8 @@ package com.oceanprotocol.api.squid.models;
 //import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 //import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.oceanprotocol.api.squid.models.asset.AssetMetadata;
+
 //@JsonIgnoreProperties(ignoreUnknown = true)
 public class Order {
 
@@ -11,7 +13,7 @@ public class Order {
     public String id;
 
 //    @JsonProperty
-    public Asset name;
+    public AssetMetadata name;
 
 //    @JsonProperty
     public int timeout;
@@ -31,7 +33,7 @@ public class Order {
     private Order() {
     }
 
-    public Order(String id, Asset name, int timeout) {
+    public Order(String id, AssetMetadata name, int timeout) {
         this.id = id;
         this.name = name;
         this.timeout = timeout;
