@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.oceanprotocol.api</groupId>
+	<groupId>com.oceanprotocol</groupId>
 	<artifactId>squid</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
@@ -21,6 +21,7 @@
         <ocean.keeper.version>0.1.1</ocean.keeper.version>
         <ocean.secretstore.version>0.0.3</ocean.secretstore.version>
 
+        <eddsa.version>0.3.0</eddsa.version>
         <jackson.version>2.9.7</jackson.version>
 		<log4j.version>2.11.1</log4j.version>
 		<junit.version>4.12</junit.version>
@@ -59,6 +60,22 @@
             <version>${ocean.keeper.version}</version>
         </dependency>
 
+        <!-- Crypto libraries -->
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>${eddsa.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bigchaindb</groupId>
+            <artifactId>cryptoconditions</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.26.0</version>
+        </dependency>
         <!-- Ocean Secret Store Client -->
 
         <dependency>
