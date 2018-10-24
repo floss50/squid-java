@@ -51,15 +51,18 @@
       "currency": "USD"
     }
   }, {
-    "type": "DidAuthPushModeVersion1",
-    "serviceEndpoint": "http://auth.example.com/did:op:123456789abcdefghi"
-  }, {
     "id": "did:op:123456789abcdefghi;bops",
     "type": "BopsService",
     "serviceEndpoint": "https://bops.example.com/enterprise/"
   }, {
+    "type": "Consume",
+    "serviceEndpoint": "http://mybrizo.org/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}"
+  }, {
+    "type": "Compute",
+    "serviceEndpoint": "http://mybrizo.org/api/v1/brizo/services/compute?pubKey=${pubKey}&serviceId={serviceId}&algo={algo}&container={container}"
+  }, {
     "type": "Metadata",
-    "serviceEndpoint": "http://mytribe.org/metadata",
+    "serviceEndpoint": "http://myaquarius.org/api/v1/provider/assets/metadata/{did}",
     "metadata": {
       "base": {
         "name": "UK Weather information 2011",
