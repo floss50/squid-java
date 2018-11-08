@@ -1,29 +1,24 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.EventsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
-import com.oceanprotocol.squid.models.asset.Asset;
-import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
+import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.abi.*;
-
-import org.web3j.abi.datatypes.*;
-import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.abi.EventEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Hash;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
-import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,7 +26,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.oceanprotocol.squid.helpers.UrlHelper.parseDDOUrl;
 
 public class OceanController extends BaseController {
 

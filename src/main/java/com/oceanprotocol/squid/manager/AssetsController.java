@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;

@@ -1,13 +1,13 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.models.Account;
-import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.keeper.contracts.OceanMarket;
 import com.oceanprotocol.keeper.contracts.OceanRegistry;
 import com.oceanprotocol.keeper.contracts.OceanToken;
 import com.oceanprotocol.keeper.contracts.PLCRVoting;
+import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.models.Account;
+import com.oceanprotocol.squid.models.Balance;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;

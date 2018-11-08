@@ -2,23 +2,18 @@ package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
-import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.asset.Asset;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 

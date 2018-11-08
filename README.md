@@ -31,7 +31,7 @@ The list of methods implemented are:
 
 **Ocean**
 
-*
+* resolveDID
 
 **Asset**
 
@@ -63,7 +63,6 @@ The list of methods implemented are:
 
 * searchAssets
 * register
-* resolveDID
 * getOrder
 * getAsset
 * getServiceAgreement

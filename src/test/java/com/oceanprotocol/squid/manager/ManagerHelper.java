@@ -1,8 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.*;
-import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.dto.KeeperDto;
 import com.typesafe.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

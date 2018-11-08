@@ -1,12 +1,9 @@
 package com.oceanprotocol.squid.helpers;
 
 import org.apache.commons.codec.binary.Hex;
-import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.utils.Numeric;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 
 public abstract class EncodingHelper {

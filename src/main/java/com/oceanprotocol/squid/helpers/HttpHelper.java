@@ -5,7 +5,6 @@ import org.apache.commons.codec.Charsets;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
