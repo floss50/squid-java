@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import org.apache.logging.log4j.LogManager;
@@ -25,21 +25,21 @@ public class AccountsController extends BaseController {
 
     private BigInteger ERROR_BALANCE= BigInteger.ZERO;
 
-    private AccountsController(KeeperDto keeperDto, ProviderDto providerDto)
+    private AccountsController(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
-        super(keeperDto, providerDto);
+        super(keeperDto, aquariusDto);
     }
 
     /**
-     * Given the KeeperDto and ProviderDto, returns a new instance of AccountsController
+     * Given the KeeperDto and AquariusDto, returns a new instance of AccountsController
      * using them as attributes
      * @param keeperDto Keeper Dto
-     * @param providerDto Provider Dto
+     * @param aquariusDto Provider Dto
      * @return AccountsController
      */
-    public static AccountsController getInstance(KeeperDto keeperDto, ProviderDto providerDto)
+    public static AccountsController getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
-        return new AccountsController(keeperDto, providerDto);
+        return new AccountsController(keeperDto, aquariusDto);
     }
 
 

@@ -1,11 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
-import com.oceanprotocol.keeper.contracts.OceanMarket;
-import com.oceanprotocol.keeper.contracts.OceanRegistry;
-import com.oceanprotocol.keeper.contracts.OceanToken;
-import com.oceanprotocol.keeper.contracts.PLCRVoting;
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.typesafe.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,8 +29,8 @@ public abstract class ManagerHelper {
         return keeper;
     }
 
-    protected static ProviderDto getProvider(Config config) {
-        return ProviderDto.getInstance(config.getString("provider.url"));
+    protected static AquariusDto getAquarius(Config config) {
+        return AquariusDto.getInstance(config.getString("aquarius.url"));
     }
 
     protected static OceanToken deployOceanTokenContract(KeeperDto keeper) throws Exception, IOException, CipherException {
@@ -73,8 +70,18 @@ public abstract class ManagerHelper {
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider(),
-                tokenAddress,
-                registryAddress
+                tokenAddress
                 ).send();
     }
+
+    protected static DIDRegistry deployDIDRegistryContract(KeeperDto keeper)
+            throws Exception {
+
+        return DIDRegistry.deploy(
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        ).send();
+    }
+
 }

@@ -1,22 +1,18 @@
 package com.oceanprotocol.squid.models;
 
-import com.bigchaindb.cryptoconditions.types.Ed25519Sha256Fulfillment;
 import com.fasterxml.jackson.annotation.*;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.core.FromJsonToModel;
-import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.charset.Charset;
-
 import java.util.*;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
+
 @JsonPropertyOrder(alphabetic=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DDO extends AbstractModel implements FromJsonToModel {
 
     static final Logger log= LogManager.getLogger(DDO.class);
@@ -27,10 +23,13 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     private static final String MODEL_CHARSET= "UTF-8";
 
     @JsonProperty("@context")
-    public String context;
+    public String context= "https://w3id.org/future-method/v1";
 
     @JsonProperty
-    public DID id;
+    public String id;
+
+    @JsonIgnore
+    private DID did;
 
     @JsonProperty("publicKey")
     public List<PublicKey> publicKeys= new ArrayList<>();
@@ -38,7 +37,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public List<Authentication> authentication= new ArrayList<>();
 
-   // @JsonProperty("service")
+    //@JsonProperty("service")
+    @JsonIgnore
     public List<Service> services= new ArrayList<>();
 
     @JsonProperty
@@ -48,6 +48,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public Date created;
 
+    @JsonIgnore
     public AssetMetadata metadata= null;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
@@ -58,6 +59,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
     static class PublicKey {
+
+        public static final String ETHEREUM_KEY_TYPE= "EthereumECDSAKey";
 
         @JsonProperty
         public String id;
@@ -75,6 +78,12 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         public String publicKeyBase58;
 
         public PublicKey() {}
+
+        public PublicKey(String id, String type, String owner)  {
+            this.id= id;
+            this.type= type;
+            this.owner= owner;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -92,7 +101,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
-    static class Service {
+    public static class Service {
+
+        public enum serviceTypes {Metadata, Compute, Consumption, Other};
 
         @JsonProperty
         public String id;
@@ -149,6 +160,26 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
+    public DDO() {
+    }
+
+    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DID.DIDGenerationException, DID.DIDFormatException {
+        this.did= generateDID(publicKey);
+        this.id= did.toString();
+        this.created= new Date();
+
+        String did= this.id.toString();
+
+        this.publicKeys.add( new DDO.PublicKey(did, ETHEREUM_KEY_TYPE, did));
+        DDO.Service service= new DDO.Service();
+        service.type= Service.serviceTypes.Metadata.toString();
+        service.serviceEndpoint= serviceUrl;
+        service.metadata= metadata;
+        this.metadata= metadata;
+
+        this.services.add(service);
+    }
+
     @JsonSetter("service")
     public void servicesSetter(ArrayList<LinkedHashMap> services) {
 
@@ -188,12 +219,18 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
-    public DID generateDID(String address)    throws DID.DIDGenerationException, DID.DIDFormatException {
-        String idHash= UUID.randomUUID().toString().replaceAll("-", "");
-        log.debug("Id generated: " + idHash);
-        this.proof= new Proof(UUID_PROOF_TYPE, address, idHash);
-        this.id= DID.getFromHash(idHash);
-        return this.id;
+    public DID generateDID(String address)    throws DID.DIDFormatException {
+        this.did= DID.builder();
+        this.id= did.toString();
+
+        log.debug("Id generated: " + this.id);
+        this.proof= new Proof(UUID_PROOF_TYPE, address, this.id);
+
+        return this.did;
+    }
+
+    public DID getDid() {
+        return did;
     }
 
     /**

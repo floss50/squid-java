@@ -86,7 +86,7 @@ public class AssetMetadata extends Metadata {
         public ArrayList<String> contentUrls;
 
         @JsonProperty
-        public ArrayList<HashMap<String,String>> links;
+        public ArrayList<Link> links;
 
         @JsonProperty
         public String inLanguage;
@@ -98,6 +98,22 @@ public class AssetMetadata extends Metadata {
         public String price;
 
         public Base() {}
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class Link {
+
+        @JsonProperty
+        public String name;
+
+        @JsonProperty
+        public String type;
+
+        @JsonProperty
+        public String url;
+
+        public Link() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

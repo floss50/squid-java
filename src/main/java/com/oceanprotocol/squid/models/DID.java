@@ -3,6 +3,8 @@ package com.oceanprotocol.squid.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.UUID;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DID {
 
@@ -19,6 +21,10 @@ public class DID {
         setDid(did);
     }
 
+    public static DID builder() throws DIDFormatException {
+        return new DID(generateRandomToken());
+    }
+
     public static DID getFromHash(String hash) throws DIDFormatException {
         return new DID(PREFIX + hash);
     }
@@ -29,6 +35,14 @@ public class DID {
 
     public String getHash() {
         return did.substring(PREFIX.length());
+    }
+
+    public static String generateRandomToken()   {
+        String token= PREFIX + UUID.randomUUID().toString()
+                + UUID.randomUUID().toString()
+                ;
+        return token.replaceAll("-", "");
+
     }
 
     @Override

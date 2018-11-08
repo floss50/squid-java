@@ -55,14 +55,14 @@
     "type": "BopsService",
     "serviceEndpoint": "https://bops.example.com/enterprise/"
   }, {
-    "type": "Consume",
+    "type": "Access",
     "serviceEndpoint": "http://mybrizo.org/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}"
   }, {
     "type": "Compute",
     "serviceEndpoint": "http://mybrizo.org/api/v1/brizo/services/compute?pubKey=${pubKey}&serviceId={serviceId}&algo={algo}&container={container}"
   }, {
     "type": "Metadata",
-    "serviceEndpoint": "http://myaquarius.org/api/v1/provider/assets/metadata/{did}",
+    "serviceEndpoint": "http://localhost:5000/api/v1/aquarius/assets/ddo/{did}",
     "metadata": {
       "base": {
         "name": "UK Weather information 2011",
@@ -78,10 +78,15 @@
         "contentType": "text/csv",
         "workExample": "423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68",
         "contentUrls": ["https://testocnfiles.blob.core.windows.net/testfiles/testzkp.zip"],
-        "links": [
-          {"sample1": "http://data.ceda.ac.uk/badc/ukcp09/data/gridded-land-obs/gridded-land-obs-daily/"},
-          {"sample2": "http://data.ceda.ac.uk/badc/ukcp09/data/gridded-land-obs/gridded-land-obs-averages-25km/"},
-          {"fieldsDescription": "http://data.ceda.ac.uk/badc/ukcp09/"}
+        "links": [{
+            "name": "Sample of Asset Data",
+            "type": "sample",
+            "url": "https://foo.com/sample.csv"
+          }, {
+            "name": "Data Format Definition",
+            "type": "format",
+            "AssetID": "4d517500da0acb0d65a716f61330969334630363ce4a6a9d39691026ac7908ea"
+          }
         ],
         "inLanguage": "en",
         "tags": "weather, uk, 2011, temperature, humidity",

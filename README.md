@@ -33,6 +33,15 @@ The list of methods implemented are:
 
 *
 
+**Asset**
+
+* getId
+* getDDO
+* getDID
+* publishMetadata
+* getMetadata
+* updateMetadata
+
 **Accounts**
 
 * getId
@@ -63,13 +72,7 @@ The list of methods implemented are:
 
 **Asset**
 
-* getId
 * purchase
-* getDDO
-* getDID
-* publishMetadata
-* getMetadata
-* updateMetadata
 * retireMetadata (Nice to Have)
 * getServiceAgreements (Nice to Have)
 

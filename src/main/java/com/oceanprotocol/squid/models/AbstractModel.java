@@ -24,6 +24,7 @@ public abstract class AbstractModel {
             objectMapper = new ObjectMapper();
             objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
         }
 
         return objectMapper;

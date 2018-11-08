@@ -126,4 +126,8 @@ public class KeeperDto {
         this.gasProvider= getContractGasProviderInstance(gasPrice, gasLimit);
         return this;
     }
+
+    public String getAddress() {
+        return address;
+    }
 }

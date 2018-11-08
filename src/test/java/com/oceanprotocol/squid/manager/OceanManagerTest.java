@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -16,14 +16,14 @@ public class OceanManagerTest {
 
     private static OceanController manager;
     private static KeeperDto keeper;
-    private static ProviderDto provider;
+    private static AquariusDto aquarius;
     private static final Config config = ConfigFactory.load();
 
     @BeforeClass
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
-        provider= ManagerHelper.getProvider(config);
+        aquarius= ManagerHelper.getAquarius(config);
     }
 
 

@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.keeper.contracts.OceanToken;
@@ -37,14 +37,14 @@ public class AccountsManagerTest {
 
     private static OceanController manager;
     private static KeeperDto keeper;
-    private static ProviderDto provider;
+    private static AquariusDto aquarius;
     private static final Config config = ConfigFactory.load();
 
     @BeforeClass
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
-        provider= ManagerHelper.getProvider(config);
+        aquarius= ManagerHelper.getAquarius(config);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class AccountsManagerTest {
         when(_keeper.getWeb3()).thenReturn(_web3j);
         when(_keeper.getCredentials()).thenReturn(_credentials);
 
-        AccountsController fakeManager= AccountsController.getInstance(_keeper, provider);
+        AccountsController fakeManager= AccountsController.getInstance(_keeper, aquarius);
 
         List<Account> accounts= fakeManager.getAccounts();
 
@@ -99,7 +99,7 @@ public class AccountsManagerTest {
         when(_call.send()).thenReturn(oceanBalance);
         Mockito.doReturn(_call).when(_token).balanceOf(any());
 
-        AccountsController manager= AccountsController.getInstance(_keeper, provider);
+        AccountsController manager= AccountsController.getInstance(_keeper, aquarius);
         manager.setTokenContract(_token);
 
         Balance balance= manager.getAccountBalance(address);

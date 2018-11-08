@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.keeper.contracts.OceanMarket;
@@ -30,7 +30,7 @@ public class AccountsManagerIT {
 
     private static AccountsController manager;
     private static KeeperDto keeper;
-    private static ProviderDto provider;
+    private static AquariusDto aquarius;
 
     private static OceanToken oceanToken;
     private static PLCRVoting plcr;
@@ -45,8 +45,8 @@ public class AccountsManagerIT {
         log.debug("Setting Up DTO's");
 
         keeper= ManagerHelper.getKeeper(config);
-        provider= ManagerHelper.getProvider(config);
-        manager= AccountsController.getInstance(keeper, provider);
+        aquarius= ManagerHelper.getAquarius(config);
+        manager= AccountsController.getInstance(keeper, aquarius);
 
         // Deploying OceanToken Smart Contract
         oceanToken= ManagerHelper.deployOceanTokenContract(keeper);
@@ -68,7 +68,7 @@ public class AccountsManagerIT {
         assertTrue(
                 manager.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
         assertTrue(
-                manager.getProviderDto().getClass().isAssignableFrom(ProviderDto.class));
+                manager.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }
 
     @Test

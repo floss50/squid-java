@@ -1,11 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.keeper.contracts.*;
+import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.ProviderDto;
-import com.oceanprotocol.keeper.contracts.OceanMarket;
-import com.oceanprotocol.keeper.contracts.OceanRegistry;
-import com.oceanprotocol.keeper.contracts.OceanToken;
-import com.oceanprotocol.keeper.contracts.PLCRVoting;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -20,16 +17,18 @@ import java.lang.reflect.Method;
 public abstract class BaseController {
 
     private KeeperDto keeperDto;
-    private ProviderDto providerDto;
+    private AquariusDto aquariusDto;
 
     protected OceanToken tokenContract;
     protected PLCRVoting plcr;
     protected OceanRegistry oceanRegistry;
     protected OceanMarket oceanMarket;
+    protected DIDRegistry didRegistry;
 
-    public BaseController(KeeperDto keeperDto, ProviderDto providerDto) throws IOException, CipherException {
+
+    public BaseController(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
         this.keeperDto= keeperDto;
-        this.providerDto= providerDto;
+        this.aquariusDto = aquariusDto;
     }
 
     public KeeperDto getKeeperDto() {
@@ -41,12 +40,12 @@ public abstract class BaseController {
         return this;
     }
 
-    public ProviderDto getProviderDto() {
-        return providerDto;
+    public AquariusDto getAquariusDto() {
+        return aquariusDto;
     }
 
-    public BaseController setProviderDto(ProviderDto providerDto) {
-        this.providerDto = providerDto;
+    public BaseController setAquariusDto(AquariusDto aquariusDto) {
+        this.aquariusDto = aquariusDto;
         return this;
     }
 
@@ -106,6 +105,30 @@ public abstract class BaseController {
         return this;
     }
 
+    /**
+     * Initialize the DIDRegistry object using the address given as parameter to point to the deployed contract
+     * @param address DIDRegistry contract address
+     * @return BaseController instance
+     * @throws IOException IOException
+     * @throws CipherException CipherException
+     */
+    public BaseController setDidRegistryContract(String address) throws IOException, CipherException {
+        this.didRegistry= DIDRegistry.load(address,
+                getKeeperDto().getWeb3(),
+                getKeeperDto().getCredentials(),
+                getKeeperDto().getContractGasProvider());
+        return this;
+    }
+
+    /**
+     * It sets the DIDRegistry stub instance
+     * @param contract DIDRegistry instance
+     * @return BaseController instance
+     */
+    public BaseController setDidRegistryContract(DIDRegistry contract)    {
+        this.didRegistry= contract;
+        return this;
+    }
 
 
     /**
@@ -136,7 +159,7 @@ public abstract class BaseController {
     public String toString() {
         return "BaseController{" +
                 "keeperDto=" + keeperDto +
-                ", providerDto=" + providerDto +
+                ", aquariusDto=" + aquariusDto +
                 '}';
     }
 }
