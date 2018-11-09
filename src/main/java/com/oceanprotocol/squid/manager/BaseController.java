@@ -20,8 +20,6 @@ public abstract class BaseController {
     private AquariusDto aquariusDto;
 
     protected OceanToken tokenContract;
-    protected PLCRVoting plcr;
-    protected OceanRegistry oceanRegistry;
     protected OceanMarket oceanMarket;
     protected DIDRegistry didRegistry;
 
@@ -72,26 +70,6 @@ public abstract class BaseController {
      */
     public BaseController setTokenContract(OceanToken contract)    {
         this.tokenContract= contract;
-        return this;
-    }
-
-    /**
-     * It sets the PLCRVoting stub instance
-     * @param contract PLCRVoting instance
-     * @return BaseController instance
-     */
-    public BaseController setPLCRVotingContract(PLCRVoting contract)    {
-        this.plcr= contract;
-        return this;
-    }
-
-    /**
-     * It sets the OceanRegistry stub instance
-     * @param contract OceanRegistry instance
-     * @return BaseController instance
-     */
-    public BaseController setOceanRegistryContract(OceanRegistry contract)    {
-        this.oceanRegistry= contract;
         return this;
     }
 

@@ -1,9 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.OceanMarket;
-import com.oceanprotocol.keeper.contracts.OceanRegistry;
 import com.oceanprotocol.keeper.contracts.OceanToken;
-import com.oceanprotocol.keeper.contracts.PLCRVoting;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.Account;
@@ -33,8 +31,6 @@ public class AccountsManagerIT {
     private static AquariusDto aquarius;
 
     private static OceanToken oceanToken;
-    private static PLCRVoting plcr;
-    private static OceanRegistry oceanRegistry;
     private static OceanMarket oceanMarket;
 
     private static final Config config = ConfigFactory.load();
@@ -50,13 +46,11 @@ public class AccountsManagerIT {
 
         // Deploying OceanToken Smart Contract
         oceanToken= ManagerHelper.deployOceanTokenContract(keeper);
-        plcr= ManagerHelper.deployPLCRVotingContract(keeper, oceanToken.getContractAddress());
-        oceanRegistry= ManagerHelper.deployOceanRegistryContract(keeper, oceanToken.getContractAddress(), plcr.getContractAddress());
-        oceanMarket= ManagerHelper.deployOceanMarketContract(keeper, oceanToken.getContractAddress(), oceanRegistry.getContractAddress());
+        oceanMarket= ManagerHelper.deployOceanMarketContract(keeper, oceanToken.getContractAddress());
 
         manager.setTokenContract(oceanToken);
-        manager.setPLCRVotingContract(plcr);
-        manager.setOceanRegistryContract(oceanRegistry);
+        //manager.setPLCRVotingContract(plcr);
+        //manager.setOceanRegistryContract(oceanRegistry);
         manager.setOceanMarketContract(oceanMarket);
 
         TEST_ADDRESS= config.getString("account.address");

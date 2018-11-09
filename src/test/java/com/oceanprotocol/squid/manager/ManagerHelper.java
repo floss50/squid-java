@@ -40,31 +40,7 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider()).send();
     }
 
-    protected static PLCRVoting deployPLCRVotingContract(KeeperDto keeper, String tokenAddress)
-            throws Exception {
-
-        return PLCRVoting.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider(),
-                tokenAddress
-        ).send();
-    }
-
-    protected static OceanRegistry deployOceanRegistryContract(KeeperDto keeper, String tokenAddress, String plcrAddress)
-            throws Exception {
-
-        return OceanRegistry.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider(),
-                tokenAddress,
-                plcrAddress
-                ).send();
-    }
-
-
-    protected static OceanMarket deployOceanMarketContract(KeeperDto keeper, String tokenAddress, String registryAddress)
+    protected static OceanMarket deployOceanMarketContract(KeeperDto keeper, String tokenAddress)
             throws Exception {
         return OceanMarket.deploy(
                 keeper.getWeb3(),

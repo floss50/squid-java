@@ -69,12 +69,12 @@ public class DDOTest {
         }, DDO_JSON_CONTENT);
 
         assertEquals("https://w3id.org/future-method/v1", ddo.context);
-        assertEquals("did:op:123456789abcdefghi", ddo.id.toString());
+        assertEquals("did:op:3809174ce71dd460faf4941140323ebafdc062f062d3932fe0195c78719a8716", ddo.id.toString());
         assertEquals(3, ddo.publicKeys.size());
-        assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:123456789abcdefghi"));
+        assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:b6e2eb5eff1a093ced9826315d5a4ef6c5b5c8bd3c49890ee284231d7e1d0aaa"));
 
         assertEquals(2, ddo.authentication.size());
-        assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:123456789abcdefghi"));
+        assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
 
         assertEquals(10, ddo.services.size());
         assertTrue(ddo.services.get(3).serviceEndpoint.startsWith("http"));
