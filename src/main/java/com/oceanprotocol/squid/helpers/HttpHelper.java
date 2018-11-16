@@ -131,6 +131,8 @@ public abstract class HttpHelper {
      */
     public static final HttpResponse httpClientGet(String url) throws HttpException {
 
+        log.debug("Getting URL: "+ url);
+
         HttpResponse response;
         HttpClient client = new HttpClient();
         GetMethod getMethod = new GetMethod(url);

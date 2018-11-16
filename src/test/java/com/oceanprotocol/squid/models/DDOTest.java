@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
@@ -44,14 +47,10 @@ public class DDOTest {
     public void generateDID() throws Exception {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {
         }, DDO_JSON_CONTENT);
-        String account = config.getString("account.address");
-
-        ddo.generateDID(account);
+        String account = config.getString("account.ganache.address");
 
         assertTrue(ddo.id.startsWith(DID.PREFIX));
         assertEquals(64, ddo.getDid().getHash().length());
-
-        assertEquals(account, ddo.proof.creator);
     }
 
     @Test
@@ -76,8 +75,8 @@ public class DDOTest {
         assertEquals(2, ddo.authentication.size());
         assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
 
-        assertEquals(10, ddo.services.size());
-        assertTrue(ddo.services.get(3).serviceEndpoint.startsWith("http"));
+        assertEquals(3, ddo.services.size());
+        assertTrue(ddo.services.get(2).serviceEndpoint.startsWith("http"));
 
         AssetMetadata metadata = (AssetMetadata) ddo.metadata;
 
@@ -107,17 +106,6 @@ public class DDOTest {
         ddo.authentication.add(auth);
         ddo.authentication.add(auth);
 
-        DDO.Service service = new DDO.Service();
-        service.id = "service1";
-        service.serviceEndpoint = "http://disney.com";
-
-        ddo.services.add(service);
-        DDO.Service service2 = new DDO.Service();
-        service2.id = "service2";
-        service2.serviceEndpoint = "http://disney.com";
-        service2.type = "Metadata";
-        ddo.services.add(service2);
-
         AssetMetadata metadata = new AssetMetadata();
         AssetMetadata.Base base = new AssetMetadata.Base();
         base.name = "test name";
@@ -127,7 +115,13 @@ public class DDOTest {
 
         metadata.base = base;
 
-        ddo.metadata = metadata;
+        MetadataService metadataService = new MetadataService(metadata, "http://disney.com", "0");
+
+        AccessService accessService = new AccessService("http://ocean.com", "1");
+
+        ddo.services.add(metadataService);
+        ddo.services.add(accessService);
+
 
         String modelJson = ddo.toJson();
         log.debug(modelJson);
@@ -140,8 +134,8 @@ public class DDOTest {
         assertEquals("AuthType", ((JSONObject) (json.getJSONArray("authentication").get(1))).getString("type"));
 
         assertEquals(2, (json.getJSONArray("service").length()));
-        assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(1))).getJSONObject("metadata").getJSONObject("base").getString("name"));
-        assertEquals("http://service.net", ((JSONObject) (json.getJSONArray("service").get(1))).getJSONObject("metadata").getJSONObject("base").getJSONArray("contentUrls").get(0));
+        assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getString("name"));
+        assertEquals("http://service.net", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getJSONArray("contentUrls").get(0));
 
     }
 

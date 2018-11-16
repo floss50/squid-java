@@ -4,12 +4,20 @@ import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
+import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class AssetsController extends BaseController {
+
+    static final Logger log= LogManager.getLogger(AssetsController.class);
 
     public AssetsController(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
@@ -50,6 +58,26 @@ public class AssetsController extends BaseController {
 
     public boolean updateMetadata(String id, DDO ddo) throws Exception  {
         return getAquariusDto().updateDDO(id, ddo);
+    }
+
+    public List<DDO> searchAssets(String text, int offset, int page)   {
+        try {
+            return getAquariusDto().searchDDO(text, offset, page);
+        } catch (Exception ex)  {
+            log.error("Error searching for DDO's " + ex.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    public List<DDO> searchAssets(Map<String, Object> params, int offset, int page, int sort)   {
+        SearchQuery searchQuery= new SearchQuery(params, offset, page, sort);
+
+        try {
+            return getAquariusDto().searchDDO(searchQuery);
+        } catch (Exception ex)  {
+            log.error("Error searching for DDO's " + ex.getMessage());
+        }
+        return new ArrayList<>();
     }
 
 }

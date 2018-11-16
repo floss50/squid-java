@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.*;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.core.FromJsonToModel;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,6 +102,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         public Authentication() {}
     }
 
+/*
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
     public static class Service {
@@ -128,6 +132,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
 
     }
+*/
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
@@ -160,24 +165,35 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
-    public DDO() {
+    public DDO() throws DID.DIDFormatException {
+        this.did= generateDID();
+        this.id= this.did.toString();
     }
 
-    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DID.DIDGenerationException, DID.DIDFormatException {
-        this.did= generateDID(publicKey);
+    public DDO(String publicKey) throws DID.DIDFormatException {
+        this(generateDID(), publicKey);
+    }
+
+    public DDO(DID did, String publicKey) {
+        this.did= did;
         this.id= did.toString();
         this.created= new Date();
+        this.proof= new Proof(UUID_PROOF_TYPE, publicKey, this.id);
+        this.publicKeys.add( new DDO.PublicKey(this.id, ETHEREUM_KEY_TYPE, this.id));
+    }
 
-        String did= this.id.toString();
-
-        this.publicKeys.add( new DDO.PublicKey(did, ETHEREUM_KEY_TYPE, did));
-        DDO.Service service= new DDO.Service();
-        service.type= Service.serviceTypes.Metadata.toString();
-        service.serviceEndpoint= serviceUrl;
-        service.metadata= metadata;
+    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DID.DIDFormatException {
+        this(publicKey);
+        MetadataService service= new MetadataService(metadata, serviceUrl);
         this.metadata= metadata;
 
         this.services.add(service);
+    }
+
+    public DDO addService(Service service)  {
+        service.serviceDefinitionId= String.valueOf(services.size());
+        services.add(service);
+        return this;
     }
 
     @JsonSetter("service")
@@ -185,11 +201,19 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         try {
             for (LinkedHashMap service: services)   {
-                if (service.containsKey("metadata") && service.containsKey("type") && service.get("type").equals(Metadata.METADATA_TYPE))    {
-                    this.metadata= getMapperInstance().convertValue(service.get("metadata"), AssetMetadata.class);
+                if (service.containsKey("type")) {
+                    if (service.get("type").equals(Service.serviceTypes.Metadata.toString()) && service.containsKey("metadata")) {
+                        this.metadata = getMapperInstance().convertValue(service.get("metadata"), AssetMetadata.class);
+                        this.services.add(getMapperInstance().convertValue(service, MetadataService.class));
+
+                    } else if (service.get("type").equals(Service.serviceTypes.Access.toString())) {
+                        this.services.add(getMapperInstance().convertValue(service, AccessService.class));
+
+                    } else {
+                        this.services.add(getMapperInstance().convertValue(service, Service.class));
+                    }
                 }
 
-                this.services.add(getMapperInstance().convertValue(service, Service.class));
             }
 
         } catch (Exception ex)    {
@@ -201,16 +225,18 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonGetter("service")
     public List<Service> servicesGetter()    {
 
-        if (this.metadata != null)  {
-            int counter= 0;
-            for (Service service: services) {
-                if (service.type!= null && service.type.equals(Metadata.METADATA_TYPE) && this.metadata != null)  {
+        int counter= 0;
+        for (Service service: services) {
+            if (service.type != null)   {
+                if (service.type.equals(Service.serviceTypes.Metadata.toString()) && this.metadata != null)  {
                     try {
-                        service.metadata= this.metadata;
+                        ((MetadataService) service).metadata= this.metadata;
                         services.set(counter, service);
                     } catch (Exception e) {
                         log.error("Error getting metadata object");
                     }
+                } else {
+                    services.set(counter, service);
                 }
                 counter++;
             }
@@ -219,15 +245,12 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
-    public DID generateDID(String address)    throws DID.DIDFormatException {
-        this.did= DID.builder();
-        this.id= did.toString();
-
-        log.debug("Id generated: " + this.id);
-        this.proof= new Proof(UUID_PROOF_TYPE, address, this.id);
-
-        return this.did;
+    public static DID generateDID() throws DID.DIDFormatException {
+        DID did= DID.builder();
+        log.debug("Id generated: " + did.toString());
+        return did;
     }
+
 
     public DID getDid() {
         return did;
@@ -237,25 +260,25 @@ public class DDO extends AbstractModel implements FromJsonToModel {
      *future integration, test pending
      */
     /**
-    public DID generateDID(EdDSAPublicKey publicKey, EdDSAPrivateKey privateKey) throws DID.DIDGenerationException {
-        try {
-            String json = toJson();
-            byte[] sha3hash = CryptoHelper.getSha3HashRaw(json.getBytes(Charset.forName(MODEL_CHARSET)));
-            byte[] signature = CryptoHelper.sign(sha3hash, privateKey);
+     public DID generateDID(EdDSAPublicKey publicKey, EdDSAPrivateKey privateKey) throws DID.DIDGenerationException {
+     try {
+     String json = toJson();
+     byte[] sha3hash = CryptoHelper.getSha3HashRaw(json.getBytes(Charset.forName(MODEL_CHARSET)));
+     byte[] signature = CryptoHelper.sign(sha3hash, privateKey);
 
-            Ed25519Sha256Fulfillment fulfillment = new Ed25519Sha256Fulfillment(publicKey, signature);
+     Ed25519Sha256Fulfillment fulfillment = new Ed25519Sha256Fulfillment(publicKey, signature);
 
-            this.proof= new Proof(DDO_PROOF_TYPE, publicKey.getA().toString(), fulfillment.getEncoded());
-            String idHash= CryptoHelper.getSha3HashHex(this.toJson().getBytes(MODEL_CHARSET));
-            log.debug("Id generated: " + idHash);
+     this.proof= new Proof(DDO_PROOF_TYPE, publicKey.getA().toString(), fulfillment.getEncoded());
+     String idHash= CryptoHelper.getSha3HashHex(this.toJson().getBytes(MODEL_CHARSET));
+     log.debug("Id generated: " + idHash);
 
-            this.id= DID.getFromHash(idHash);
-            return this.id;
+     this.id= DID.getFromHash(idHash);
+     return this.id;
 
-        } catch (Exception ex)  {
-            log.error("Error generating DID " + ex.getMessage());
-            throw new DID.DIDGenerationException("Error generating DID " + ex.getMessage());
-        }
-    }
+     } catch (Exception ex)  {
+     log.error("Error generating DID " + ex.getMessage());
+     throw new DID.DIDGenerationException("Error generating DID " + ex.getMessage());
+     }
+     }
      */
 }

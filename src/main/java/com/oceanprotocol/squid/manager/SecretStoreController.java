@@ -28,8 +28,7 @@ public class SecretStoreController {
     }
 
 
-    public static SecretStoreController getInstance(SecretStoreDto ssDto, EvmDto evmDto)
-            throws IOException, CipherException {
+    public static SecretStoreController getInstance(SecretStoreDto ssDto, EvmDto evmDto) {
         return new SecretStoreController(ssDto, evmDto);
     }
 

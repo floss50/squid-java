@@ -5,7 +5,7 @@ import org.web3j.crypto.Hash;
 public abstract class EthereumHelper {
 
     public static String getFunctionSelector(String functionDefinition)    {
-        String fullSignature= Hash.sha3String(functionDefinition);
-        return fullSignature.substring(0, 10);
+        return Hash.sha3String(functionDefinition)
+                .substring(0, 10);
     }
 }

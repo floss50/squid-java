@@ -40,7 +40,7 @@ public class AccountsManagerIT {
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
-        keeper= ManagerHelper.getKeeper(config);
+        keeper= ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
         aquarius= ManagerHelper.getAquarius(config);
         manager= AccountsController.getInstance(keeper, aquarius);
 
@@ -49,11 +49,9 @@ public class AccountsManagerIT {
         oceanMarket= ManagerHelper.deployOceanMarketContract(keeper, oceanToken.getContractAddress());
 
         manager.setTokenContract(oceanToken);
-        //manager.setPLCRVotingContract(plcr);
-        //manager.setOceanRegistryContract(oceanRegistry);
         manager.setOceanMarketContract(oceanMarket);
 
-        TEST_ADDRESS= config.getString("account.address");
+        TEST_ADDRESS= config.getString("account.parity.address");
     }
 
     @Test
@@ -72,7 +70,7 @@ public class AccountsManagerIT {
     }
 
     @Test
-    public void getAccountsBalance() throws IOException, CipherException {
+    public void getAccountsBalance()  {
         manager.requestTokens(BigInteger.valueOf(100));
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);

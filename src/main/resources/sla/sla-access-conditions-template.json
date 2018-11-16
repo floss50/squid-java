@@ -1,0 +1,142 @@
+[
+  {
+    "name": "lockPayment",
+    "dependencies": [],
+    "isTerminalCondition": false,
+    "canBeFulfilledBeforeTimeout": true,
+    "conditionKey": {
+      "contractAddress": "{contract.paymentConditions.address}",
+      "fingerprint": "{function.lockPayment.fingerprint}"
+    },
+    "parameters": [
+      {
+        "name": "assetId",
+        "type": "bytes32",
+        "value": "{parameter.did}"
+      }, {
+        "name": "price",
+        "type": "uint",
+        "value": {parameter.price}
+      }
+    ],
+    "events": [{
+      "name": "PaymentLocked",
+      "actorType": "publisher",
+      "handler": {
+        "moduleName": "accessControl",
+        "functionName": "grantAccess",
+        "version": "0.1"
+      }
+    }]
+  },
+  {
+  "name": "grantAccess",
+  "dependencies": [{
+    "name": "lockPayment",
+    "timeout": 0
+  }
+  ],
+  "isTerminalCondition": false,
+  "canBeFulfilledBeforeTimeout": true,
+  "conditionKey": {
+    "contractAddress": "{contract.accessConditions.address}",
+    "fingerprint": "{function.grantAccess.fingerprint}"
+  },
+  "parameters": [
+    {
+      "name": "assetId",
+      "type": "bytes32",
+      "value": "{parameter.did}"
+    }, {
+      "name": "documentKeyId",
+      "type": "bytes32",
+      "value": "{parameter.did}"
+    }
+  ],
+  "events": [{
+    "name": "AccessGranted",
+    "actorType": "consumer",
+    "handler": {
+      "moduleName": "asset",
+      "functionName": "consumeService",
+      "version": "0.1"
+    }
+  }, {
+    "name": "AccessGranted",
+    "actorType": "publisher",
+    "handler": {
+      "moduleName": "payment",
+      "functionName": "releasePayment",
+      "version": "0.1"
+    }
+  }]
+
+},{
+  "name": "releasePayment",
+  "dependencies": [{
+    "name": "grantAccess",
+    "timeout": 0
+  }
+  ],
+  "isTerminalCondition": true,
+  "canBeFulfilledBeforeTimeout": true,
+  "conditionKey": {
+    "contractAddress": "{contract.paymentConditions.address}",
+    "fingerprint": "{function.releasePayment.fingerprint}"
+  },
+  "parameters": [
+    {
+      "name": "assetId",
+      "type": "bytes32",
+      "value": "{parameter.did}"
+    }, {
+      "name": "price",
+      "type": "uint",
+      "value": {parameter.price}
+    }
+  ],
+  "events": [{
+    "name": "PaymentReleased",
+    "actorType": "publisher",
+    "handler": {
+      "moduleName": "serviceAgreement",
+      "functionName": "fulfillAgreement",
+      "version": "0.1"
+    }
+  }]
+}, {
+  "name": "refundPayment",
+  "dependencies": [{
+    "name": "lockPayment",
+    "timeout": 86400
+  }
+  ],
+  "canBeFulfilledBeforeTimeout": false,
+  "isTerminalCondition": true,
+  "conditionKey": {
+    "contractAddress": "{contract.paymentConditions.address}",
+    "fingerprint": "{function.refundPayment.fingerprint}"
+  },
+  "parameters": [
+    {
+      "name": "assetId",
+      "type": "bytes32",
+      "value": "{parameter.did}"
+    }, {
+      "name": "price",
+      "type": "uint",
+      "value": {parameter.price}
+    }
+  ],
+  "events": [{
+    "name": "PaymentRefund",
+    "actorType": "consumer",
+    "handler": {
+      "moduleName": "serviceAgreement",
+      "functionName": "fulfillAgreement",
+      "version": "0.1"
+    }
+  }]
+
+}
+]

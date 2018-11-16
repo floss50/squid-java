@@ -1,0 +1,97 @@
+package com.oceanprotocol.squid.models.service;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.oceanprotocol.squid.core.FromJsonToModel;
+import com.oceanprotocol.squid.models.AbstractModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonPropertyOrder(alphabetic=true)
+public class Condition extends AbstractModel implements FromJsonToModel {
+
+    @JsonProperty
+    public String name;
+
+    @JsonProperty
+    public boolean isTerminalCondition;
+
+    @JsonProperty
+    public boolean canBeFulfilledBeforeTimeout;
+
+    @JsonProperty
+    public ConditionKey conditionKey;
+
+    @JsonProperty
+    public List<ConditionParameter> parameters= new ArrayList<>();
+
+
+    public Condition() {}
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class ConditionParameter {
+
+        @JsonProperty
+        public String name;
+
+        @JsonProperty
+        public String type;
+
+        @JsonProperty
+        public Object value;
+
+        public ConditionParameter() {}
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class ConditionKey {
+
+        @JsonProperty
+        public String contractAddress;
+
+        @JsonProperty
+        public String fingerprint;
+
+        public ConditionKey() {}
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class Event {
+
+        @JsonProperty
+        public String name;
+
+        @JsonProperty
+        public String actorType;
+
+
+        @JsonProperty
+        public List<Handler> handlers;
+
+        public Event() {}
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class Handler {
+
+        @JsonProperty
+        public String moduleName;
+
+        @JsonProperty
+        public String functionName;
+
+        @JsonProperty
+        public String version;
+
+        public Handler() {}
+    }
+
+}

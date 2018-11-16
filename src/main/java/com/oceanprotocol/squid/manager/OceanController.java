@@ -1,13 +1,18 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -24,7 +29,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class OceanController extends BaseController {
@@ -51,10 +58,24 @@ public class OceanController extends BaseController {
         return new OceanController(keeperDto, aquariusDto);
     }
 
+    // TODO: This method is pending to be refactored
+    /**
+     * Given a DDO, returns a DID created using the ddo
+     * @param ddo
+     * @return DID
+     * @throws DID.DIDFormatException
+     */
     public DID generateDID(DDO ddo) throws DID.DIDFormatException {
         return DID.builder();
     }
 
+    /**
+     * Given a DID, scans the DIDRegistry events on-chain to resolve the
+     * Metadata API url and return the DDO found
+     * @param did
+     * @return DDO
+     * @throws IOException
+     */
     public DDO resolveDID(DID did) throws IOException {
 
         EthFilter didFilter = new EthFilter(
@@ -70,7 +91,7 @@ public class OceanController extends BaseController {
         //String didTopic= "0x" + EncodingHelper.encodeToHex(did.getHash());
         String didTopic= "0x" + did.getHash();
         String metadataTopic= "0x" + EncodingHelper.padRightWithZero(
-                EncodingHelper.encodeToHex(DDO.Service.serviceTypes.Metadata.toString()), 64);
+                EncodingHelper.encodeToHex(Service.serviceTypes.Metadata.toString()), 64);
 
         didFilter.addOptionalTopics(didTopic, metadataTopic);
 
@@ -102,15 +123,21 @@ public class OceanController extends BaseController {
     }
 
 
-
-
+    /**
+     * Given a DID and a Metadata API url, register on-chain the DID.
+     * It allows to resolve DDO's using DID's as input
+     * @param did
+     * @param url metadata url
+     * @return boolean success
+     * @throws Exception
+     */
     public boolean registerDID(DID did, String url) throws Exception{
-        log.debug("Registering DID " + did.getHash() + "into Registry " + didRegistry.getContractAddress());
+        log.debug("Registering DID " + did.getHash() + " into Registry " + didRegistry.getContractAddress());
 
         TransactionReceipt receipt= didRegistry.registerAttribute(
                 EncodingHelper.hexStringToBytes(did.getHash()),
                 DID_VALUE_TYPE,
-                EncodingHelper.byteArrayToByteArray32(EncodingHelper.stringToBytes(DDO.Service.serviceTypes.Metadata.toString())),
+                EncodingHelper.byteArrayToByteArray32(EncodingHelper.stringToBytes(Service.serviceTypes.Metadata.toString())),
                 url
         ).send();
 
@@ -119,14 +146,45 @@ public class OceanController extends BaseController {
         return true;
     }
 
-    // TODO: to be implemented
-    public Order getOrder(String orderId)   {
-        return null;
+    public DDO registerAsset(AssetMetadata metadata, String publicKey, String accessEndpoint, String purchaseEndpoint, int threshold) throws Exception {
+
+        // Initializing DDO
+        DDO ddo= new DDO(publicKey);
+
+        // Encrypting contentUrls and adding them to the Metadata
+        ArrayList<String> urls= new ArrayList<>();
+        urls.add(encryptContentUrls(ddo.getDid(), metadata.base.contentUrls, threshold));
+        metadata.base.contentUrls= urls;
+
+        // Definition of service endpoints
+        String metadataEndpoint= getAquariusDto().getDdoEndpoint() + "/{did}";
+
+        // Initialization of services supported for this asset
+        MetadataService metadataService= new MetadataService(metadata, metadataEndpoint, "0");
+        AccessService accessService= new AccessService(accessEndpoint, "1");
+        accessService.purchaseEndpoint= purchaseEndpoint;
+
+        // Initializing conditions and adding to Access service
+        AccessSLA sla= new AccessSLA();
+        accessService.conditions= sla.initializeConditions(
+                getAccessConditionParams(ddo.getDid().getHash(), Integer.parseInt(metadata.base.price)));
+
+        // Adding services to DDO
+        ddo.addService(metadataService)
+                .addService(accessService);
+
+        // Storing DDO
+        DDO createdDDO= getAquariusDto().createDDO(ddo);
+
+        // Registering DID
+        registerDID(ddo.getDid(), metadataEndpoint);
+
+        return createdDDO;
     }
 
     // TODO: to be implemented
-    public List<AssetMetadata> searchAssets()   {
-        return new ArrayList<>();
+    public Order getOrder(String orderId)   {
+        return null;
     }
 
     // TODO: to be implemented
@@ -134,9 +192,20 @@ public class OceanController extends BaseController {
         return new ArrayList<>();
     }
 
-    // TODO: to be implemented
-    public AssetMetadata register()   {
-        return null;
+    private String encryptContentUrls(DID did, ArrayList<String> contentUrls, int threshold) throws IOException {
+        String urls= "[" + StringsHelper.wrapWithQuotesAndJoin(contentUrls) + "]";
+        log.debug("Encrypting did: "+ did.getHash());
+        return getSecretStoreController().encryptDocument(did.getHash(), urls, threshold);
+
+    }
+
+    private Map<String, Object> getAccessConditionParams(String did, int price)  {
+        Map<String, Object> params= new HashMap<>();
+        params.put("parameter.did", did);
+        params.put("parameter.price", price);
+        params.put("contract.paymentConditions.address", paymentConditions.getContractAddress());
+        params.put("contract.accessConditions.address", accessConditions.getContractAddress());
+        return params;
     }
 
 

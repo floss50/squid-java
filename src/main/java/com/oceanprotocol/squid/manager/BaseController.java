@@ -1,6 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.*;
+import com.oceanprotocol.secretstore.core.EvmDto;
+import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import org.web3j.crypto.CipherException;
@@ -18,35 +20,119 @@ public abstract class BaseController {
 
     private KeeperDto keeperDto;
     private AquariusDto aquariusDto;
+    private SecretStoreDto secretStoreDto;
+    private EvmDto evmDto;
+    private SecretStoreController secretStoreController;
 
     protected OceanToken tokenContract;
     protected OceanMarket oceanMarket;
     protected DIDRegistry didRegistry;
+    protected ServiceAgreement serviceAgreement;
+    protected PaymentConditions paymentConditions;
+    protected AccessConditions accessConditions;
 
 
+    /**
+     * Constructor
+     * @param keeperDto KeeperDto
+     * @param aquariusDto AquariusDto
+     * @throws IOException
+     * @throws CipherException
+     */
     public BaseController(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
         this.keeperDto= keeperDto;
         this.aquariusDto = aquariusDto;
     }
 
+    /**
+     * Get the KeeperDto
+     * @return KeeperDto
+     */
     public KeeperDto getKeeperDto() {
         return keeperDto;
     }
 
+    /**
+     * Set the KeeperDto
+     * @param keeperDto KeeperDto
+     * @return this
+     */
     public BaseController setKeeperDto(KeeperDto keeperDto) {
         this.keeperDto = keeperDto;
         return this;
     }
 
+    /**
+     * Get the AquariusDto
+     * @return AquariusDto
+     */
     public AquariusDto getAquariusDto() {
         return aquariusDto;
     }
 
+    /**
+     * Set the AquariusDto
+     * @param aquariusDto AquariusDto
+     * @return this
+     */
     public BaseController setAquariusDto(AquariusDto aquariusDto) {
         this.aquariusDto = aquariusDto;
         return this;
     }
 
+    /**
+     * Get the SecretStoreDto
+     * @return SecretStoreDto
+     */
+    public SecretStoreDto getSecretStoreDto() {
+        return secretStoreDto;
+    }
+
+    /**
+     * Set the SecretStoreDto
+     * @param secretStoreDto SecretStoreDto
+     * @return this
+     */
+    public BaseController setSecretStoreDto(SecretStoreDto secretStoreDto) {
+        this.secretStoreDto = secretStoreDto;
+        return this;
+    }
+
+    /**
+     * Get the SecretStoreController
+     * @return SecretStoreDto
+     */
+    public SecretStoreController getSecretStoreController() {
+        return secretStoreController;
+    }
+
+    /**
+     * Set the SecretStoreController
+     * @param secretStoreController SecretStoreDto
+     * @return this
+     */
+    public BaseController setSecretStoreController(SecretStoreController secretStoreController) {
+        this.secretStoreController = secretStoreController;
+        return this;
+    }
+
+    /**
+     * Get the EvmDto
+     * @return EvmDto
+     */
+    public EvmDto getEvmDto() {
+        return evmDto;
+    }
+
+    /**
+     * Set the EvmDto necessary to stablish the encryption/decryption flow necessary by Secret Store
+     * @param evmDto EvmDto
+     * @return this
+     */
+    public BaseController setEvmDto(EvmDto evmDto) {
+        this.evmDto = evmDto;
+        return this;
+    }
 
     /**
      * Initialize the OceanToken object using the address given as parameter to point to the deployed contract
@@ -95,6 +181,36 @@ public abstract class BaseController {
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
                 getKeeperDto().getContractGasProvider());
+        return this;
+    }
+
+    /**
+     * It sets the ServiceAgreement stub instance
+     * @param contract ServiceAgreement instance
+     * @return BaseController instance
+     */
+    public BaseController setServiceAgreementContract(ServiceAgreement contract)    {
+        this.serviceAgreement= contract;
+        return this;
+    }
+
+    /**
+     * It sets the PaymentConditions stub instance
+     * @param contract PaymentConditions instance
+     * @return BaseController instance
+     */
+    public BaseController setPaymentConditionsContract(PaymentConditions contract)    {
+        this.paymentConditions= contract;
+        return this;
+    }
+
+    /**
+     * It sets the AccessConditions stub instance
+     * @param contract AccessConditions instance
+     * @return BaseController instance
+     */
+    public BaseController setAccessConditionsContract(AccessConditions contract)    {
+        this.accessConditions= contract;
         return this;
     }
 

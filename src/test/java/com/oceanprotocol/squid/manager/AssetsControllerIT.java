@@ -7,6 +7,7 @@ import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,9 @@ import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -58,7 +62,7 @@ public class AssetsControllerIT {
 
         objectMapper = new ObjectMapper();
 
-        TEST_ADDRESS = config.getString("account.address");
+        TEST_ADDRESS = config.getString("account.ganache.address");
     }
 
 
@@ -84,14 +88,45 @@ public class AssetsControllerIT {
 
     }
 
-    // TODO: Pending of Aquarius search method refactor
     @Test
-    public void search() throws Exception {
-        //manager.publishMetadata(metadataBase, METADATA_URL);
-        //manager.publishMetadata(metadataBase, METADATA_URL);
-        //manager.publishMetadata(metadataBase, METADATA_URL);
+    public void searchAssets() throws Exception {
+
+        DDO ddo1= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+        DDO ddo2= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+        DDO ddo3= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+        DDO ddo4= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+        DDO ddo5= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+
+        ddo1.generateDID();
+        ddo2.generateDID();
+        ddo3.generateDID();
+        ddo4.generateDID();
+        ddo5.generateDID();
+
+        String randomParam= UUID.randomUUID().toString().replaceAll("-","");
+        log.debug("Using random param for search: " + randomParam);
+
+//        ((MetadataService) ddo1.services.get(2)).metadata.base.type = randomParam;
+//        ((MetadataService) ddo2.services.get(2)).metadata.base.type = randomParam;
+//        ((MetadataService) ddo4.services.get(2)).metadata.base.name = "random name";
+        ddo1.metadata.base.type= randomParam;
+        ddo2.metadata.base.type= randomParam;
+        ddo4.metadata.base.name = "random name";
+
+        aquarius.createDDO(ddo1);
+        aquarius.createDDO(ddo2);
+        aquarius.createDDO(ddo3);
+        aquarius.createDDO(ddo4);
+        aquarius.createDDO(ddo5);
+
+        List<DDO> result1= manager.searchAssets(randomParam, 10, 0);
+
+        assertEquals(2, result1.size());
+        assertEquals(randomParam,result1.get(0).metadata.base.type);
+
 
 
     }
+
 
 }
