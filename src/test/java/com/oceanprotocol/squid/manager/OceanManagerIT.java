@@ -13,6 +13,7 @@ import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.Endpoints;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -26,7 +27,9 @@ import org.web3j.protocol.Web3j;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -108,7 +111,10 @@ public class OceanManagerIT {
         String consumeUrl= "http://mybrizo.org/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
         String purchaseEndpoint= "http://mybrizo.org/api/v1/brizo/services/access/initialize";
 
-        DDO ddo= manager.registerAsset(metadataBase, publicKey, consumeUrl, purchaseEndpoint, 0);
+
+        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+
+        DDO ddo= manager.registerAsset(metadataBase, publicKey, serviceEndpoints, 0);
         DDO resolvedDDO= manager.resolveDID(new DID(ddo.id));
 
         assertEquals(ddo.id, resolvedDDO.id);

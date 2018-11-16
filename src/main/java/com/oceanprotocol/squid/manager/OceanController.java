@@ -11,6 +11,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.Endpoints;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
@@ -146,7 +147,7 @@ public class OceanController extends BaseController {
         return true;
     }
 
-    public DDO registerAsset(AssetMetadata metadata, String publicKey, String accessEndpoint, String purchaseEndpoint, int threshold) throws Exception {
+    public DDO registerAsset(AssetMetadata metadata, String publicKey, Endpoints serviceEndpoints, int threshold) throws Exception {
 
         // Initializing DDO
         DDO ddo= new DDO(publicKey);
@@ -157,12 +158,18 @@ public class OceanController extends BaseController {
         metadata.base.contentUrls= urls;
 
         // Definition of service endpoints
-        String metadataEndpoint= getAquariusDto().getDdoEndpoint() + "/{did}";
+
+        String metadataEndpoint;
+        if (serviceEndpoints.getMetadataEndpoint() == null)
+            metadataEndpoint= getAquariusDto().getDdoEndpoint() + "/{did}";
+        else
+            metadataEndpoint= serviceEndpoints.getMetadataEndpoint();
+
 
         // Initialization of services supported for this asset
         MetadataService metadataService= new MetadataService(metadata, metadataEndpoint, "0");
-        AccessService accessService= new AccessService(accessEndpoint, "1");
-        accessService.purchaseEndpoint= purchaseEndpoint;
+        AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(), "1");
+        accessService.purchaseEndpoint= serviceEndpoints.getPurchaseEndpoint();
 
         // Initializing conditions and adding to Access service
         AccessSLA sla= new AccessSLA();
