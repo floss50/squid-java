@@ -154,8 +154,22 @@ public abstract class BaseController {
      * @param contract OceanToken instance
      * @return BaseController instance
      */
-    public BaseController setTokenContract(OceanToken contract)    {
+    public BaseController setTokenContract(OceanToken contract)   {
         this.tokenContract= contract;
+        return this;
+    }
+
+    /**
+     * Initialize the Token Contract given a contract address
+     * @param address OceanToken contract address
+     * @return BaseController instance
+     */
+    public BaseController initializeTokenContract(String address) throws Exception {
+        this.tokenContract= OceanToken.load(address,
+                getKeeperDto().getWeb3(),
+                getKeeperDto().getCredentials(),
+                getKeeperDto().getContractGasProvider()
+                );
         return this;
     }
 
@@ -166,6 +180,21 @@ public abstract class BaseController {
      */
     public BaseController setOceanMarketContract(OceanMarket contract)    {
         this.oceanMarket= contract;
+        return this;
+    }
+
+
+    /**
+     * Initialize the OceanMarket Contract given a contract address
+     * @param address OceanMarket contract address
+     * @return BaseController instance
+     */
+    public BaseController initializeOceanMarketContract(String address) throws Exception {
+        this.oceanMarket= OceanMarket.load(address,
+                getKeeperDto().getWeb3(),
+                getKeeperDto().getCredentials(),
+                getKeeperDto().getContractGasProvider()
+        );
         return this;
     }
 

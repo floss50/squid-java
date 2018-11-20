@@ -10,6 +10,7 @@ import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
@@ -102,37 +103,6 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         public Authentication() {}
     }
 
-/*
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
-    public static class Service {
-
-        public enum serviceTypes {Metadata, Compute, Consumption, Other};
-
-        @JsonProperty
-        public String id;
-
-        @JsonProperty
-        public String type;
-
-        @JsonProperty
-        public String serviceEndpoint;
-
-        @JsonProperty
-        public String description;
-
-        @JsonProperty
-        public Map<String, Object> additionalInfo= new HashMap<>();
-
-        //@JsonProperty
-        public AssetMetadata metadata;
-
-
-        public Service() {}
-
-
-    }
-*/
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
@@ -256,29 +226,16 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return did;
     }
 
-    /**
-     *future integration, test pending
-     */
-    /**
-     public DID generateDID(EdDSAPublicKey publicKey, EdDSAPrivateKey privateKey) throws DID.DIDGenerationException {
-     try {
-     String json = toJson();
-     byte[] sha3hash = CryptoHelper.getSha3HashRaw(json.getBytes(Charset.forName(MODEL_CHARSET)));
-     byte[] signature = CryptoHelper.sign(sha3hash, privateKey);
 
-     Ed25519Sha256Fulfillment fulfillment = new Ed25519Sha256Fulfillment(publicKey, signature);
 
-     this.proof= new Proof(DDO_PROOF_TYPE, publicKey.getA().toString(), fulfillment.getEncoded());
-     String idHash= CryptoHelper.getSha3HashHex(this.toJson().getBytes(MODEL_CHARSET));
-     log.debug("Id generated: " + idHash);
+    public AccessService getAccessService(String serviceDefinitionId) throws IOException {
+        for (Service service: services) {
+            if (service.serviceDefinitionId.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.Access.toString())) {
+                return (AccessService) service;
+            }
+        }
+        throw new IOException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
+    }
 
-     this.id= DID.getFromHash(idHash);
-     return this.id;
 
-     } catch (Exception ex)  {
-     log.error("Error generating DID " + ex.getMessage());
-     throw new DID.DIDGenerationException("Error generating DID " + ex.getMessage());
-     }
-     }
-     */
 }

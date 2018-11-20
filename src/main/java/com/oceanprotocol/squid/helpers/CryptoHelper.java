@@ -5,13 +5,25 @@ import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.Utils;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
+import org.web3j.crypto.Hash;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import com.google.common.base.Preconditions;
+import org.web3j.utils.Numeric;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Uint;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.generated.Uint64;
 
 public abstract class CryptoHelper {
 
@@ -20,6 +32,9 @@ public abstract class CryptoHelper {
      */
     private static final char[] DIGITS =
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    private static final BigInteger MASK_256 = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
+
 
     public static byte[] sign(byte[] hash, EdDSAPrivateKey privateKey)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
@@ -41,6 +56,20 @@ public abstract class CryptoHelper {
         md.update(input);
         String id = getHex(md.digest());
         return id;
+    }
+
+    public static byte[] soliditySha3(Object... data) {
+        if (data.length == 1) {
+            return Hash.sha3(toBytes(data[0]));
+        }
+        List<byte[]> arrays = Stream.of(data).map(CryptoHelper::toBytes).collect(Collectors.toList());
+        ByteBuffer buffer = ByteBuffer.allocate(arrays.stream().mapToInt(a -> a.length).sum());
+        for (byte[] a : arrays) {
+            buffer.put(a);
+        }
+        byte[] array = buffer.array();
+        assert buffer.position() == array.length;
+        return Hash.sha3(array);
     }
 
     /**
@@ -103,6 +132,36 @@ public abstract class CryptoHelper {
 
     public static String stringToHex(String arg) throws UnsupportedEncodingException {
         return String.format("%x", new BigInteger(1, arg.getBytes("UTF-8")));
+    }
+
+    public static byte[] toBytes(Object obj) {
+        if (obj instanceof byte[]) {
+            int length = ((byte[]) obj).length;
+            Preconditions.checkArgument(length <= 32);
+            if (length < 32) {
+                return Arrays.copyOf((byte[]) obj, 32);
+            }
+            return (byte[]) obj;
+        } else if (obj instanceof BigInteger) {
+            BigInteger value = (BigInteger) obj;
+            if (value.signum() < 0) {
+                value = MASK_256.and(value);
+            }
+            return Numeric.toBytesPadded(value, 32);
+        } else if (obj instanceof Address) {
+            Uint uint = ((Address) obj).toUint160();
+            return Numeric.toBytesPadded(uint.getValue(), 20);
+        } else if (obj instanceof Uint256) {
+            Uint uint = (Uint) obj;
+            return Numeric.toBytesPadded(uint.getValue(), 32);
+        } else if (obj instanceof Uint64) {
+            Uint uint = (Uint) obj;
+            return Numeric.toBytesPadded(uint.getValue(), 8);
+        } else if (obj instanceof Number) {
+            long l = ((Number) obj).longValue();
+            return toBytes(BigInteger.valueOf(l));
+        }
+        throw new IllegalArgumentException(obj.getClass().getName());
     }
 
 }

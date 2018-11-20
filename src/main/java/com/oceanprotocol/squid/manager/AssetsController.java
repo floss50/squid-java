@@ -1,11 +1,13 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.squid.core.sla.SlaManager;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AccessService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
@@ -79,5 +81,38 @@ public class AssetsController extends BaseController {
         }
         return new ArrayList<>();
     }
+
+    public String purchaseAsset(DID did, String serviceDefinitionId, String publicKey) throws IOException {
+
+        OceanController oceanController;
+        DDO ddo;
+
+        // 1. Generate Service Agreement Id
+        String serviceAgreementId= SlaManager.generateSlaId();
+
+
+        // Checking if DDO is already there and serviceDefinitionId is included
+        try {
+            oceanController= OceanController.getInstance(getKeeperDto(), getAquariusDto());
+            ddo= oceanController.resolveDID(did);
+        } catch (Exception e) {
+            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+
+        AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+
+        // 2. Consumer sign service details. It includes:
+        // (serviceAgreementId, templateId, conditionKeys, timeouts, conditionParameters)
+
+
+        // 3. Send agreement details to Publisher (Brizo endpoint). Params are:
+        // (did, serviceAgreementId, serviceDefinitionId, signature, consumerPublicKey)
+
+        // 4. Listening of events
+
+        return null;
+    }
+
 
 }

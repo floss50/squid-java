@@ -17,13 +17,25 @@ public class Condition extends AbstractModel implements FromJsonToModel {
     public String name;
 
     @JsonProperty
+    public List<Dependency> dependencies= new ArrayList<>();
+
+    @JsonProperty
+    public int timeout;
+
+    @JsonProperty
     public boolean isTerminalCondition;
 
     @JsonProperty
-    public boolean canBeFulfilledBeforeTimeout;
+    public String conditionKey;
 
     @JsonProperty
-    public ConditionKey conditionKey;
+    public String contractName;
+
+    @JsonProperty
+    public String functionName;
+
+    @JsonProperty
+    public int index;
 
     @JsonProperty
     public List<ConditionParameter> parameters= new ArrayList<>();
@@ -31,6 +43,19 @@ public class Condition extends AbstractModel implements FromJsonToModel {
 
     public Condition() {}
 
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class Dependency {
+
+        @JsonProperty
+        public String name;
+
+        @JsonProperty
+        public int timeout;
+
+        public Dependency() {}
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
@@ -46,19 +71,6 @@ public class Condition extends AbstractModel implements FromJsonToModel {
         public Object value;
 
         public ConditionParameter() {}
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
-    public static class ConditionKey {
-
-        @JsonProperty
-        public String contractAddress;
-
-        @JsonProperty
-        public String fingerprint;
-
-        public ConditionKey() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

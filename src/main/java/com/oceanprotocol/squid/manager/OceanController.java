@@ -147,10 +147,10 @@ public class OceanController extends BaseController {
         return true;
     }
 
-    public DDO registerAsset(AssetMetadata metadata, String publicKey, Endpoints serviceEndpoints, int threshold) throws Exception {
+    public DDO registerAsset(AssetMetadata metadata, String address, Endpoints serviceEndpoints, int threshold) throws Exception {
 
         // Initializing DDO
-        DDO ddo= new DDO(publicKey);
+        DDO ddo= new DDO(address);
 
         // Encrypting contentUrls and adding them to the Metadata
         ArrayList<String> urls= new ArrayList<>();
@@ -174,6 +174,8 @@ public class OceanController extends BaseController {
         // Initializing conditions and adding to Access service
         AccessSLA sla= new AccessSLA();
         accessService.conditions= sla.initializeConditions(
+                accessService.templateId,
+                address,
                 getAccessConditionParams(ddo.getDid().getHash(), Integer.parseInt(metadata.base.price)));
 
         // Adding services to DDO

@@ -2,9 +2,13 @@ package com.oceanprotocol.squid.helpers;
 
 import org.apache.commons.codec.binary.Hex;
 import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.crypto.Hash;
 import org.web3j.utils.Numeric;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class EncodingHelper {
 
@@ -26,6 +30,9 @@ public abstract class EncodingHelper {
         return byteValueLen32;
     }
 
+//    public static byte[] soliditySha3(String... params) {
+//        List<byte[]> arrays= Stream.of(params).map(Hash::sha3).collect(Collectors.toList());
+//    }
 
     /**
      * Encodes a String in Hex
