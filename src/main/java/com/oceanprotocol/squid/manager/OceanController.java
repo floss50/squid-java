@@ -1,7 +1,10 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
+import com.oceanprotocol.squid.core.sla.SlaManager;
 import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.dto.BrizoDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
@@ -10,10 +13,12 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.Endpoints;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.oceanprotocol.squid.models.service.Service;
+import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -59,7 +64,6 @@ public class OceanController extends BaseController {
         return new OceanController(keeperDto, aquariusDto);
     }
 
-    // TODO: This method is pending to be refactored
     /**
      * Given a DDO, returns a DID created using the ddo
      * @param ddo
@@ -176,7 +180,7 @@ public class OceanController extends BaseController {
         accessService.conditions= sla.initializeConditions(
                 accessService.templateId,
                 address,
-                getAccessConditionParams(ddo.getDid().getHash(), Integer.parseInt(metadata.base.price)));
+                getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
 
         // Adding services to DDO
         ddo.addService(metadataService)
@@ -189,6 +193,58 @@ public class OceanController extends BaseController {
         registerDID(ddo.getDid(), metadataEndpoint);
 
         return createdDDO;
+    }
+
+    public Flowable<ServiceAgreement.ExecuteAgreementEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
+
+        DDO ddo;
+
+        // 1. Generate Service Agreement Id
+        String serviceAgreementId= SlaManager.generateSlaId();
+
+        // Checking if DDO is already there and serviceDefinitionId is included
+        try {
+
+            ddo= resolveDID(did);
+        } catch (Exception e) {
+            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+
+        AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+
+        // 2. Consumer sign service details. It includes:
+        // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
+        String agreementSignature= accessService.generateServiceAgreementSignature(
+                getKeeperDto().getWeb3(),
+                getKeeperDto().getAddress(),
+                serviceAgreementId
+                );
+
+        InitializeAccessSLA initializePayload= new InitializeAccessSLA(
+                did.toString(),
+                serviceAgreementId,
+                serviceDefinitionId,
+                agreementSignature,
+                address
+        );
+
+        // 3. Send agreement details to Publisher (Brizo endpoint)
+        boolean isInitialized= BrizoDto.initializeAccessServiceAgreement(accessService.purchaseEndpoint, initializePayload);
+
+        if (!isInitialized)  {
+            throw new IOException("Unable to initialize SLA using Brizo");
+        }
+
+
+        // 4. Listening of events
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable = AccessSLA
+                .listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+
+        SlaManager slaManager= new SlaManager();
+        slaManager.registerExecuteAgreementFlowable(flowable);
+
+        return flowable;
     }
 
     // TODO: to be implemented

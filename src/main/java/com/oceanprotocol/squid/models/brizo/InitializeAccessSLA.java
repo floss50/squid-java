@@ -13,22 +13,22 @@ public class InitializeAccessSLA extends AbstractModel implements FromJsonToMode
     public String serviceAgreementId;
 
     @JsonProperty
-    public String tyserviceDefinitionId;
+    public String serviceDefinitionId;
 
     @JsonProperty
     public String signature;
 
     @JsonProperty
-    public String consumerPublicKey;
+    public String consumerAddress;
 
     public InitializeAccessSLA() {}
 
-    public InitializeAccessSLA(String did, String serviceAgreementId, String tyserviceDefinitionId, String signature, String consumerPublicKey) {
+    public InitializeAccessSLA(String did, String serviceAgreementId, String serviceDefinitionId, String signature, String consumerAddress) {
         this.did = did;
         this.serviceAgreementId = serviceAgreementId;
-        this.tyserviceDefinitionId = tyserviceDefinitionId;
+        this.serviceDefinitionId = serviceDefinitionId;
         this.signature = signature;
-        this.consumerPublicKey = consumerPublicKey;
+        this.consumerAddress = consumerAddress;
     }
 
     @Override
@@ -36,9 +36,9 @@ public class InitializeAccessSLA extends AbstractModel implements FromJsonToMode
         return "InitializeAccessSLA{" +
                 "did='" + did + '\'' +
                 ", serviceAgreementId='" + serviceAgreementId + '\'' +
-                ", tyserviceDefinitionId='" + tyserviceDefinitionId + '\'' +
+                ", serviceDefinitionId='" + serviceDefinitionId + '\'' +
                 ", signature='" + signature + '\'' +
-                ", consumerPublicKey='" + consumerPublicKey + '\'' +
+                ", consumerAddress='" + consumerAddress + '\'' +
                 '}';
     }
 }

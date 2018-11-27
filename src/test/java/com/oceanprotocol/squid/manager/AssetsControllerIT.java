@@ -124,9 +124,9 @@ public class AssetsControllerIT {
         assertEquals(2, result1.size());
         assertEquals(randomParam,result1.get(0).metadata.base.type);
 
-
-
     }
+
+
 
 
 }

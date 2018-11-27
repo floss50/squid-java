@@ -1,14 +1,18 @@
 package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
+import io.reactivex.Flowable;
+import org.web3j.abi.EventEncoder;
 import org.web3j.abi.datatypes.Address;
-import org.web3j.crypto.Hash;
-import org.web3j.utils.Numeric;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,6 +27,22 @@ public class AccessSLA implements SlaFunctions {
 
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
+
+    public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
+        EthFilter slaFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                slaContract.getContractAddress()
+        );
+
+        final Event event= slaContract.EXECUTEAGREEMENT_EVENT;
+        final String eventSignature= EventEncoder.encode(event);
+        String slaTopic= "0x" + serviceAgreementId;
+        slaFilter.addSingleTopic(eventSignature);
+        slaFilter.addOptionalTopics(slaTopic);
+
+        return slaContract.executeAgreementEventFlowable(slaFilter);
+    }
 
     public List<Condition> initializeConditions(String templateId, String address, Map<String, Object> params) throws IOException {
         params.putAll(getFunctionsFingerprints(templateId, address));

@@ -106,20 +106,23 @@ public class OceanManagerIT {
 
     @Test
     public void registerAsset() throws Exception {
-        String publicKey= config.getString("account.ganache.address");
-        String metadataUrl= "http://localhost:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://mybrizo.org/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
-        String purchaseEndpoint= "http://mybrizo.org/api/v1/brizo/services/access/initialize";
+        String publicKey= config.getString("account.parity.address");
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
 
         Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         DDO ddo= manager.registerAsset(metadataBase, publicKey, serviceEndpoints, 0);
-        DDO resolvedDDO= manager.resolveDID(new DID(ddo.id));
+        DID did= new DID(ddo.id);
+        DDO resolvedDDO= manager.resolveDID(did);
 
         assertEquals(ddo.id, resolvedDDO.id);
         assertEquals(metadataUrl, resolvedDDO.services.get(0).serviceEndpoint);
         assertTrue( resolvedDDO.services.size() == 2);
+
+        manager.purchaseAsset(did, "1", config.getString("account.parity.address2"));
     }
 
 
@@ -129,7 +132,7 @@ public class OceanManagerIT {
 
         DID did= DID.builder();
         String oldUrl= "http://mymetadata.io/api";
-        String newUrl= "http://localhost:5000/api/v1/aquarius/assets/ddo/{did}";
+        String newUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
 
         ddoBase.id = did.toString();
 

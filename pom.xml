@@ -17,9 +17,9 @@
 		<java.version>1.8</java.version>
         <final-name>squid</final-name>
 
-		<web3j.version>3.6.0</web3j.version>
-        <ocean.keeper.version>0.3.22</ocean.keeper.version>
-        <ocean.secretstore.version>0.0.3</ocean.secretstore.version>
+		<web3j.version>4.0.1</web3j.version>
+        <ocean.keeper.version>0.4.0</ocean.keeper.version>
+        <ocean.secretstore.version>0.0.4</ocean.secretstore.version>
 
         <eddsa.version>0.3.0</eddsa.version>
         <jackson.version>2.9.7</jackson.version>
