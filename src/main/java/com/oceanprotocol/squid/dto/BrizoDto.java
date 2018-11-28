@@ -13,12 +13,15 @@ public class BrizoDto {
     private static final Logger log = LogManager.getLogger(BrizoDto.class);
 
 
-    public static boolean initializeAccessServiceAgreement(String url, InitializeAccessSLA payload)   {
+    public static boolean initializeAccessServiceAgreement(String url, InitializeAccessSLA payload)  {
         log.debug("Initializing SLA[" + payload.serviceAgreementId + "]: " + url);
 
         try {
+            String payloadJson= payload.toJson();
+            log.debug(payloadJson);
+
             HttpResponse response = HttpHelper.httpClientPost(
-                    url, new ArrayList<>(), payload.toJson());
+                    url, new ArrayList<>(), payloadJson);
 
             if (response.getStatusCode() != 201) {
                 log.error("Unable to Initialize SLA: " + response.toString());
@@ -26,6 +29,7 @@ public class BrizoDto {
             }
         } catch (Exception e)   {
             log.error("Exception Initializing SLA: " + e.getMessage());
+
             return false;
         }
         return true;

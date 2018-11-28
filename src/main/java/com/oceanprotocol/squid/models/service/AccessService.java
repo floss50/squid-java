@@ -74,7 +74,8 @@ public class AccessService extends Service {
                     + EthereumHelper.remove0x(serviceAgreementId);
 
         //return EthereumHelper.remove0x(Hash.sha3(params));
-        return Hash.sha3(params);
+        //return Hash.sha3(params);
+        return params;
     }
 
     public String generateServiceAgreementSignature(Web3j web3, String address, String serviceAgreementId) throws IOException {
