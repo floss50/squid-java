@@ -5,22 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.oceanprotocol.squid.helpers.CryptoHelper.soliditySha3;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic=true)
 public class AccessService extends Service {
+
+    private static final Logger log = LogManager.getLogger(AccessService.class);
 
     @JsonProperty
     public String purchaseEndpoint;
@@ -67,29 +66,27 @@ public class AccessService extends Service {
      */
     public String generateServiceAgreementHash(String serviceAgreementId) throws IOException  {
         String params=
-            EthereumHelper.remove0x(templateId)
-                    + fetchConditionKeys(conditions)
-                    + fetchConditionValues(conditions)
+                    templateId
+                    + fetchConditionKeys()
+                    + fetchConditionValues()
                     + fetchTimeout()
-                    + EthereumHelper.remove0x(serviceAgreementId);
+                    + serviceAgreementId;
 
-        //return EthereumHelper.remove0x(Hash.sha3(params));
-        //return Hash.sha3(params);
-        return params;
+
+        //log.debug("Concatenation: " + params);
+        return Hash.sha3(EthereumHelper.remove0x(params));
+    }
+    public String generateServiceAgreementSignatureFromHash(Web3j web3, String address, String hash) throws IOException {
+        return EthereumHelper.ethSignMessage(web3, hash, address);
     }
 
     public String generateServiceAgreementSignature(Web3j web3, String address, String serviceAgreementId) throws IOException {
         String hash= generateServiceAgreementHash(serviceAgreementId);
-        return EthereumHelper.ethEncodeAndSignMessage(web3, hash, address);
+        return EthereumHelper.ethSignMessage(web3, hash, address);
     }
 
-    /**
-     * return web3.soliditySha3(
-     *      ['bytes32', 'bytes32[]', 'bytes32[]', 'uint256[]', 'bytes32'],
-     *      [sa_template_id, condition_keys, values_hash_list, timeouts, service_agreement_id]
-     */
 
-    public String fetchConditionKeys(List<Condition> conditions)  {
+    public String fetchConditionKeys()  {
         String conditionKeys= "";
 
         int counter= 0;
@@ -101,25 +98,32 @@ public class AccessService extends Service {
     }
 
 
-    public String fetchConditionValues(List<Condition> conditions) throws UnsupportedEncodingException {
+    public String fetchConditionValues() throws UnsupportedEncodingException {
         String data= "";
 
         int counter= 0;
         for (Condition condition: conditions)   {
+            String token= "";
             for (Condition.ConditionParameter param: condition.parameters) {
 
                 if (param.type.equals("string"))
-                    data= data + EthereumHelper.remove0x((String) param.value);
+                    token= token + EthereumHelper.remove0x((String) param.value);
                 else if (param.type.contains("bytes32"))
-                    data= data + EncodingHelper.hexEncodeAbiType("bytes32", param.value);
-                else if (param.type.startsWith("uint"))
-                    data= data + EncodingHelper.hexEncodeAbiType("uint", param.value);
+                    token= token + EthereumHelper.remove0x((String) param.value);
+                else if (param.type.contains("int"))
+                    token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
                 else
-                    data= data + EthereumHelper.remove0x((String) param.value);
+                    token= token + EthereumHelper.remove0x((String) param.value);
 
                 counter++;
             }
+            //log.debug("Token: " + token);
+            data= data + EthereumHelper.remove0x(Hash.sha3(token));
         }
+
+
+        //log.debug("ConditionValues String (HEX): " + data);
+        //log.debug("ConditionValues String (SHA3): " + Hash.sha3(data));
 
         return data;
     }

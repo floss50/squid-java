@@ -31,6 +31,13 @@ public abstract class EthereumHelper {
         return input.replaceAll("0x", "");
     }
 
+    public static String add0x(String input) {
+        if (!input.startsWith("0x"))
+            return "0x" + input;
+        return input;
+    }
+
+
     public static String getFunctionSelector(String functionDefinition)    {
         return Hash.sha3String(functionDefinition)
                 .substring(0, 10);

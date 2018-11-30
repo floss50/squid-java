@@ -206,7 +206,7 @@ public class OceanController extends BaseController {
         try {
 
             ddo= resolveDID(did);
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
             throw new IOException(e.getMessage());
         }

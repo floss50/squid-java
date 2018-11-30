@@ -5,31 +5,22 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
-import com.oceanprotocol.secretstore.core.EvmDto;
-import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.Endpoints;
-import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -108,8 +99,8 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
-        String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
 
 
         Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);

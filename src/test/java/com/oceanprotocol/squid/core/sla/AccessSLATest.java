@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.web3j.crypto.Hash;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -41,8 +42,8 @@ public class AccessSLATest {
     private static final String DID= "0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea";
     private static final String SERVICEAGREEMENT_ID= "0xf136d6fadecb48fdb2fc1fb420f5a5d1c32d22d9424e47ab9461556e058fefaa";
 
-    private static final String EXPECTED_HASH= "0x71dde05ab58b8ff8e08b2714b46c1f8ba3efb2a0333462e5d26421cc1f2b197e";
-    private static final String EXPECTED_SIGNATURE= "0xff0330d727973a6a32b5403202fb2bb0892fdb6613cade992e27b64135f63ee445d6ec49f445de75bff9e121599be444b27c04e55101f988a414bf1dbca4bc411b";
+    private static final String EXPECTED_HASH= "0x66652d0f8f8ec464e67aa6981c17fa1b1644e57d9cfd39b6f1b58ad1b71d61bb";
+    private static final String EXPECTED_SIGNATURE= "0x28fbc30b05fe7caf6d8082778ef3aabd17ceeb31d1bba2908354f999da55bb1878d7e2f7242f591d112fe7e93f9a98ef7d7a85af76e54c53f0b8ee5ced96e4271b";
 
     private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-generated-example-2.json";
 
@@ -100,7 +101,7 @@ public class AccessSLATest {
                 accessService.conditions.get(0).conditionKey.equals("0x2165e057ca19e807eaa52b6d5f82024021d1c1fbf92d3c53d2eb8a1a4de42d3f"));
 
         String agreementSignature= accessService.generateServiceAgreementHash(SERVICEAGREEMENT_ID);
-        assertEquals("044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d2165e057ca19e807eaa52b6d5f82024021d1c1fbf92d3c53d2eb8a1a4de42d3f5c0b248ab89b89638a6ef7020afbe7390c90c1debebfb93f06577a221e455655c7b899951bb944225768dcc8173572e641b4b62aad4d1f42f59132c6f4eb9a6274901f13c534f069cb9523bacb4f617f4724a2910eae6a82f6fcec7adf28ac4c307863623336636637386438376634636534613738346631376332613461363934663139663366626630356238313461633662306237313937313633383838383635000000000000000000000000000000000000000000000000000000000000000a307863623336636637386438376634636534613738346631376332613461363934663139663366626630356238313461633662306237313937313633383838383635307863623336636637386438376634636534613738346631376332613461363934663139663366626630356238313461633662306237313937313633383838383635307863623336636637386438376634636534613738346631376332613461363934663139663366626630356238313461633662306237313937313633383838383635000000000000000000000000000000000000000000000000000000000000000a307863623336636637386438376634636534613738346631376332613461363934663139663366626630356238313461633662306237313937313633383838383635000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000af136d6fadecb48fdb2fc1fb420f5a5d1c32d22d9424e47ab9461556e058fefaa",
+        assertEquals("0x66652d0f8f8ec464e67aa6981c17fa1b1644e57d9cfd39b6f1b58ad1b71d61bb",
                 agreementSignature);
 
     }
@@ -112,14 +113,38 @@ public class AccessSLATest {
         AccessService accessService= (AccessService) ddo.services.get(0);
 
         String hash= accessService.generateServiceAgreementHash(SERVICEAGREEMENT_ID);
-        String signature= accessService.generateServiceAgreementSignature(keeper.getWeb3(), keeper.getAddress(), SERVICEAGREEMENT_ID);
+        String signature= accessService.generateServiceAgreementSignatureFromHash(keeper.getWeb3(), keeper.getAddress(), hash);
+
+        final String hashTemplateId= Hash.sha3(TEMPLATE_ID);
+        final String hashConditionKeys= Hash.sha3(accessService.fetchConditionKeys());
+        final String hashConditionValues= Hash.sha3(accessService.fetchConditionValues());
+        final String hashTimeouts= Hash.sha3(accessService.fetchTimeout());
+        final String hashServiceAgreementId= Hash.sha3(SERVICEAGREEMENT_ID);
+
+        log.debug("Hash templateId: " + hashTemplateId);
+        log.debug("Hash conditionKeys: " + hashConditionKeys);
+        log.debug("Hash conditionValues: " + hashConditionValues);
+        log.debug("Hash Timeouts: " + hashTimeouts);
+        log.debug("Hash ServiceAgreementId: " + hashServiceAgreementId);
+
+
+
+        log.debug("\n-------\n");
 
         log.debug("Hash: " + hash);
         log.debug("Signature: " + signature);
-        assertTrue(signature.length() == 132);
 
-        assertEquals(EXPECTED_HASH, hash);
-        assertEquals(EXPECTED_SIGNATURE, signature);
+        assertEquals("hashTemplateId doesn't match", "0x40105d5bc10105c17fd72b93a8f73369e2ee6eee4d4714b7bf7bf3c2f156e601", hashTemplateId);
+        assertEquals("hashConditionKeys Hash doesn't match", "0x5b0fbb997b36bcc10d1543e071c2a859fe21ad8a9f18af6bdeb366a584d091b3", hashConditionKeys);
+        assertEquals("hashConditionValues doesn't match", "0xfbb8894170e025ff7aaf7c5278c16fa17f4ea3d1126623ebdac87bd91e70acc2", hashConditionValues);
+        assertEquals("hashTimeouts doesn't match", "0x4a0dd5c0cd0686c8feff15f4ec2ff2b3b7009451ee56eb3d10d75d8a7da95c7f", hashTimeouts);
+        assertEquals("hashServiceAgreementId doesn't match", "0x922c3379f6140ee422c40a900f23479d22737270ec1439ca87fcb321c6c0c692", hashServiceAgreementId);
+
+        assertEquals(EXPECTED_HASH.length(), hash.length());
+        assertEquals(EXPECTED_SIGNATURE.length(), signature.length());
+
+        assertEquals("Error matching the HASH", EXPECTED_HASH, hash);
+        assertEquals("Error matching the SIGNATURE", EXPECTED_SIGNATURE, signature);
     }
 
     @Test
