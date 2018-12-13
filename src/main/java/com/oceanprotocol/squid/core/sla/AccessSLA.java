@@ -5,12 +5,15 @@ import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.manager.BaseController;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Event;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
@@ -44,8 +47,9 @@ public class AccessSLA implements SlaFunctions {
         return slaContract.executeAgreementEventFlowable(slaFilter);
     }
 
-    public List<Condition> initializeConditions(String templateId, String address, Map<String, Object> params) throws IOException {
-        params.putAll(getFunctionsFingerprints(templateId, address));
+    public List<Condition> initializeConditions(String templateId, BaseController.ContractAddresses addresses, Map<String, Object> params) throws IOException {
+
+        params.putAll(getFunctionsFingerprints(templateId, addresses));
 
         if (conditionsTemplate == null)
             conditionsTemplate = new String(Files.readAllBytes(Paths.get(ACCESS_CONDITIONS_FILE_TEMPLATE)));
@@ -62,19 +66,33 @@ public class AccessSLA implements SlaFunctions {
                 .readValue(conditionsTemplate, new TypeReference<List<Condition>>() {});
     }
 
-    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,uint)";
+    /*
+    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
+    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
+    */
+
+    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,uint256)";
     private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32)";
-    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,uint)";
-    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,uint)";
+    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,uint256)";
+    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,uint256)";
 
     /**
      * Compose the different conditionKey hashes using:
      * (serviceAgreementTemplateId, address, signature)
      * @return Map of (varible name => conditionKeys)
      */
-    public Map<String, Object> getFunctionsFingerprints(String templateId, String address) throws UnsupportedEncodingException {
+    /*
+    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseController.ContractAddresses addresses) throws UnsupportedEncodingException {
+
+        String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());
+        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddres());
+
         byte[] bytesTemplateId= EncodingHelper.hexStringToBytes(templateId);
-        Address _address= new Address(address);
+
+        Address _addressPayment= new Address(checksumPaymentConditionsAddress);
+        Address _addressAccess= new Address(checksumAccessConditionsAddress);
 
                 Map<String, Object> fingerprints= new HashMap<>();
         fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
@@ -90,23 +108,76 @@ public class AccessSLA implements SlaFunctions {
                 FUNCTION_REFUNDPAYMENT_DEF));
 
         fingerprints.put("function.lockPayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_LOCKPAYMENT_DEF)
+                bytesTemplateId, _addressPayment, EthereumHelper.getFunctionSelectorBytes(FUNCTION_LOCKPAYMENT_DEF)
         ));
 
         fingerprints.put("function.grantAccess.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_GRANTACCESS_DEF)
+                bytesTemplateId, _addressAccess, EthereumHelper.getFunctionSelectorBytes(FUNCTION_GRANTACCESS_DEF)
         ));
 
         fingerprints.put("function.releasePayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_RELEASEPAYMENT_DEF)
+                bytesTemplateId, _addressPayment, EthereumHelper.getFunctionSelectorBytes(FUNCTION_RELEASEPAYMENT_DEF)
         ));
 
         fingerprints.put("function.refundPayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_REFUNDPAYMENT_DEF)
+                bytesTemplateId, _addressPayment, EthereumHelper.getFunctionSelectorBytes(FUNCTION_REFUNDPAYMENT_DEF)
         ));
 
         return fingerprints;
     }
+    */
+
+
+    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseController.ContractAddresses addresses) throws UnsupportedEncodingException {
+
+
+        String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());
+        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddres());
+
+        Map<String, Object> fingerprints= new HashMap<>();
+        fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
+                FUNCTION_LOCKPAYMENT_DEF));
+
+        fingerprints.put("function.grantAccess.fingerprint", EthereumHelper.getFunctionSelector(
+                FUNCTION_GRANTACCESS_DEF));
+
+        fingerprints.put("function.releasePayment.fingerprint", EthereumHelper.getFunctionSelector(
+                FUNCTION_RELEASEPAYMENT_DEF));
+
+        fingerprints.put("function.refundPayment.fingerprint", EthereumHelper.getFunctionSelector(
+                FUNCTION_REFUNDPAYMENT_DEF));
+
+        fingerprints.put("function.lockPayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF)));
+
+        fingerprints.put("function.grantAccess.conditionKey",
+                fetchConditionKey(templateId, checksumAccessConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF)));
+
+        fingerprints.put("function.releasePayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF)));
+
+        fingerprints.put("function.refundPayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_REFUNDPAYMENT_DEF)));
+
+
+        return fingerprints;
+    }
+
+    public static String fetchConditionKey(String templateId, String address, String fingerprint)   {
+
+        templateId = templateId.replaceAll("0x", "");
+        address = address.replaceAll("0x", "");
+        fingerprint = fingerprint.replaceAll("0x", "");
+
+        String params= templateId
+                + address
+                + fingerprint;
+
+        return Hash.sha3(params);
+    }
+
+
+
 
 
 }

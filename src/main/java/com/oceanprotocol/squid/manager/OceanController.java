@@ -3,6 +3,7 @@ package com.oceanprotocol.squid.manager;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.core.sla.SlaManager;
+import com.oceanprotocol.squid.core.sla.func.LockPayment;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.BrizoDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
@@ -13,11 +14,9 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
-import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.Endpoints;
-import com.oceanprotocol.squid.models.service.MetadataService;
-import com.oceanprotocol.squid.models.service.Service;
+import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,12 +31,12 @@ import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class OceanController extends BaseController {
@@ -172,14 +171,38 @@ public class OceanController extends BaseController {
 
         // Initialization of services supported for this asset
         MetadataService metadataService= new MetadataService(metadata, metadataEndpoint, "0");
-        AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(), "1");
+
+
+        // Definition of a DEFAULT ServiceAgreement Contract
+        AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
+        serviceAgreementContract.contractName = "ServiceAgreement";
+        serviceAgreementContract.fulfillmentOperator = 1;
+
+        // Execute Agreement Event
+        Condition.Event executeAgreementEvent = new Condition.Event();
+        executeAgreementEvent.name = "ExecuteAgreement";
+        executeAgreementEvent.actorType = "consumer";
+        // Handler
+        Condition.Handler handler = new Condition.Handler();
+        handler.moduleName = "payment";
+        handler.functionName = "lockPayment";
+        handler.version = "0.1";
+        executeAgreementEvent.handler = handler;
+
+        serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
+
+
+        AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(),
+                "1",
+                serviceAgreementContract);
+
         accessService.purchaseEndpoint= serviceEndpoints.getPurchaseEndpoint();
 
         // Initializing conditions and adding to Access service
         AccessSLA sla= new AccessSLA();
         accessService.conditions= sla.initializeConditions(
                 accessService.templateId,
-                address,
+                getContractAddresses(),
                 getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
 
         // Adding services to DDO
@@ -223,7 +246,7 @@ public class OceanController extends BaseController {
 
         InitializeAccessSLA initializePayload= new InitializeAccessSLA(
                 did.toString(),
-                serviceAgreementId,
+                "0x".concat(serviceAgreementId),
                 serviceDefinitionId,
                 agreementSignature,
                 address
@@ -241,10 +264,36 @@ public class OceanController extends BaseController {
         Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable = AccessSLA
                 .listenExecuteAgreement(serviceAgreement, serviceAgreementId);
 
-        SlaManager slaManager= new SlaManager();
-        slaManager.registerExecuteAgreementFlowable(flowable);
+
+        /*
+        SlaManager slaManager= new SlaManager(serviceAgreement, paymentConditions, accessConditions);
+        ServiceAgreement.ExecuteAgreementEventResponse executeAgreementEventResponse =
+                slaManager.registerExecuteAgreementFlowable(flowable, ddo);
+*/
+
+        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+
+        flowable.subscribe(event -> {
+
+            log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
+
+            if (event.state) {
+
+                LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
+
+            }
+
+        })
+        ;
 
         return flowable;
+    }
+
+
+    public void lockPayment(DID did, String serviceAgreementId) {
+
+
+
     }
 
     // TODO: to be implemented
@@ -270,7 +319,46 @@ public class OceanController extends BaseController {
         params.put("parameter.price", price);
         params.put("contract.paymentConditions.address", paymentConditions.getContractAddress());
         params.put("contract.accessConditions.address", accessConditions.getContractAddress());
+
+        params.put("parameter.assetId", did.replace("did:op:", ""));
+
         return params;
+    }
+
+
+    private BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
+
+        BasicAssetInfo assetInfo =  new BasicAssetInfo();
+
+        try {
+
+            List<Condition> conditions = accessService.conditions;
+            Condition lockCondition = conditions.stream()
+                    .filter(condition -> condition.name.equalsIgnoreCase("lockPayment"))
+                    .findFirst()
+                    .get();
+
+
+            String assetIdAsString = "";
+
+            for (Condition.ConditionParameter parameter : lockCondition.parameters) {
+
+                if (parameter.name.equalsIgnoreCase("assetId")) {
+                    assetInfo.setAssetId(EncodingHelper.hexStringToBytes((String) parameter.value));
+                }
+
+                if (parameter.name.equalsIgnoreCase("price")) {
+
+                    assetInfo.setPrice((Integer) parameter.value);
+                }
+            }
+        }  catch (UnsupportedEncodingException e) {
+
+    }
+
+
+        return assetInfo;
+
     }
 
 

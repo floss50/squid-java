@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.service.AccessService;
@@ -11,13 +12,18 @@ import com.oceanprotocol.squid.models.service.Condition;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.reactivex.Flowable;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.web3j.abi.TypeEncoder;
+import org.web3j.abi.datatypes.Address;
 import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -60,6 +66,7 @@ public class AccessSLATest {
 
     }
 
+    /*
     @Test
     public void initializeConditions() throws Exception {
 
@@ -105,6 +112,7 @@ public class AccessSLATest {
                 agreementSignature);
 
     }
+    */
 
     @Ignore
     @Test
@@ -165,6 +173,37 @@ public class AccessSLATest {
 
         SlaManager manager= new SlaManager();
         manager.registerExecuteAgreementFlowable(flowable);
+
+    }
+
+
+    @Test
+    public void fetchConditionKeyTest() throws UnsupportedEncodingException {
+
+        String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
+        String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
+
+        String targetGrantAccessConditionKey = "0x600b855012216922339cafd208590e02fdd8c8b8bbfd761d951976801a2b2b05";
+        String targetLockPaymentConditionKey = "0x1699b99d88626025f8b13de3b666cccec63eaf744d664d901a95b62c36d2b531";
+
+        String targetLockPaymentFingerprint = "0x668453f0";
+
+        String templateId = "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
+        String address =  Keys.toChecksumAddress("0x00bd138abd70e2f00903268f3db08f2d25677c9e");
+
+        String grantAccessFingerprint = EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF);
+        String lockPaymentFingerprint = EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF);
+
+        //assertEquals(fingerprint, targetLockPaymentFingerprint);
+
+        String grantAccessConditionKey = AccessSLA.fetchConditionKey(templateId, address, grantAccessFingerprint);
+        assertEquals(grantAccessConditionKey, targetGrantAccessConditionKey);
+
+
+        String lockPaymentConditionKey = AccessSLA.fetchConditionKey(templateId, address, lockPaymentFingerprint);
+        assertEquals(lockPaymentConditionKey, targetLockPaymentConditionKey);
+
+
 
     }
 

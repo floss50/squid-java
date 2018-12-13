@@ -25,6 +25,8 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.web3j.crypto.Keys;
+
 public class OceanManagerIT {
 
     private static final Logger log = LogManager.getLogger(OceanManagerIT.class);
@@ -99,13 +101,18 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume";//?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";//?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
         String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
 
+        String serviceAgreementAddress = saContract.getContractAddress();
 
         Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
-        DDO ddo= manager.registerAsset(metadataBase, publicKey, serviceEndpoints, 0);
+        DDO ddo= manager.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
+
         DID did= new DID(ddo.id);
         DDO resolvedDDO= manager.resolveDID(did);
 
@@ -113,7 +120,7 @@ public class OceanManagerIT {
         assertEquals(metadataUrl, resolvedDDO.services.get(0).serviceEndpoint);
         assertTrue( resolvedDDO.services.size() == 2);
 
-        manager.purchaseAsset(did, "1", config.getString("account.parity.address2"));
+         manager.purchaseAsset(did, "1", config.getString("account.parity.address2"));
     }
 
 
