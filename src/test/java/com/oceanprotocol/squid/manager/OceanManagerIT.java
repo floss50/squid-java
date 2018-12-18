@@ -5,6 +5,7 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
@@ -13,6 +14,7 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.Endpoints;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
@@ -37,8 +39,12 @@ public class OceanManagerIT {
     private static DDO ddoBase;
     private static AssetMetadata metadataBase;
 
-    private static OceanController manager;
-    private static KeeperDto keeper;
+    private static OceanController managerPublisher;
+    private static OceanController managerConsumer;
+
+    private static KeeperDto keeperPublisher;
+    private static KeeperDto keeperConsumer;
+
     private static AquariusDto aquarius;
     private static SecretStoreController secretStore;
 
@@ -49,23 +55,61 @@ public class OceanManagerIT {
 
     private static final Config config = ConfigFactory.load();
 
+
+    private static final String DID_REGISTRY_CONTRACT;
+    static {
+        DID_REGISTRY_CONTRACT = config.getString("contract.didRegistry.address");
+    }
+
+    private static final String SERVICE_AGREEMENT_CONTRACT;
+    static {
+        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.serviceAgreement.address");
+    }
+
+    private static final String PAYMENT_CONDITIONS_CONTRACT;
+    static {
+        PAYMENT_CONDITIONS_CONTRACT = config.getString("contract.paymentConditions.address");
+    }
+
+    private static final String ACCESS_CONDITIONS_CONTRACT;
+    static {
+        ACCESS_CONDITIONS_CONTRACT = config.getString("contract.accessConditions.address");
+    }
+
     @BeforeClass
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
 
         // Initializing DTO's
-        keeper= ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
+        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
-        didRegistry= ManagerHelper.deployDIDRegistryContract(keeper);
-        saContract= ManagerHelper.deployServiceAgreementContract(keeper);
-        accessConditions= ManagerHelper.deployAccessConditionsContract(keeper, saContract.getContractAddress());
-        paymentConditions= ManagerHelper.deployPaymentConditionsContract(keeper, saContract.getContractAddress(), accessConditions.getContractAddress());
+        /*
+        didRegistry= ManagerHelper.deployDIDRegistryContract(keeperPublisher);
+        saContract= ManagerHelper.deployServiceAgreementContract(keeperPublisher);
+        accessConditions= ManagerHelper.deployAccessConditionsContract(keeperPublisher, saContract.getContractAddress());
+        paymentConditions= ManagerHelper.deployPaymentConditionsContract(keeperPublisher, saContract.getContractAddress(), accessConditions.getContractAddress());
+*/
+        didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
+        saContract= ManagerHelper.loadServiceAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
+        accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
+        paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
 
-        // Initializing the OceanController
-        manager= OceanController.getInstance(keeper, aquarius);
-        manager.setSecretStoreController(secretStore)
+        // Initializing the OceanController for the Publisher
+        managerPublisher = OceanController.getInstance(keeperPublisher, aquarius);
+        managerPublisher.setSecretStoreController(secretStore)
+                .setDidRegistryContract(didRegistry)
+                .setServiceAgreementContract(saContract)
+                .setPaymentConditionsContract(paymentConditions)
+                .setAccessConditionsContract(accessConditions);
+
+
+        // Initializing the OceanController for the Consumer
+        managerConsumer = OceanController.getInstance(keeperConsumer, aquarius);
+        managerConsumer.setSecretStoreController(secretStore)
                 .setDidRegistryContract(didRegistry)
                 .setServiceAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
@@ -84,9 +128,9 @@ public class OceanManagerIT {
     public void getInstance() {
         // Checking if web3j driver included in KeeperDto implements the Web3j interface
         assertTrue(
-                manager.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
+                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
         assertTrue(
-                manager.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
+                managerPublisher.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }
 
 
@@ -99,21 +143,57 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume";//?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";//?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
         String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
 
+        String serviceAgreementAddress = saContract.getContractAddress();
 
         Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
-        DDO ddo= manager.registerAsset(metadataBase, publicKey, serviceEndpoints, 0);
+
+
+        DDO ddo= managerPublisher.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
+
         DID did= new DID(ddo.id);
-        DDO resolvedDDO= manager.resolveDID(did);
+        DDO resolvedDDO= managerPublisher.resolveDID(did);
 
         assertEquals(ddo.id, resolvedDDO.id);
         assertEquals(metadataUrl, resolvedDDO.services.get(0).serviceEndpoint);
         assertTrue( resolvedDDO.services.size() == 2);
 
-        manager.purchaseAsset(did, "1", config.getString("account.parity.address2"));
+    }
+
+
+    @Test
+    public void purchaseAsset() throws Exception {
+
+        String publicKey= config.getString("account.parity.address");
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume";//?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";//?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+
+        String serviceDefinitionId = "1";
+
+        String serviceAgreementAddress = saContract.getContractAddress();
+
+        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+
+
+        DDO ddo= managerPublisher.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
+
+        DID did= new DID(ddo.id);
+
+
+        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
+        managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
+        managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId());
+
     }
 
 
@@ -130,13 +210,13 @@ public class OceanManagerIT {
         ddoBase.services.get(0).serviceEndpoint = newUrl;
         aquarius.createDDO(ddoBase);
 
-        boolean didRegistered= manager.registerDID(did, oldUrl);
+        boolean didRegistered= managerPublisher.registerDID(did, oldUrl);
         assertTrue(didRegistered);
 
         log.debug("Registering " + did.toString());
-        manager.registerDID(did, newUrl);
+        managerPublisher.registerDID(did, newUrl);
 
-        DDO ddo= manager.resolveDID(did);
+        DDO ddo= managerPublisher.resolveDID(did);
         assertEquals(did.getDid(), ddo.id);
         assertEquals(newUrl, ddo.services.get(0).serviceEndpoint);
     }

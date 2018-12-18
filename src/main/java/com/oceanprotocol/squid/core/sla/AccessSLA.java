@@ -1,16 +1,18 @@
 package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.manager.BaseController;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
 import org.web3j.abi.EventEncoder;
-import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Event;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
@@ -28,6 +30,36 @@ public class AccessSLA implements SlaFunctions {
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
 
+
+    public static class SLAResponse {
+
+        private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable;
+        private String serviceAgreementId;
+
+        public SLAResponse( Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable,
+                            String serviceAgreementId) {
+            this.flowable = flowable;
+            this.serviceAgreementId = serviceAgreementId;
+        }
+
+
+        public Flowable<ServiceAgreement.ExecuteAgreementEventResponse> getFlowable() {
+            return flowable;
+        }
+
+        public void setFlowable(Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
+            this.flowable = flowable;
+        }
+
+        public String getServiceAgreementId() {
+            return serviceAgreementId;
+        }
+
+        public void setServiceAgreementId(String serviceAgreementId) {
+            this.serviceAgreementId = serviceAgreementId;
+        }
+    }
+
     public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
@@ -44,8 +76,30 @@ public class AccessSLA implements SlaFunctions {
         return slaContract.executeAgreementEventFlowable(slaFilter);
     }
 
-    public List<Condition> initializeConditions(String templateId, String address, Map<String, Object> params) throws IOException {
-        params.putAll(getFunctionsFingerprints(templateId, address));
+
+    public static Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
+                                                                                                  String serviceAgreementId)   {
+
+        EthFilter grantedFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                accessConditions.getContractAddress()
+        );
+
+        final Event event= AccessConditions.ACCESSGRANTED_EVENT;
+        final String eventSignature= EventEncoder.encode(event);
+        String slaTopic= "0x" + serviceAgreementId;
+
+        grantedFilter.addSingleTopic(eventSignature);
+        grantedFilter.addOptionalTopics(slaTopic);
+
+
+        return accessConditions.accessGrantedEventFlowable(grantedFilter);
+    }
+
+    public List<Condition> initializeConditions(String templateId, BaseController.ContractAddresses addresses, Map<String, Object> params) throws IOException {
+
+        params.putAll(getFunctionsFingerprints(templateId, addresses));
 
         if (conditionsTemplate == null)
             conditionsTemplate = new String(Files.readAllBytes(Paths.get(ACCESS_CONDITIONS_FILE_TEMPLATE)));
@@ -62,21 +116,24 @@ public class AccessSLA implements SlaFunctions {
                 .readValue(conditionsTemplate, new TypeReference<List<Condition>>() {});
     }
 
-    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,uint)";
-    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32)";
-    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,uint)";
-    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,uint)";
+    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
+    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
+
 
     /**
      * Compose the different conditionKey hashes using:
      * (serviceAgreementTemplateId, address, signature)
      * @return Map of (varible name => conditionKeys)
      */
-    public Map<String, Object> getFunctionsFingerprints(String templateId, String address) throws UnsupportedEncodingException {
-        byte[] bytesTemplateId= EncodingHelper.hexStringToBytes(templateId);
-        Address _address= new Address(address);
+    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseController.ContractAddresses addresses) throws UnsupportedEncodingException {
 
-                Map<String, Object> fingerprints= new HashMap<>();
+
+        String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());
+        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddres());
+
+        Map<String, Object> fingerprints= new HashMap<>();
         fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_LOCKPAYMENT_DEF));
 
@@ -89,24 +146,44 @@ public class AccessSLA implements SlaFunctions {
         fingerprints.put("function.refundPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_REFUNDPAYMENT_DEF));
 
-        fingerprints.put("function.lockPayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_LOCKPAYMENT_DEF)
-        ));
+        fingerprints.put("function.lockPayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF)));
 
-        fingerprints.put("function.grantAccess.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_GRANTACCESS_DEF)
-        ));
+        fingerprints.put("function.grantAccess.conditionKey",
+                fetchConditionKey(templateId, checksumAccessConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF)));
 
-        fingerprints.put("function.releasePayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_RELEASEPAYMENT_DEF)
-        ));
+        fingerprints.put("function.releasePayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF)));
 
-        fingerprints.put("function.refundPayment.conditionKey", CryptoHelper.soliditySha3(
-                bytesTemplateId, _address, EthereumHelper.getFunctionSelectorBytes(FUNCTION_REFUNDPAYMENT_DEF)
-        ));
+        fingerprints.put("function.refundPayment.conditionKey",
+                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_REFUNDPAYMENT_DEF)));
+
 
         return fingerprints;
     }
+
+    /**
+     * Calculates the conditionKey
+     * @param templateId
+     * @param address Checksum address
+     * @param fingerprint
+     * @return
+     */
+    public static String fetchConditionKey(String templateId, String address, String fingerprint)   {
+
+        templateId = templateId.replaceAll("0x", "");
+        address = address.replaceAll("0x", "");
+        fingerprint = fingerprint.replaceAll("0x", "");
+
+        String params= templateId
+                + address
+                + fingerprint;
+
+        return Hash.sha3(params);
+    }
+
+
+
 
 
 }

@@ -23,7 +23,7 @@ public class Condition extends AbstractModel implements FromJsonToModel {
     public int timeout;
 
     @JsonProperty
-    public boolean isTerminalCondition;
+    public int isTerminalCondition;
 
     @JsonProperty
     public String conditionKey;
@@ -40,6 +40,8 @@ public class Condition extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public List<ConditionParameter> parameters= new ArrayList<>();
 
+    @JsonProperty
+    public List<Event> events= new ArrayList<>();
 
     public Condition() {}
 
@@ -83,9 +85,8 @@ public class Condition extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public String actorType;
 
-
         @JsonProperty
-        public List<Handler> handlers;
+        public Handler handler;
 
         public Event() {}
     }

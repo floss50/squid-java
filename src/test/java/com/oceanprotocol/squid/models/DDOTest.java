@@ -2,10 +2,12 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.Condition;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
@@ -21,6 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -138,6 +143,20 @@ public class DDOTest {
         assertEquals("http://service.net", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getJSONArray("contentUrls").get(0));
 
     }
+
+
+    private Map<String, Object> getAccessConditionParams(String did, int price)  {
+        Map<String, Object> params= new HashMap<>();
+        params.put("parameter.did", did);
+        params.put("parameter.price", price);
+        params.put("contract.paymentConditions.address", "0xaaaabbbccc");
+        params.put("contract.accessConditions.address", "0xbbbbccccdddd");
+
+        params.put("parameter.assetId", did.replace("did:op:", ""));
+
+        return params;
+    }
+
 
 
 }

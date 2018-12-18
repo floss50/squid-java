@@ -37,6 +37,21 @@ public abstract class ManagerHelper {
         return keeper;
     }
 
+
+    public static KeeperDto getKeeper(Config config, VmClient client, String nAddress) throws IOException, CipherException {
+        KeeperDto keeper= KeeperDto.getInstance(
+                config.getString("keeper.url"),
+                config.getString("account." + client.toString() + ".address" + nAddress),
+                config.getString("account." + client.toString() + ".password" + nAddress),
+                config.getString("account." + client.toString() + ".file" + nAddress)
+        );
+
+        keeper.setGasLimit(BigInteger.valueOf(config.getLong("keeper.gasLimit")))
+                .setGasPrice(BigInteger.valueOf(config.getLong("keeper.gasPrice")));
+
+        return keeper;
+    }
+
     public static AquariusDto getAquarius(Config config) {
         return AquariusDto.getInstance(config.getString("aquarius.url"));
     }
@@ -69,6 +84,14 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider()).send();
     }
 
+    public static OceanToken loadOceanTokenContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+        return OceanToken.load(
+                address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider());
+    }
+
     public static OceanMarket deployOceanMarketContract(KeeperDto keeper, String tokenAddress)
             throws Exception {
         return OceanMarket.deploy(
@@ -77,6 +100,16 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider(),
                 tokenAddress
                 ).send();
+    }
+
+    public static OceanMarket loadOceanMarketContract(KeeperDto keeper, String address)
+            throws Exception {
+        return OceanMarket.load(
+                address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
     }
 
     public static DIDRegistry deployDIDRegistryContract(KeeperDto keeper)
@@ -89,11 +122,30 @@ public abstract class ManagerHelper {
         ).send();
     }
 
+    public static DIDRegistry loadDIDRegistryContract(KeeperDto keeper, String address)
+            throws Exception {
+
+        return DIDRegistry.load(
+                address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
+
     public static ServiceAgreement deployServiceAgreementContract(KeeperDto keeper) throws Exception, IOException, CipherException {
         return ServiceAgreement.deploy(
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()).send();
+    }
+
+    public static ServiceAgreement loadServiceAgreementContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+        return ServiceAgreement.load(
+                address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider());
     }
 
 
@@ -107,6 +159,15 @@ public abstract class ManagerHelper {
         ).send();
     }
 
+    public static PaymentConditions loadPaymentConditionsContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+        return PaymentConditions.load(
+                address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
+
 
     public static AccessConditions deployAccessConditionsContract(KeeperDto keeper, String saAddress) throws Exception, IOException, CipherException {
         return AccessConditions.deploy(
@@ -115,6 +176,14 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider(),
                 saAddress
         ).send();
+    }
+
+    public static AccessConditions loadAccessConditionsContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+        return AccessConditions.load(address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+                );
     }
 
 }

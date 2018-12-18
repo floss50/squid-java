@@ -1,8 +1,10 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.core.sla.SlaManager;
+import com.oceanprotocol.squid.core.sla.func.LockPayment;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.BrizoDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
@@ -13,11 +15,9 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
-import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.Endpoints;
-import com.oceanprotocol.squid.models.service.MetadataService;
-import com.oceanprotocol.squid.models.service.Service;
+import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,25 +26,27 @@ import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class OceanController extends BaseController {
 
     static final Logger log= LogManager.getLogger(OceanController.class);
 
-    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(0);
+    // TODO  Check the business logic in squid-py related with this DID Types !!!
+    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
 
 
     protected OceanController(KeeperDto keeperDto, AquariusDto aquariusDto)
@@ -172,14 +174,39 @@ public class OceanController extends BaseController {
 
         // Initialization of services supported for this asset
         MetadataService metadataService= new MetadataService(metadata, metadataEndpoint, "0");
-        AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(), "1");
+
+
+        // Definition of a DEFAULT ServiceAgreement Contract
+        AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
+        serviceAgreementContract.contractName = "ServiceAgreement";
+        serviceAgreementContract.fulfillmentOperator = 1;
+
+        // Execute Agreement Event
+        Condition.Event executeAgreementEvent = new Condition.Event();
+        executeAgreementEvent.name = "ExecuteAgreement";
+        executeAgreementEvent.actorType = "consumer";
+        // Handler
+        Condition.Handler handler = new Condition.Handler();
+        handler.moduleName = "payment";
+        handler.functionName = "lockPayment";
+        handler.version = "0.1";
+        executeAgreementEvent.handler = handler;
+
+        serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
+
+
+        AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(),
+                "1",
+                serviceAgreementContract);
+
+
         accessService.purchaseEndpoint= serviceEndpoints.getPurchaseEndpoint();
 
         // Initializing conditions and adding to Access service
         AccessSLA sla= new AccessSLA();
         accessService.conditions= sla.initializeConditions(
                 accessService.templateId,
-                address,
+                getContractAddresses(),
                 getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
 
         // Adding services to DDO
@@ -195,7 +222,7 @@ public class OceanController extends BaseController {
         return createdDDO;
     }
 
-    public Flowable<ServiceAgreement.ExecuteAgreementEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
+    public AccessSLA.SLAResponse initializePurchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
 
         DDO ddo;
 
@@ -217,16 +244,16 @@ public class OceanController extends BaseController {
         // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
         String agreementSignature= accessService.generateServiceAgreementSignature(
                 getKeeperDto().getWeb3(),
-                getKeeperDto().getAddress(),
+                address,
                 serviceAgreementId
                 );
 
         InitializeAccessSLA initializePayload= new InitializeAccessSLA(
                 did.toString(),
-                serviceAgreementId,
+                "0x".concat(serviceAgreementId),
                 serviceDefinitionId,
                 agreementSignature,
-                address
+                Keys.toChecksumAddress(address)
         );
 
         // 3. Send agreement details to Publisher (Brizo endpoint)
@@ -238,13 +265,48 @@ public class OceanController extends BaseController {
 
 
         // 4. Listening of events
-        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable = AccessSLA
-                .listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+       return  new AccessSLA.SLAResponse(AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId),
+               serviceAgreementId);
 
-        SlaManager slaManager= new SlaManager();
-        slaManager.registerExecuteAgreementFlowable(flowable);
+    }
 
-        return flowable;
+
+    public void lockPayment(String serviceDefinitionId, Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
+
+        flowable.subscribe(event -> {
+
+            if (event.state) {
+
+                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
+                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
+
+                DID did =  new DID(EncodingHelper.toHexString(event.did));
+                DDO ddo;
+
+                try {
+
+                    ddo = resolveDID(did);
+
+                } catch (IOException e) {
+                    log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+                    throw new IOException(e.getMessage());
+                }
+
+                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+                BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+
+                LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
+
+            }
+        });
+
+    }
+
+    public Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
+                                                                                        String serviceAgreementId)
+    {
+        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
+
     }
 
     // TODO: to be implemented
@@ -270,7 +332,45 @@ public class OceanController extends BaseController {
         params.put("parameter.price", price);
         params.put("contract.paymentConditions.address", paymentConditions.getContractAddress());
         params.put("contract.accessConditions.address", accessConditions.getContractAddress());
+
+        params.put("parameter.assetId", did.replace("did:op:", "0x"));
+
         return params;
+    }
+
+
+    private BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
+
+        BasicAssetInfo assetInfo =  new BasicAssetInfo();
+
+        try {
+
+            List<Condition> conditions = accessService.conditions;
+            Condition lockCondition = conditions.stream()
+                    .filter(condition -> condition.name.equalsIgnoreCase("lockPayment"))
+                    .findFirst()
+                    .get();
+
+
+            String assetIdAsString = "";
+
+            for (Condition.ConditionParameter parameter : lockCondition.parameters) {
+
+                if (parameter.name.equalsIgnoreCase("assetId")) {
+                    assetInfo.setAssetId(EncodingHelper.hexStringToBytes((String) parameter.value));
+                }
+
+                if (parameter.name.equalsIgnoreCase("price")) {
+
+                    assetInfo.setPrice((Integer) parameter.value);
+                }
+            }
+        }  catch (UnsupportedEncodingException e) {
+
+            }
+
+        return assetInfo;
+
     }
 
 

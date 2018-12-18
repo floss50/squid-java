@@ -27,9 +27,10 @@ public class AccessService extends Service {
     @JsonProperty
     public List<Condition> conditions= new ArrayList<>();
 
+    @JsonProperty
     public ServiceAgreementContract serviceAgreementContract;
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    //@JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
     public static class ServiceAgreementContract {
 
@@ -41,7 +42,6 @@ public class AccessService extends Service {
 
         @JsonProperty
         public List<Condition.Event> events= new ArrayList<>();
-
 
         public ServiceAgreementContract() {}
     }
@@ -55,6 +55,16 @@ public class AccessService extends Service {
     public AccessService(String serviceEndpoint, String serviceDefinitionId)  {
         super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
         this.templateId= ACCESS_TEMPLATE_ID;
+    }
+
+
+    public AccessService(String serviceEndpoint, String serviceDefinitionId,
+                         ServiceAgreementContract serviceAgreementContract
+    )  {
+        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        this.templateId= ACCESS_TEMPLATE_ID;
+        this.serviceAgreementContract = serviceAgreementContract;
+
     }
 
     /**
@@ -111,9 +121,11 @@ public class AccessService extends Service {
                 else if (param.type.contains("bytes32"))
                     token= token + EthereumHelper.remove0x((String) param.value);
                 else if (param.type.contains("int"))
-                    token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                  // token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                  if (param.value instanceof String)
+                        token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", Integer.parseInt((String)param.value)));
                 else
-                    token= token + EthereumHelper.remove0x((String) param.value);
+                      token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
 
                 counter++;
             }

@@ -32,6 +32,38 @@ public abstract class BaseController {
     protected AccessConditions accessConditions;
 
 
+    protected ContractAddresses contractAddresses  = new ContractAddresses();
+
+
+    public static class ContractAddresses {
+
+        private String paymentConditionsAddress;
+        private String accessConditionsAddres;
+
+        public ContractAddresses(){}
+
+        public ContractAddresses(String paymentConditionsAddress, String accessConditionsAddres){
+            this.paymentConditionsAddress = paymentConditionsAddress;
+            this.accessConditionsAddres = accessConditionsAddres;
+        }
+
+        public String getPaymentConditionsAddress() {
+            return paymentConditionsAddress;
+        }
+
+        public void setPaymentConditionsAddress(String paymentConditionsAddress) {
+            this.paymentConditionsAddress = paymentConditionsAddress;
+        }
+
+        public String getAccessConditionsAddres() {
+            return accessConditionsAddres;
+        }
+
+        public void setAccessConditionsAddres(String accessConditionsAddres) {
+            this.accessConditionsAddres = accessConditionsAddres;
+        }
+    }
+
     /**
      * Constructor
      * @param keeperDto KeeperDto
@@ -42,6 +74,11 @@ public abstract class BaseController {
     public BaseController(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
         this.keeperDto= keeperDto;
         this.aquariusDto = aquariusDto;
+    }
+
+
+    public ContractAddresses getContractAddresses() {
+        return contractAddresses;
     }
 
     /**
@@ -230,6 +267,7 @@ public abstract class BaseController {
      */
     public BaseController setPaymentConditionsContract(PaymentConditions contract)    {
         this.paymentConditions= contract;
+        this.contractAddresses.setPaymentConditionsAddress(this.paymentConditions.getContractAddress());
         return this;
     }
 
@@ -240,6 +278,7 @@ public abstract class BaseController {
      */
     public BaseController setAccessConditionsContract(AccessConditions contract)    {
         this.accessConditions= contract;
+        this.contractAddresses.setAccessConditionsAddres(this.accessConditions.getContractAddress());
         return this;
     }
 
