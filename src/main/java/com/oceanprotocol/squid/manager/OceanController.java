@@ -1,5 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.core.sla.SlaManager;
@@ -25,6 +26,7 @@ import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
@@ -43,7 +45,8 @@ public class OceanController extends BaseController {
 
     static final Logger log= LogManager.getLogger(OceanController.class);
 
-    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(0);
+    // TODO  Check the business logic in squid-py related with this DID Types !!!
+    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
 
 
     protected OceanController(KeeperDto keeperDto, AquariusDto aquariusDto)
@@ -196,6 +199,7 @@ public class OceanController extends BaseController {
                 "1",
                 serviceAgreementContract);
 
+
         accessService.purchaseEndpoint= serviceEndpoints.getPurchaseEndpoint();
 
         // Initializing conditions and adding to Access service
@@ -218,7 +222,7 @@ public class OceanController extends BaseController {
         return createdDDO;
     }
 
-    public Flowable<ServiceAgreement.ExecuteAgreementEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
+    public AccessSLA.SLAResponse initializePurchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
 
         DDO ddo;
 
@@ -240,7 +244,7 @@ public class OceanController extends BaseController {
         // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
         String agreementSignature= accessService.generateServiceAgreementSignature(
                 getKeeperDto().getWeb3(),
-                getKeeperDto().getAddress(),
+                address,
                 serviceAgreementId
                 );
 
@@ -249,7 +253,7 @@ public class OceanController extends BaseController {
                 "0x".concat(serviceAgreementId),
                 serviceDefinitionId,
                 agreementSignature,
-                address
+                Keys.toChecksumAddress(address)
         );
 
         // 3. Send agreement details to Publisher (Brizo endpoint)
@@ -261,38 +265,47 @@ public class OceanController extends BaseController {
 
 
         // 4. Listening of events
-        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable = AccessSLA
-                .listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+       return  new AccessSLA.SLAResponse(AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId),
+               serviceAgreementId);
+
+    }
 
 
-        /*
-        SlaManager slaManager= new SlaManager(serviceAgreement, paymentConditions, accessConditions);
-        ServiceAgreement.ExecuteAgreementEventResponse executeAgreementEventResponse =
-                slaManager.registerExecuteAgreementFlowable(flowable, ddo);
-*/
-
-        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+    public void lockPayment(String serviceDefinitionId, Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
 
         flowable.subscribe(event -> {
 
-            log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
-
             if (event.state) {
+
+                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
+                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
+
+                DID did =  new DID(EncodingHelper.toHexString(event.did));
+                DDO ddo;
+
+                try {
+
+                    ddo = resolveDID(did);
+
+                } catch (IOException e) {
+                    log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+                    throw new IOException(e.getMessage());
+                }
+
+                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+                BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
                 LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
 
             }
+        });
 
-        })
-        ;
-
-        return flowable;
     }
 
-
-    public void lockPayment(DID did, String serviceAgreementId) {
-
-
+    public Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
+                                                                                        String serviceAgreementId)
+    {
+        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
 
     }
 
@@ -320,7 +333,7 @@ public class OceanController extends BaseController {
         params.put("contract.paymentConditions.address", paymentConditions.getContractAddress());
         params.put("contract.accessConditions.address", accessConditions.getContractAddress());
 
-        params.put("parameter.assetId", did.replace("did:op:", ""));
+        params.put("parameter.assetId", did.replace("did:op:", "0x"));
 
         return params;
     }
@@ -354,8 +367,7 @@ public class OceanController extends BaseController {
             }
         }  catch (UnsupportedEncodingException e) {
 
-    }
-
+            }
 
         return assetInfo;
 

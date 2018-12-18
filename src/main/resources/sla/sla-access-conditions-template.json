@@ -126,7 +126,7 @@
       "timeout": 1
     }
   ],
-  "timeout": 1,
+  "timeout": 86400,
   "isTerminalCondition": 1,
   "conditionKey": "{function.refundPayment.conditionKey}",
   "contractName": "PaymentConditions",

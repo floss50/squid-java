@@ -56,36 +56,4 @@ public class LockPayment {
 
     }
 
-
-   public static void listenForGrantedAccess(AccessConditions accessConditions,
-                                             String serviceAgreementId,
-                                             BasicAssetInfo assetInfo) {
-
-        EthFilter grantedFilter = new EthFilter(
-                   DefaultBlockParameterName.EARLIEST,
-                   DefaultBlockParameterName.LATEST,
-                   accessConditions.getContractAddress()
-           );
-
-       final Event event= AccessConditions.ACCESSGRANTED_EVENT;
-       final String eventSignature= EventEncoder.encode(event);
-       String slaTopic= "0x" + serviceAgreementId;
-
-       grantedFilter.addSingleTopic(eventSignature);
-       grantedFilter.addOptionalTopics(slaTopic);
-
-/*
-       accessConditions
-               .accessGrantedEventFlowable(grantedFilter)
-               .subscribe();
-
-
-       }
-
-
-*/
-
-   }
-
-
 }
