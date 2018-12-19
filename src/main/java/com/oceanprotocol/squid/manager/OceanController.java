@@ -19,8 +19,11 @@ import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
@@ -32,13 +35,18 @@ import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class OceanController extends BaseController {
@@ -309,6 +317,52 @@ public class OceanController extends BaseController {
 
     }
 
+
+    public void consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath,) throws IOException {
+
+        consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
+    }
+
+
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath,, int threshold) throws IOException {
+
+        DDO ddo;
+
+        try {
+
+            ddo = resolveDID(did);
+        } catch (IOException e) {
+            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+
+        String serviceEndpoint = ddo.getAccessService(serviceDefinitionId).serviceEndpoint;
+        List<String> contentUrls = StringsHelper.getStringsFromJoin( decryptContentUrls(did,  ddo.metadata.base.contentUrls.get(0), threshold));
+
+        for (String url: contentUrls) {
+
+            // For each url we call to consume Brizo endpoint that requires consumerAddress, serviceAgreementId and url as a parameters
+            try {
+
+                String fileName = url.substring(url.lastIndexOf("/"));
+
+                InputStream dataStream = BrizoDto.consumeUrl(serviceEndpoint, consumerAddress, serviceAgreementId, url);
+                String destinationPath = basePath + File.separator + fileName;
+
+                FileUtils.copyInputStreamToFile(dataStream, new File(fileName));
+
+                return true;
+
+            } catch (URISyntaxException e) {
+                log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Malformed URL. " + e.getMessage());
+            } catch (IOException e) {
+                log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Error downloading. " + e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
     // TODO: to be implemented
     public Order getOrder(String orderId)   {
         return null;
@@ -323,6 +377,12 @@ public class OceanController extends BaseController {
         String urls= "[" + StringsHelper.wrapWithQuotesAndJoin(contentUrls) + "]";
         log.debug("Encrypting did: "+ did.getHash());
         return getSecretStoreController().encryptDocument(did.getHash(), urls, threshold);
+
+    }
+
+    private String decryptContentUrls(DID did, String encryptedUrls, int threshold) throws IOException {
+        log.debug("Decrypting did: "+ did.getHash());
+        return getSecretStoreController().decryptDocument(did.getHash(), encryptedUrls);
 
     }
 
