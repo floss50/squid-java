@@ -318,13 +318,13 @@ public class OceanController extends BaseController {
     }
 
 
-    public void consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath,) throws IOException {
+    public void consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws IOException {
 
         consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
     }
 
 
-    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath,, int threshold) throws IOException {
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath, int threshold) throws IOException {
 
         DDO ddo;
 
