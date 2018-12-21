@@ -16,8 +16,9 @@
       * [Table of Contents](#table-of-contents)
       * [Features](#features)
       * [Next methods to integrate](#next-methods-to-integrate)
-         * [Installing the library](#installing-the-library)
+        * [Installing the library](#installing-the-library)
       * [How to run the integration tests](#how-to-run-the-integration-tests)
+      * [New Version](#new-version)
       * [License](#license)
 
 
@@ -127,6 +128,10 @@ mvn clean -Dtest=*IT test
 
 Run the Secret Store methods require to connect to a Parity EVM client, so if you are using Ganache it's not going to work.
 
+
+## New Version
+
+The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version.
 
 
 ## License
