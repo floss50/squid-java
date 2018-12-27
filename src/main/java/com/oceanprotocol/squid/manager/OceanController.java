@@ -19,11 +19,9 @@ import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
@@ -41,12 +39,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 
 public class OceanController extends BaseController {
@@ -236,7 +229,24 @@ public class OceanController extends BaseController {
         return SlaManager.generateSlaId();
     }
 
-    public  Flowable<ServiceAgreement.ExecuteAgreementEventResponse>  initializePurchaseAsset(DID did, String serviceDefinitionId, String address,  String serviceAgreementId) throws IOException {
+
+    public boolean syncPurchaseAsset(DID did, String serviceDefinitionId, String address,  String serviceAgreementId) throws IOException {
+
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = this.initializeServiceAgreement(did, serviceDefinitionId, address, serviceAgreementId);
+        ServiceAgreement.ExecuteAgreementEventResponse executeAgreementEventResponse = slaResponse.blockingFirst();
+
+        if (!EncodingHelper.toHexString(executeAgreementEventResponse.serviceAgreementId).equals(serviceAgreementId))
+            return false;  // TODO Raise Functional Exception
+
+        this.lockPayment(did, serviceDefinitionId, serviceAgreementId);
+
+        AccessConditions.AccessGrantedEventResponse accessGrantedEventResponse = this.listenForGrantedAccess(accessConditions, serviceAgreementId)
+                .blockingFirst();
+
+        return true;
+    }
+
+    public  Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
         DDO ddo;
 

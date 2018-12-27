@@ -5,20 +5,12 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
-import com.oceanprotocol.squid.core.sla.AccessSLA;
-import com.oceanprotocol.squid.core.sla.SlaManager;
-import com.oceanprotocol.squid.core.sla.func.LockPayment;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
-import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.Endpoints;
-import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.reactivex.Flowable;
@@ -28,14 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -207,8 +193,8 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        //AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
-        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+        //AccessSLA.SLAResponse slaResponse = managerConsumer.initializeServiceAgreement(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializeServiceAgreement(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
         managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
         managerConsumer.listenForGrantedAccess(accessConditions, serviceAgreementId);
 
@@ -264,9 +250,10 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializeServiceAgreement(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
         ServiceAgreement.ExecuteAgreementEventResponse r = slaResponse.blockingFirst();
         managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
+
 
         /*
 
