@@ -6,12 +6,16 @@ import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
+import com.oceanprotocol.squid.core.sla.func.LockPayment;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
+import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.Endpoints;
 import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
@@ -23,6 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -89,8 +94,14 @@ public class OceanManagerIT {
 
 
         // Initializing DTO's
-        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        // This works
+        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+
+        // This doesn't
+        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+
 
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
@@ -193,7 +204,9 @@ public class OceanManagerIT {
 
         DID did= new DID(ddo.id);
 
-        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
+
+        //AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
+        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"));
         managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
         managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId());
 
@@ -220,6 +233,71 @@ public class OceanManagerIT {
         DDO ddo= managerPublisher.resolveDID(did);
         assertEquals(did.getDid(), ddo.id);
         assertEquals(newUrl, ddo.services.get(0).serviceEndpoint);
+    }
+
+
+    @Test
+    public void consumerAsset() throws Exception {
+
+        String publicKey= config.getString("account.parity.address");
+
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+
+        String serviceDefinitionId = "1";
+
+        String serviceAgreementAddress = saContract.getContractAddress();
+
+        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+
+        DDO ddo= managerPublisher.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
+
+        DID did= new DID(ddo.id);
+
+        log.debug("DDO registered!");
+
+        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
+
+        ServiceAgreement.ExecuteAgreementEventResponse r = slaResponse.getFlowable().blockingFirst();
+        managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
+
+        /*
+
+        Alternative lockPayment method
+        We must handle the flowable outside lockPayment method
+
+        slaResponse.getFlowable()
+                .subscribe(event -> {
+
+                            if (event.state) {
+
+                                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
+                                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
+
+                                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+                                BasicAssetInfo assetInfo = managerConsumer.getBasicAssetInfo(accessService);
+
+                                managerConsumer.lockPayment(did, serviceDefinitionId, serviceAgreementId);
+
+                            }
+                        }
+
+                );
+        */
+        log.debug("Waiting for granted Access............");
+        AccessConditions.AccessGrantedEventResponse response = managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId())
+        .blockingFirst();
+
+        String serviceAgreementId = EncodingHelper.toHexString(response.serviceId);
+        log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
+
+        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
+
+
     }
 
 

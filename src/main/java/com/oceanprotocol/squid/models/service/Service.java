@@ -11,8 +11,13 @@ import com.oceanprotocol.squid.models.AbstractModel;
 public class Service extends AbstractModel implements FromJsonToModel {
 
 
+    @JsonIgnore
     public static final String CONSUMER_ADDRESS_PARAM = "consumerAddress";
+
+    @JsonIgnore
     public static final String SERVICE_AGREEMENT_PARAM = "serviceAgreementId";
+
+    @JsonIgnore
     public static final String URL_PARAM = "url";
 
     public enum serviceTypes {Access, Metadata, FitchainCompute, CloudCompute};

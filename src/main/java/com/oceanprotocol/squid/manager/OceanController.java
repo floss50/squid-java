@@ -310,6 +310,28 @@ public class OceanController extends BaseController {
 
     }
 
+
+    public boolean lockPayment(DID did, String serviceDefinitionId, String serviceAgreementId) throws IOException {
+
+        DDO ddo;
+
+        try {
+
+            ddo = resolveDID(did);
+
+        } catch (IOException e) {
+            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+
+        AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+
+        return LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
+
+
+    }
+
     public Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
                                                                                         String serviceAgreementId)
     {
@@ -399,7 +421,7 @@ public class OceanController extends BaseController {
     }
 
 
-    private BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
+    public  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
 
         BasicAssetInfo assetInfo =  new BasicAssetInfo();
 
