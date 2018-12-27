@@ -7,6 +7,7 @@ import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -144,8 +145,27 @@ public class OceanManagerIT {
 
     }
 
+    private DDO newRegisteredAsset() throws Exception {
+
+        String publicKey= config.getString("account.parity.address");
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+
+        String serviceAgreementAddress = saContract.getContractAddress();
+
+        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+
+        return managerPublisher.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
+
+    }
+
     @Test
     public void registerAsset() throws Exception {
+
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
@@ -171,24 +191,11 @@ public class OceanManagerIT {
 
 
     @Test
-    public void purchaseAsset() throws Exception {
-
-        String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
-        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+    public void purchaseAssetOld() throws Exception {
 
         String serviceDefinitionId = "1";
 
-        String serviceAgreementAddress = saContract.getContractAddress();
-
-        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
-
-        DDO ddo= managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
-                serviceEndpoints,
-                0);
-
+        DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
@@ -198,6 +205,25 @@ public class OceanManagerIT {
         managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
         managerConsumer.listenForGrantedAccess(accessConditions, serviceAgreementId);
 
+    }
+
+
+    @Test
+    public void purchaseAsset() throws Exception {
+
+        String serviceDefinitionId = "1";
+
+        DDO ddo= newRegisteredAsset();
+        DID did= new DID(ddo.id);
+
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
+
+        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+
+        // blocking for testing purpose
+        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+        assertEquals(serviceAgreementId, event.serviceId);
     }
 
     @Test
@@ -227,23 +253,9 @@ public class OceanManagerIT {
     @Test
     public void consumerAsset() throws Exception {
 
-        String publicKey= config.getString("account.parity.address");
-
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
-        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
-
         String serviceDefinitionId = "1";
 
-        String serviceAgreementAddress = saContract.getContractAddress();
-
-        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
-
-        DDO ddo= managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
-                serviceEndpoints,
-                0);
-
+        DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
         log.debug("DDO registered!");
@@ -253,7 +265,6 @@ public class OceanManagerIT {
         Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializeServiceAgreement(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
         ServiceAgreement.ExecuteAgreementEventResponse r = slaResponse.blockingFirst();
         managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
-
 
         /*
 

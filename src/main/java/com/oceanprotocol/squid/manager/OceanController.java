@@ -230,20 +230,22 @@ public class OceanController extends BaseController {
     }
 
 
-    public boolean syncPurchaseAsset(DID did, String serviceDefinitionId, String address,  String serviceAgreementId) throws IOException {
 
-        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = this.initializeServiceAgreement(did, serviceDefinitionId, address, serviceAgreementId);
-        ServiceAgreement.ExecuteAgreementEventResponse executeAgreementEventResponse = slaResponse.blockingFirst();
+    public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
-        if (!EncodingHelper.toHexString(executeAgreementEventResponse.serviceAgreementId).equals(serviceAgreementId))
-            return false;  // TODO Raise Functional Exception
+        return this.initializeServiceAgreement(did, serviceDefinitionId, address, serviceAgreementId)
+                .map(event -> EncodingHelper.toHexString(event.serviceAgreementId))
+                .switchMap(eventServiceAgreementId -> {
+                    this.lockPayment(did, serviceDefinitionId, eventServiceAgreementId);
+                    return this.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                });
+                /* OR
+                .concatMap((eventServiceAgreementId -> {
+                    this.lockPayment(did, serviceDefinitionId, eventServiceAgreementId);
+                    return this.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                })
+                */
 
-        this.lockPayment(did, serviceDefinitionId, serviceAgreementId);
-
-        AccessConditions.AccessGrantedEventResponse accessGrantedEventResponse = this.listenForGrantedAccess(accessConditions, serviceAgreementId)
-                .blockingFirst();
-
-        return true;
     }
 
     public  Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
@@ -292,6 +294,7 @@ public class OceanController extends BaseController {
     }
 
 
+    // TODO Deprecated
     public void lockPayment(String serviceDefinitionId, Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
 
         flowable.subscribe(event -> {
@@ -384,15 +387,15 @@ public class OceanController extends BaseController {
                 InputStream dataStream = BrizoDto.consumeUrl(serviceEndpoint, consumerAddress, serviceAgreementId, url);
                 String destinationPath = basePath + File.separator + fileName;
 
-                FileUtils.copyInputStreamToFile(dataStream, new File(fileName));
-
-                return true;
+                FileUtils.copyInputStreamToFile(dataStream, new File(destinationPath));
 
             } catch (URISyntaxException e) {
                 log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Malformed URL. " + e.getMessage());
             } catch (IOException e) {
                 log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Error downloading. " + e.getMessage());
             }
+
+            return true;
         }
 
         return false;
