@@ -230,12 +230,15 @@ public class OceanController extends BaseController {
         return createdDDO;
     }
 
-    public AccessSLA.SLAResponse initializePurchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
+
+    public String getNewServiceAgreementId() {
+
+        return SlaManager.generateSlaId();
+    }
+
+    public  Flowable<ServiceAgreement.ExecuteAgreementEventResponse>  initializePurchaseAsset(DID did, String serviceDefinitionId, String address,  String serviceAgreementId) throws IOException {
 
         DDO ddo;
-
-        // 1. Generate Service Agreement Id
-        String serviceAgreementId= SlaManager.generateSlaId();
 
         // Checking if DDO is already there and serviceDefinitionId is included
         try {
@@ -273,8 +276,8 @@ public class OceanController extends BaseController {
 
 
         // 4. Listening of events
-       return  new AccessSLA.SLAResponse(AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId),
-               serviceAgreementId);
+       return  AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+
 
     }
 
@@ -421,7 +424,7 @@ public class OceanController extends BaseController {
     }
 
 
-    public  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
+    private  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
 
         BasicAssetInfo assetInfo =  new BasicAssetInfo();
 

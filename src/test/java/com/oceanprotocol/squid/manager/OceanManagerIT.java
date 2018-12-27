@@ -6,6 +6,7 @@ import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
+import com.oceanprotocol.squid.core.sla.SlaManager;
 import com.oceanprotocol.squid.core.sla.func.LockPayment;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
@@ -204,11 +205,12 @@ public class OceanManagerIT {
 
         DID did= new DID(ddo.id);
 
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        //AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
-        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"));
-        managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
-        managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId());
+        //AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+        managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
+        managerConsumer.listenForGrantedAccess(accessConditions, serviceAgreementId);
 
     }
 
@@ -260,46 +262,38 @@ public class OceanManagerIT {
 
         log.debug("DDO registered!");
 
-        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        ServiceAgreement.ExecuteAgreementEventResponse r = slaResponse.getFlowable().blockingFirst();
-        managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
+        Flowable<ServiceAgreement.ExecuteAgreementEventResponse> slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
+        ServiceAgreement.ExecuteAgreementEventResponse r = slaResponse.blockingFirst();
+        managerConsumer.lockPayment(serviceDefinitionId, slaResponse);
 
         /*
 
         Alternative lockPayment method
         We must handle the flowable outside lockPayment method
 
-        slaResponse.getFlowable()
+        slaResponse
                 .subscribe(event -> {
 
                             if (event.state) {
 
-                                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
-                                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
+                                String eventServiceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
+                                log.debug("Receiving event - " + eventServiceAgreementId);
 
-                                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
-                                BasicAssetInfo assetInfo = managerConsumer.getBasicAssetInfo(accessService);
-
-                                managerConsumer.lockPayment(did, serviceDefinitionId, serviceAgreementId);
-
+                                managerConsumer.lockPayment(did, serviceDefinitionId, eventServiceAgreementId);
                             }
                         }
-
                 );
         */
         log.debug("Waiting for granted Access............");
-        AccessConditions.AccessGrantedEventResponse response = managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId())
+        AccessConditions.AccessGrantedEventResponse response = managerConsumer.listenForGrantedAccess(accessConditions, serviceAgreementId)
         .blockingFirst();
 
-        String serviceAgreementId = EncodingHelper.toHexString(response.serviceId);
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-
         managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
 
-
     }
-
 
     @Test
     public void getOrder() {
