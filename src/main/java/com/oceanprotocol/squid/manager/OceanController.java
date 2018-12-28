@@ -223,32 +223,12 @@ public class OceanController extends BaseController {
         return createdDDO;
     }
 
-
     public String getNewServiceAgreementId() {
 
         return SlaManager.generateSlaId();
     }
 
-
-
     public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
-
-        return this.initializeServiceAgreement(did, serviceDefinitionId, address, serviceAgreementId)
-                .map(event -> EncodingHelper.toHexString(event.serviceAgreementId))
-                .switchMap(eventServiceAgreementId -> {
-                    this.lockPayment(did, serviceDefinitionId, eventServiceAgreementId);
-                    return this.listenForGrantedAccess(accessConditions, serviceAgreementId);
-                });
-                /* OR
-                .concatMap((eventServiceAgreementId -> {
-                    this.lockPayment(did, serviceDefinitionId, eventServiceAgreementId);
-                    return this.listenForGrantedAccess(accessConditions, serviceAgreementId);
-                })
-                */
-
-    }
-
-    public  Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
         DDO ddo;
 
@@ -261,9 +241,25 @@ public class OceanController extends BaseController {
             throw new IOException(e.getMessage());
         }
 
+
+        return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
+                .map(event -> EncodingHelper.toHexString(event.serviceAgreementId))
+                .switchMap(eventServiceAgreementId -> {
+                    if (eventServiceAgreementId.isEmpty())
+                        return Flowable.empty();
+                    else {
+                        this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
+                        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                    }
+                });
+
+    }
+
+    private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
+
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
 
-        // 2. Consumer sign service details. It includes:
+        //  Consumer sign service details. It includes:
         // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
         String agreementSignature= accessService.generateServiceAgreementSignature(
                 getKeeperDto().getWeb3(),
@@ -286,79 +282,24 @@ public class OceanController extends BaseController {
             throw new IOException("Unable to initialize SLA using Brizo");
         }
 
-
         // 4. Listening of events
        return  AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
 
-
     }
 
 
-    // TODO Deprecated
-    public void lockPayment(String serviceDefinitionId, Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
-
-        flowable.subscribe(event -> {
-
-            if (event.state) {
-
-                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
-                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
-
-                DID did =  new DID(EncodingHelper.toHexString(event.did));
-                DDO ddo;
-
-                try {
-
-                    ddo = resolveDID(did);
-
-                } catch (IOException e) {
-                    log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
-                    throw new IOException(e.getMessage());
-                }
-
-                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
-                BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
-
-                LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
-
-            }
-        });
-
-    }
-
-
-    public boolean lockPayment(DID did, String serviceDefinitionId, String serviceAgreementId) throws IOException {
-
-        DDO ddo;
-
-        try {
-
-            ddo = resolveDID(did);
-
-        } catch (IOException e) {
-            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
-            throw new IOException(e.getMessage());
-        }
+    private boolean lockPayment(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws IOException {
 
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        return LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
-
-
-    }
-
-    public Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
-                                                                                        String serviceAgreementId)
-    {
-        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
-
+        return LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, assetInfo);
     }
 
 
-    public void consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws IOException {
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws IOException {
 
-        consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
+        return consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
     }
 
 
@@ -450,8 +391,6 @@ public class OceanController extends BaseController {
                     .get();
 
 
-            String assetIdAsString = "";
-
             for (Condition.ConditionParameter parameter : lockCondition.parameters) {
 
                 if (parameter.name.equalsIgnoreCase("assetId")) {
@@ -463,7 +402,8 @@ public class OceanController extends BaseController {
                     assetInfo.setPrice((Integer) parameter.value);
                 }
             }
-        }  catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
+            log.error("Exception encoding serviceAgreement " + e.getMessage());
 
             }
 
