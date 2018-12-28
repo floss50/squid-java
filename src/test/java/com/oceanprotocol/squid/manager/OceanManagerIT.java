@@ -82,13 +82,13 @@ public class OceanManagerIT {
 
 
         // Initializing DTO's
-        // This works
-        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        // This works with serviceAgreement's signature
+        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
 
         // This doesn't
-        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
-        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
 
 
         aquarius= ManagerHelper.getAquarius(config);
@@ -201,7 +201,7 @@ public class OceanManagerIT {
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
 
         // blocking for testing purpose
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
