@@ -7,11 +7,21 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -22,6 +32,14 @@ public abstract class HttpHelper {
     protected static final Logger log = LogManager.getLogger(HttpHelper.class);
 
     private HttpHelper() {
+    }
+
+    static class DownloadResponseHandler implements ResponseHandler<InputStream> {
+
+        @Override
+        public InputStream handleResponse(org.apache.http.HttpResponse response) throws ClientProtocolException, IOException {
+            return  response.getEntity().getContent();
+        }
     }
 
     /**
@@ -154,5 +172,37 @@ public abstract class HttpHelper {
         }
         return response;
     }
+
+
+    /**
+     * Download the content of a resource
+     * @param url
+     * @return InputStream with the binary content of the resource
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static InputStream downloadResource(String url) throws IOException, URISyntaxException {
+
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setRedirectStrategy(new LaxRedirectStrategy()) // adds HTTP REDIRECT support to GET and POST methods
+                .build();
+
+        try {
+
+            HttpGet get = new HttpGet(new URL(url).toURI()); // we're using GET but it could be via POST as well
+            return httpclient.execute(get, new DownloadResponseHandler());
+
+        } catch (IOException e) {
+            throw e;
+        } catch (URISyntaxException e) {
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(httpclient);
+        }
+
+    }
+
+
+
 
 }

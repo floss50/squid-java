@@ -19,6 +19,7 @@ import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -32,13 +33,13 @@ import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class OceanController extends BaseController {
@@ -222,12 +223,14 @@ public class OceanController extends BaseController {
         return createdDDO;
     }
 
-    public AccessSLA.SLAResponse initializePurchaseAsset(DID did, String serviceDefinitionId, String address) throws IOException {
+    public String getNewServiceAgreementId() {
+
+        return SlaManager.generateSlaId();
+    }
+
+    public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
         DDO ddo;
-
-        // 1. Generate Service Agreement Id
-        String serviceAgreementId= SlaManager.generateSlaId();
 
         // Checking if DDO is already there and serviceDefinitionId is included
         try {
@@ -238,9 +241,25 @@ public class OceanController extends BaseController {
             throw new IOException(e.getMessage());
         }
 
+
+        return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
+                .map(event -> EncodingHelper.toHexString(event.serviceAgreementId))
+                .switchMap(eventServiceAgreementId -> {
+                    if (eventServiceAgreementId.isEmpty())
+                        return Flowable.empty();
+                    else {
+                        this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
+                        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                    }
+                });
+
+    }
+
+    private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
+
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
 
-        // 2. Consumer sign service details. It includes:
+        //  Consumer sign service details. It includes:
         // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
         String agreementSignature= accessService.generateServiceAgreementSignature(
                 getKeeperDto().getWeb3(),
@@ -263,50 +282,64 @@ public class OceanController extends BaseController {
             throw new IOException("Unable to initialize SLA using Brizo");
         }
 
-
         // 4. Listening of events
-       return  new AccessSLA.SLAResponse(AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId),
-               serviceAgreementId);
+       return  AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
 
     }
 
 
-    public void lockPayment(String serviceDefinitionId, Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
+    private boolean lockPayment(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws IOException {
 
-        flowable.subscribe(event -> {
+        AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-            if (event.state) {
+        return LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, assetInfo);
+    }
 
-                String serviceAgreementId =  EncodingHelper.toHexString(event.serviceAgreementId);
-                log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
 
-                DID did =  new DID(EncodingHelper.toHexString(event.did));
-                DDO ddo;
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws IOException {
 
-                try {
+        return consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
+    }
 
-                    ddo = resolveDID(did);
 
-                } catch (IOException e) {
-                    log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
-                    throw new IOException(e.getMessage());
-                }
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath, int threshold) throws IOException {
 
-                AccessService accessService= ddo.getAccessService(serviceDefinitionId);
-                BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+        DDO ddo;
 
-                LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, ddo, assetInfo);
+        try {
 
+            ddo = resolveDID(did);
+        } catch (IOException e) {
+            log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+
+        String serviceEndpoint = ddo.getAccessService(serviceDefinitionId).serviceEndpoint;
+        List<String> contentUrls = StringsHelper.getStringsFromJoin( decryptContentUrls(did,  ddo.metadata.base.contentUrls.get(0), threshold));
+
+        for (String url: contentUrls) {
+
+            // For each url we call to consume Brizo endpoint that requires consumerAddress, serviceAgreementId and url as a parameters
+            try {
+
+                String fileName = url.substring(url.lastIndexOf("/"));
+
+                InputStream dataStream = BrizoDto.consumeUrl(serviceEndpoint, consumerAddress, serviceAgreementId, url);
+                String destinationPath = basePath + File.separator + fileName;
+
+                FileUtils.copyInputStreamToFile(dataStream, new File(destinationPath));
+
+            } catch (URISyntaxException e) {
+                log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Malformed URL. " + e.getMessage());
+            } catch (IOException e) {
+                log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Error downloading. " + e.getMessage());
             }
-        });
 
-    }
+            return true;
+        }
 
-    public Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
-                                                                                        String serviceAgreementId)
-    {
-        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
-
+        return false;
     }
 
     // TODO: to be implemented
@@ -326,6 +359,12 @@ public class OceanController extends BaseController {
 
     }
 
+    private String decryptContentUrls(DID did, String encryptedUrls, int threshold) throws IOException {
+        log.debug("Decrypting did: "+ did.getHash());
+        return getSecretStoreController().decryptDocument(did.getHash(), encryptedUrls);
+
+    }
+
     private Map<String, Object> getAccessConditionParams(String did, int price)  {
         Map<String, Object> params= new HashMap<>();
         params.put("parameter.did", did);
@@ -339,7 +378,7 @@ public class OceanController extends BaseController {
     }
 
 
-    private BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
+    private  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
 
         BasicAssetInfo assetInfo =  new BasicAssetInfo();
 
@@ -352,8 +391,6 @@ public class OceanController extends BaseController {
                     .get();
 
 
-            String assetIdAsString = "";
-
             for (Condition.ConditionParameter parameter : lockCondition.parameters) {
 
                 if (parameter.name.equalsIgnoreCase("assetId")) {
@@ -365,7 +402,8 @@ public class OceanController extends BaseController {
                     assetInfo.setPrice((Integer) parameter.value);
                 }
             }
-        }  catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
+            log.error("Exception encoding serviceAgreement " + e.getMessage());
 
             }
 

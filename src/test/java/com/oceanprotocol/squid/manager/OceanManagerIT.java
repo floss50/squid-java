@@ -5,9 +5,9 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
-import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -82,8 +82,14 @@ public class OceanManagerIT {
 
 
         // Initializing DTO's
+        // This works with serviceAgreement's signature
         keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
         keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+
+        // This doesn't
+        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
+
 
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
@@ -139,18 +145,35 @@ public class OceanManagerIT {
 
     }
 
-    @Test
-    public void registerAsset() throws Exception {
+    private DDO newRegisteredAsset() throws Exception {
+
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume";//?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";//?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
         Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
+        return managerPublisher.registerAsset(metadataBase,
+                serviceAgreementAddress,
+                serviceEndpoints,
+                0);
 
+    }
+
+    @Test
+    public void registerAsset() throws Exception {
+
+        String publicKey= config.getString("account.parity.address");
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+
+        String serviceAgreementAddress = saContract.getContractAddress();
+
+        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         DDO ddo= managerPublisher.registerAsset(metadataBase,
                 serviceAgreementAddress,
@@ -170,33 +193,20 @@ public class OceanManagerIT {
     @Test
     public void purchaseAsset() throws Exception {
 
-        String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume";//?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";//?pubKey=${pubKey}&serviceId={serviceId}&url={url}";
-        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
-
         String serviceDefinitionId = "1";
 
-        String serviceAgreementAddress = saContract.getContractAddress();
-
-        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
-
-
-        DDO ddo= managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
-                serviceEndpoints,
-                0);
-
+        DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        AccessSLA.SLAResponse slaResponse = managerConsumer.initializePurchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"));
-        managerConsumer.lockPayment(serviceDefinitionId, slaResponse.getFlowable());
-        managerConsumer.listenForGrantedAccess(accessConditions, slaResponse.getServiceAgreementId());
+        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
 
+        // blocking for testing purpose
+        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+        assertEquals(serviceAgreementId, event.serviceId);
     }
-
-
 
     @Test
     public void resolveDID() throws Exception {
@@ -223,6 +233,31 @@ public class OceanManagerIT {
 
 
     @Test
+    public void consumerAsset() throws Exception {
+
+        String serviceDefinitionId = "1";
+
+        DDO ddo= newRegisteredAsset();
+        DID did= new DID(ddo.id);
+
+        log.debug("DDO registered!");
+
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
+
+        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+
+        // blocking for testing purpose
+        log.debug("Waiting for granted Access............");
+        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+
+        log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
+        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
+
+    }
+
+    @Test
     public void getOrder() {
     }
+
 }

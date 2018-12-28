@@ -12,7 +12,7 @@
     "compression": "zip",
     "contentType": "text/csv",
     "workExample": "423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68",
-    "contentUrls": ["http://catplanet.org/wp-content/uploads/2014/02/I-can-xplain.jpg","http://http://catplanet.org/link2.jpg"],
+    "contentUrls": ["http://catplanet.org/wp-content/uploads/2014/02/I-can-xplain.jpg","https://raw.githubusercontent.com/tbertinmahieux/MSongsDB/master/Tasks_Demos/CoverSongs/shs_dataset_test.txt"],
     "links": [{
       "name": "Sample of Asset Data",
       "type": "sample",

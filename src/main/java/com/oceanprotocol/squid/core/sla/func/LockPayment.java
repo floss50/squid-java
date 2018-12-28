@@ -1,31 +1,23 @@
 package com.oceanprotocol.squid.core.sla.func;
 
-import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
-import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.Condition;
-import com.oceanprotocol.squid.models.service.Service;
-import io.reactivex.Flowable;
-import jnr.constants.platform.Access;
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.util.List;
 
 public class LockPayment {
+
+    static final Logger log= LogManager.getLogger(LockPayment.class);
 
 
     public static Boolean  executeLockPayment(PaymentConditions paymentConditions,
                                               String serviceAgreementId,
-                                              DDO ddo,
                                               BasicAssetInfo assetInfo) {
 
         byte[] serviceId;
@@ -42,12 +34,14 @@ public class LockPayment {
                     BigInteger.valueOf(assetInfo.getPrice())
             ).send();
 
-            if (!receipt.getStatus().equals("0x1"))
+            if (!receipt.getStatus().equals("0x1")) {
+                log.error("The Status received is not valid: " + receipt.getStatus());
                 return false;
+            }
             return true;
 
         } catch (UnsupportedEncodingException e) {
-
+            log.error("Exception encoding serviceAgreement " + e.getMessage());
         }
 
         finally {
