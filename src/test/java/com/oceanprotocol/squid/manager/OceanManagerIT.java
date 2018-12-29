@@ -191,41 +191,7 @@ public class OceanManagerIT {
     }
 
 
-    private boolean unlockAccount(OceanController oceanController, String address, String password, BigInteger unlockDuration) throws Exception {
 
-        PersonalUnlockAccount personalUnlockAccount =
-                oceanController
-                        .getKeeperDto()
-                        .getWeb3()
-                        // From JsonRpc2_0Admin:
-                        // Parity has a bug where it won't support a duration
-                        // See https://github.com/ethcore/parity/issues/1215
-
-                        //From https://wiki.parity.io/JSONRPC-personal-module#personal_unlockaccount
-                        /*
-                        If permanent unlocking is disabled (the default) then the duration argument will be ignored,
-                        and the account will be unlocked for a single signing. With permanent locking enabled, the duration sets the number
-                        of seconds to hold the account open for. It will default to 300 seconds. Passing 0 unlocks the account indefinitely.
-
-                        There can only be one unlocked account at a time. (?????)
-
-                        https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
-
-                        The sign method calculates an Ethereum specific signature with:
-                        sign(keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))).
-
-                         By adding a prefix to the message makes the calculated signature recognisable as an Ethereum specific signature.
-                         This prevents misuse where a malicious DApp can sign arbitrary data (e.g. transaction) and use the signature to impersonate the victim.
-
-                         Note the address to sign with must be unlocked.
-
-                         */
-                        .personalUnlockAccount(address, password, null)
-                        // TODO Note: The Passphrasse is in plain text!!
-                        .sendAsync().get();
-
-        return personalUnlockAccount.accountUnlocked();
-    }
 
 
 
@@ -242,12 +208,10 @@ public class OceanManagerIT {
         String purchaseAddress = config.getString("account.parity.address2");
         String purchasePassword = config.getString("account.parity.password2");
 
-        BigInteger unlockDuration = BigInteger.valueOf(30);
-
-        boolean accountUnlocked = unlockAccount(managerConsumer, purchaseAddress, purchasePassword, unlockDuration);
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        boolean accountUnlocked = managerConsumer.unlockAccount(purchaseAddress, purchasePassword);
         assertTrue(accountUnlocked);
-
-
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
                 managerConsumer.purchaseAsset(did, serviceDefinitionId, purchaseAddress, serviceAgreementId);
