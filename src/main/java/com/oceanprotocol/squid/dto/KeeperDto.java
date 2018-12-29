@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
+import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
@@ -20,7 +20,7 @@ public class KeeperDto {
 
     protected static final Logger log = LogManager.getLogger(KeeperDto.class);
 
-    private Web3j web3 = null;
+    private Admin web3 = null;
     private String keeperUrl;
     private String address;
     private String password;
@@ -56,7 +56,7 @@ public class KeeperDto {
     }
 
     private KeeperDto(Web3jService web3jService)  {
-        this.web3= Web3j.build(web3jService);
+        this.web3= Admin.build(web3jService);
     }
 
     private KeeperDto(String url, String address, String password, String credentialsFile) throws IOException, CipherException {
@@ -69,7 +69,7 @@ public class KeeperDto {
         this.gasPrice= DEFAULT_GAS_PRICE;
         this.gasLimit= DEFAULT_GAS_LIMIT;
 
-        this.web3 = Web3j.build(new HttpService(this.keeperUrl));
+        this.web3 = Admin.build(new HttpService(this.keeperUrl));
 
         this.txManager= new RawTransactionManager(this.web3, getCredentials());
         this.gasProvider= new StaticGasProvider(this.gasPrice, this.gasLimit);
@@ -80,7 +80,7 @@ public class KeeperDto {
      * Get the Web3j instance
      * @return web3j
      */
-    public Web3j getWeb3()  {
+    public Admin getWeb3()  {
         return web3;
     }
 

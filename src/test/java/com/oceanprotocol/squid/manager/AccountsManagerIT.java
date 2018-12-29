@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.admin.Admin;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -58,7 +59,7 @@ public class AccountsManagerIT {
     public void getInstance() {
         // Checking if web3j driver included in KeeperDto implements the Web3j interface
         assertTrue(
-                manager.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
+                manager.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
         assertTrue(
                 manager.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }

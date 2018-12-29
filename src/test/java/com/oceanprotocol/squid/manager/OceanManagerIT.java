@@ -20,7 +20,10 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.admin.Admin;
+import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -82,27 +85,25 @@ public class OceanManagerIT {
 
 
         // Initializing DTO's
-        // This works with serviceAgreement's signature
-        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
 
-        // This doesn't
-        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
-        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-
+        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
 
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
+
         /*
         didRegistry= ManagerHelper.deployDIDRegistryContract(keeperPublisher);
         saContract= ManagerHelper.deployServiceAgreementContract(keeperPublisher);
         accessConditions= ManagerHelper.deployAccessConditionsContract(keeperPublisher, saContract.getContractAddress());
         paymentConditions= ManagerHelper.deployPaymentConditionsContract(keeperPublisher, saContract.getContractAddress(), accessConditions.getContractAddress());
-*/
+        */
+
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
         saContract= ManagerHelper.loadServiceAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
+
 
         // Initializing the OceanController for the Publisher
         managerPublisher = OceanController.getInstance(keeperPublisher, aquarius);
@@ -134,7 +135,7 @@ public class OceanManagerIT {
     public void getInstance() {
         // Checking if web3j driver included in KeeperDto implements the Web3j interface
         assertTrue(
-                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
+                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
         assertTrue(
                 managerPublisher.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }
@@ -190,6 +191,44 @@ public class OceanManagerIT {
     }
 
 
+    private boolean unlockAccount(OceanController oceanController, String address, String password, BigInteger unlockDuration) throws Exception {
+
+        PersonalUnlockAccount personalUnlockAccount =
+                oceanController
+                        .getKeeperDto()
+                        .getWeb3()
+                        // From JsonRpc2_0Admin:
+                        // Parity has a bug where it won't support a duration
+                        // See https://github.com/ethcore/parity/issues/1215
+
+                        //From https://wiki.parity.io/JSONRPC-personal-module#personal_unlockaccount
+                        /*
+                        If permanent unlocking is disabled (the default) then the duration argument will be ignored,
+                        and the account will be unlocked for a single signing. With permanent locking enabled, the duration sets the number
+                        of seconds to hold the account open for. It will default to 300 seconds. Passing 0 unlocks the account indefinitely.
+
+                        There can only be one unlocked account at a time. (?????)
+
+                        https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
+
+                        The sign method calculates an Ethereum specific signature with:
+                        sign(keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))).
+
+                         By adding a prefix to the message makes the calculated signature recognisable as an Ethereum specific signature.
+                         This prevents misuse where a malicious DApp can sign arbitrary data (e.g. transaction) and use the signature to impersonate the victim.
+
+                         Note the address to sign with must be unlocked.
+
+                         */
+                        .personalUnlockAccount(address, password, null)
+                        // TODO Note: The Passphrasse is in plain text!!
+                        .sendAsync().get();
+
+        return personalUnlockAccount.accountUnlocked();
+    }
+
+
+
     @Test
     public void purchaseAsset() throws Exception {
 
@@ -200,13 +239,24 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
+        String purchaseAddress = config.getString("account.parity.address2");
+        String purchasePassword = config.getString("account.parity.password2");
+
+        BigInteger unlockDuration = BigInteger.valueOf(30);
+
+        boolean accountUnlocked = unlockAccount(managerConsumer, purchaseAddress, purchasePassword, unlockDuration);
+        assertTrue(accountUnlocked);
+
+
+
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, purchaseAddress, serviceAgreementId);
 
         // blocking for testing purpose
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
         assertEquals(serviceAgreementId, event.serviceId);
     }
+
 
     @Test
     public void resolveDID() throws Exception {
@@ -232,6 +282,7 @@ public class OceanManagerIT {
     }
 
 
+
     @Test
     public void consumerAsset() throws Exception {
 
@@ -255,6 +306,7 @@ public class OceanManagerIT {
         managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
 
     }
+
 
     @Test
     public void getOrder() {
