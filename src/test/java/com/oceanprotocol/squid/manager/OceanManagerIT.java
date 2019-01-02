@@ -58,6 +58,15 @@ public class OceanManagerIT {
 
     private static final Config config = ConfigFactory.load();
 
+    private static final String PURCHASE_ADDRESS;
+    static {
+        PURCHASE_ADDRESS = config.getString("account.parity.address2");
+    }
+
+    private static final String PURCHASE_PASSWORD;
+    static {
+        PURCHASE_PASSWORD = config.getString("account.parity.password2");
+    }
 
     private static final String DID_REGISTRY_CONTRACT;
     static {
@@ -82,9 +91,6 @@ public class OceanManagerIT {
     @BeforeClass
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
-
-
-        // Initializing DTO's
 
         keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
         keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
@@ -205,16 +211,13 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        String purchaseAddress = config.getString("account.parity.address2");
-        String purchasePassword = config.getString("account.parity.password2");
-
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.unlockAccount(purchaseAddress, purchasePassword);
+        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
         assertTrue(accountUnlocked);
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, purchaseAddress, serviceAgreementId);
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
@@ -259,15 +262,20 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        assertTrue(accountUnlocked);
+
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
 
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
+        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, PURCHASE_ADDRESS, "~/tmp/");
 
     }
 
