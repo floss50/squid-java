@@ -17,11 +17,16 @@ before_install:
 - cd barge
 - bash -x start_ocean.sh --latest --no-brizo --no-pleuston --local-spree-node 2>&1 > start_ocean.log &
 - cd ..
-- sleep 60
 - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
 - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+- |
+    for i in $(seq 1 50); do
+      sleep 5
+      [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
+    done
 
 install:
+- mvn clean -Dtest=*IT test
 - mvn --settings .maven.xml install -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
 - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
 - export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
