@@ -53,6 +53,8 @@ public class OceanManagerIT {
     private static PaymentConditions paymentConditions;
     private static AccessConditions accessConditions;
 
+    private static final String SERVICE_DEFINITION_ID = "1";
+
     private static final Config config = ConfigFactory.load();
 
     private static final String PURCHASE_ADDRESS;
@@ -83,6 +85,11 @@ public class OceanManagerIT {
     private static final String ACCESS_CONDITIONS_CONTRACT;
     static {
         ACCESS_CONDITIONS_CONTRACT = config.getString("contract.accessConditions.address");
+    }
+
+    private static final String CONSUME_BASE_PATH;
+    static {
+        CONSUME_BASE_PATH = config.getString("consume.basePath");
     }
 
     @BeforeClass
@@ -210,8 +217,6 @@ public class OceanManagerIT {
     @Test
     public void purchaseAsset() throws Exception {
 
-        String serviceDefinitionId = "1";
-
         DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
@@ -223,9 +228,7 @@ public class OceanManagerIT {
         assertTrue(accountUnlocked);
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
-
-        ManagerHelper.checkExecuteAgreementEvents(serviceAgreementId, saContract, keeperPublisher);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
@@ -235,7 +238,6 @@ public class OceanManagerIT {
     @Test
     public void consumerAsset() throws Exception {
 
-        String serviceDefinitionId = "1";
 
         DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
@@ -250,16 +252,14 @@ public class OceanManagerIT {
         assertTrue(accountUnlocked);
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
 
-        // ManagerHelper.checkExecuteAgreementEvents(serviceAgreementId, saContract, keeperPublisher);
-
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        managerConsumer.consume(serviceDefinitionId, "0x" + serviceAgreementId, did, PURCHASE_ADDRESS, "/tmp");
+        managerConsumer.consume(SERVICE_DEFINITION_ID, "0x" + serviceAgreementId, did, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
 
     }
 
