@@ -97,11 +97,17 @@ public class AssetsControllerIT {
         DDO ddo4= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
         DDO ddo5= DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
 
-        ddo1.generateDID();
-        ddo2.generateDID();
-        ddo3.generateDID();
-        ddo4.generateDID();
-        ddo5.generateDID();
+        DID did1 = ddo1.generateDID();
+        DID did2 = ddo2.generateDID();
+        DID did3 = ddo3.generateDID();
+        DID did4 = ddo4.generateDID();
+        DID did5 = ddo5.generateDID();
+
+        ddo1.id = did1.toString();
+        ddo2.id = did2.toString();
+        ddo3.id = did3.toString();
+        ddo4.id = did4.toString();
+        ddo5.id = did5.toString();
 
         String randomParam= UUID.randomUUID().toString().replaceAll("-","");
         log.debug("Using random param for search: " + randomParam);

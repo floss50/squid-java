@@ -49,7 +49,7 @@ public class AssetsController extends BaseController {
     }
 
     public DDO getByDID(String id) throws Exception {
-        return getAquariusDto().getDDO(id);
+        return getAquariusDto().getDDOUsingId(id);
     }
 
     public DDO getByDIDUsingUrl(String url) throws Exception {
