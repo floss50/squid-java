@@ -14,18 +14,15 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.EthAccounts;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,8 +33,6 @@ public class AccountsManagerTest {
 
     private static final Logger log = LogManager.getLogger(AccountsManagerTest.class);
 
-    private static OceanController manager;
-    private static KeeperDto keeper;
     private static AquariusDto aquarius;
     private static final Config config = ConfigFactory.load();
 

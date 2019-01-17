@@ -30,36 +30,6 @@ public class AccessSLA implements SlaFunctions {
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
 
-
-    public static class SLAResponse {
-
-        private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable;
-        private String serviceAgreementId;
-
-        public SLAResponse( Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable,
-                            String serviceAgreementId) {
-            this.flowable = flowable;
-            this.serviceAgreementId = serviceAgreementId;
-        }
-
-
-        public Flowable<ServiceAgreement.ExecuteAgreementEventResponse> getFlowable() {
-            return flowable;
-        }
-
-        public void setFlowable(Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
-            this.flowable = flowable;
-        }
-
-        public String getServiceAgreementId() {
-            return serviceAgreementId;
-        }
-
-        public void setServiceAgreementId(String serviceAgreementId) {
-            this.serviceAgreementId = serviceAgreementId;
-        }
-    }
-
     public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,

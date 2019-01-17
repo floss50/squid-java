@@ -1,7 +1,6 @@
 package com.oceanprotocol.squid.helpers;
 
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 public class CryptoHelperTest {

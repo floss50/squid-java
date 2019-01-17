@@ -76,14 +76,13 @@ public class AccessService extends Service {
      */
     public String generateServiceAgreementHash(String serviceAgreementId) throws IOException  {
         String params=
-                    templateId
-                    + fetchConditionKeys()
-                    + fetchConditionValues()
-                    + fetchTimeout()
-                    + serviceAgreementId;
+                templateId
+                        + fetchConditionKeys()
+                        + fetchConditionValues()
+                        + fetchTimeout()
+                        + serviceAgreementId;
 
 
-        //log.debug("Concatenation: " + params);
         return Hash.sha3(EthereumHelper.remove0x(params));
     }
     public String generateServiceAgreementSignatureFromHash(Web3j web3, String address, String hash) throws IOException {
@@ -111,7 +110,6 @@ public class AccessService extends Service {
     public String fetchConditionValues() throws UnsupportedEncodingException {
         String data= "";
 
-        int counter= 0;
         for (Condition condition: conditions)   {
             String token= "";
             for (Condition.ConditionParameter param: condition.parameters) {
@@ -121,21 +119,15 @@ public class AccessService extends Service {
                 else if (param.type.contains("bytes32"))
                     token= token + EthereumHelper.remove0x((String) param.value);
                 else if (param.type.contains("int"))
-                  // token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
-                  if (param.value instanceof String)
+                    // token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                    if (param.value instanceof String)
                         token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", Integer.parseInt((String)param.value)));
-                else
-                      token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                    else
+                        token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
 
-                counter++;
             }
-            //log.debug("Token: " + token);
             data= data + EthereumHelper.remove0x(Hash.sha3(token));
         }
-
-
-        //log.debug("ConditionValues String (HEX): " + data);
-        //log.debug("ConditionValues String (SHA3): " + Hash.sha3(data));
 
         return data;
     }
@@ -150,96 +142,6 @@ public class AccessService extends Service {
 
         return data;
     }
-
-/*
-    public byte[][] fetchConditionKeysHash() throws IOException {
-
-        byte[][] data= new byte[conditions.size()*3][];
-        int counter= 0;
-        byte[] templateIdHex= EncodingHelper.hexStringToBytes(templateId);
-
-        for (Condition condition: conditions)   {
-            data[counter] = templateIdHex;
-            counter++;
-            data[counter]= EncodingHelper.hexStringToBytes(condition.conditionKey);
-            counter++;
-            data[counter]= EncodingHelper.stringToBytes(condition.contractName);
-            counter++;
-        }
-
-
-        return data;
-    }
-
-    public byte[][] fetchTimeoutByte() throws IOException {
-        byte[][] data= new byte[conditions.size()][];
-        int counter= 0;
-
-        for (Condition condition: conditions)   {
-            data[counter]= ByteBuffer.allocate(Integer.BYTES).putInt(condition.timeout).array();
-            counter++;
-        }
-
-        return data;
-    }
-
-    public byte[] fetchTimeoutHash() throws IOException {
-        List<byte[]> hashList= new ArrayList<>();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (Condition condition: conditions)   {
-            baos.write(soliditySha3(condition.timeout));
-        }
-        return baos.toByteArray();
-    }
-
-
-
-    public byte[][] fetchConditionValuesBytes() throws IOException {
-        AtomicInteger numItems= new AtomicInteger(0);
-        conditions.forEach(c -> {numItems.addAndGet(c.parameters.size());});
-        byte[][] data= new byte[numItems.get() * 2][];
-
-        int counter= 0;
-
-        for (Condition condition: conditions)   {
-            for (Condition.ConditionParameter param: condition.parameters) {
-                data[counter] = EncodingHelper.stringToBytes(param.type);
-                counter++;
-
-                if (param.type.equals("string"))
-                    data[counter]= EncodingHelper.stringToBytes((String)param.value);
-                if (param.type.equals("bytes32"))
-                    data[counter]= EncodingHelper.hexStringToBytes((String)param.value);
-                if (param.type.startsWith("uint"))
-                    data[counter]= EncodingHelper.integerToBytes((int)param.value);
-                else
-                    data[counter]= EncodingHelper.stringToBytes((String)param.value);
-
-                counter++;
-            }
-        }
-        return data;
-    }
-
-    public byte[] fetchConditionValuesHash() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (Condition condition: conditions)   {
-            for (Condition.ConditionParameter param: condition.parameters) {
-                if (param.type.equals("string"))
-                    baos.write(soliditySha3(
-                            EncodingHelper.stringToBytes(param.type), EncodingHelper.stringToBytes((String)param.value)));
-                if (param.type.equals("bytes32"))
-                    baos.write(soliditySha3(
-                            EncodingHelper.stringToBytes(param.type), EncodingHelper.hexStringToBytes((String)param.value)));
-                if (param.type.startsWith("uint"))
-                    baos.write(soliditySha3(EncodingHelper.stringToBytes(param.type), EncodingHelper.integerToBytes((int)param.value)));
-                else
-                    baos.write(soliditySha3(
-                            EncodingHelper.stringToBytes(param.type), param.value));
-            }
-        }
-        return baos.toByteArray();
-    }*/
 
 
 }

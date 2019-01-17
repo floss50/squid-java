@@ -13,14 +13,12 @@ import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.HttpResponse;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -29,7 +27,6 @@ import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
-import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
@@ -37,7 +34,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
@@ -98,15 +94,12 @@ public class OceanController extends BaseController {
         final String eventSignature= EventEncoder.encode(event);
         didFilter.addSingleTopic(eventSignature);
 
-        //String didTopic= "0x" + EncodingHelper.encodeToHex(did.getHash());
         String didTopic= "0x" + did.getHash();
         String metadataTopic= "0x" + EncodingHelper.padRightWithZero(
                 EncodingHelper.encodeToHex(Service.serviceTypes.Metadata.toString()), 64);
-
         didFilter.addOptionalTopics(didTopic, metadataTopic);
 
         EthLog ethLog= getKeeperDto().getWeb3().ethGetLogs(didFilter).send();
-
         List<EthLog.LogResult> logs = ethLog.getLogs();
 
         int numLogs= logs.size();
@@ -167,17 +160,14 @@ public class OceanController extends BaseController {
         metadata.base.contentUrls= urls;
 
         // Definition of service endpoints
-
         String metadataEndpoint;
         if (serviceEndpoints.getMetadataEndpoint() == null)
             metadataEndpoint= getAquariusDto().getDdoEndpoint() + "/{did}";
         else
             metadataEndpoint= serviceEndpoints.getMetadataEndpoint();
 
-
         // Initialization of services supported for this asset
         MetadataService metadataService= new MetadataService(metadata, metadataEndpoint, "0");
-
 
         // Definition of a DEFAULT ServiceAgreement Contract
         AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
@@ -197,12 +187,9 @@ public class OceanController extends BaseController {
 
         serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
 
-
         AccessService accessService= new AccessService(serviceEndpoints.getAccessEndpoint(),
                 "1",
                 serviceAgreementContract);
-
-
         accessService.purchaseEndpoint= serviceEndpoints.getPurchaseEndpoint();
 
         // Initializing conditions and adding to Access service
@@ -231,7 +218,6 @@ public class OceanController extends BaseController {
     }
 
 
-
     public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
         DDO ddo;
@@ -244,7 +230,6 @@ public class OceanController extends BaseController {
             log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
             throw new IOException(e.getMessage());
         }
-
 
         return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
                 .map(event ->  EncodingHelper.toHexString(event.serviceAgreementId))
@@ -290,7 +275,6 @@ public class OceanController extends BaseController {
        return  AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
 
     }
-
 
     private boolean lockPayment(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws IOException {
 

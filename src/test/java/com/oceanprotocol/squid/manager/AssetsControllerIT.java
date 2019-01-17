@@ -7,18 +7,14 @@ import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,8 +36,6 @@ public class AssetsControllerIT {
 
     private static AssetMetadata metadataBase;
     private static DDO ddoBase;
-    private static JSONObject metadataJson;
-
     private static final Config config = ConfigFactory.load();
     private static String TEST_ADDRESS;
 
@@ -58,8 +52,6 @@ public class AssetsControllerIT {
         ddoBase = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
 
         metadataBase = (AssetMetadata) ddoBase.metadata;
-        JSONObject metadataJson = new JSONObject(metadataBase);
-
         objectMapper = new ObjectMapper();
 
         TEST_ADDRESS = config.getString("account.ganache.address");
@@ -112,9 +104,6 @@ public class AssetsControllerIT {
         String randomParam= UUID.randomUUID().toString().replaceAll("-","");
         log.debug("Using random param for search: " + randomParam);
 
-//        ((MetadataService) ddo1.services.get(2)).metadata.base.type = randomParam;
-//        ((MetadataService) ddo2.services.get(2)).metadata.base.type = randomParam;
-//        ((MetadataService) ddo4.services.get(2)).metadata.base.name = "random name";
         ddo1.metadata.base.type= randomParam;
         ddo2.metadata.base.type= randomParam;
         ddo4.metadata.base.name = "random name";
@@ -131,8 +120,5 @@ public class AssetsControllerIT {
         assertEquals(randomParam,result1.get(0).metadata.base.type);
 
     }
-
-
-
 
 }

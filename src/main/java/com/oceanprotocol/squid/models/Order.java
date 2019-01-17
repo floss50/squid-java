@@ -1,33 +1,30 @@
 package com.oceanprotocol.squid.models;
 
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 
-//@JsonIgnoreProperties(ignoreUnknown = true)
 public class Order {
 
 
-//    @JsonProperty
+    //    @JsonProperty
     public String id;
 
-//    @JsonProperty
+    //    @JsonProperty
     public AssetMetadata name;
 
-//    @JsonProperty
+    //    @JsonProperty
     public int timeout;
 
-//    @JsonProperty
+    //    @JsonProperty
     public String pubkey= null;
 
-//    @JsonProperty
+    //    @JsonProperty
     public String key= null;
 
-//    @JsonProperty
+    //    @JsonProperty
     public boolean wasPaid= false;
 
-//    @JsonProperty
+    //    @JsonProperty
     public int status= 0;
 
     private Order() {
