@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-public class EthereumHelperTest {
+public class EthereumHelperTestIT {
 
     private static final Config config = ConfigFactory.load();
     private static KeeperDto keeper;

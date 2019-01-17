@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.web3j.protocol.Web3j;
+import org.web3j.protocol.admin.Admin;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -53,8 +53,19 @@ public class OceanManagerIT {
     private static PaymentConditions paymentConditions;
     private static AccessConditions accessConditions;
 
+    private static final String SERVICE_DEFINITION_ID = "1";
+
     private static final Config config = ConfigFactory.load();
 
+    private static final String PURCHASE_ADDRESS;
+    static {
+        PURCHASE_ADDRESS = config.getString("account.parity.address");
+    }
+
+    private static final String PURCHASE_PASSWORD;
+    static {
+        PURCHASE_PASSWORD = config.getString("account.parity.password");
+    }
 
     private static final String DID_REGISTRY_CONTRACT;
     static {
@@ -76,29 +87,21 @@ public class OceanManagerIT {
         ACCESS_CONDITIONS_CONTRACT = config.getString("contract.accessConditions.address");
     }
 
+    private static final String CONSUME_BASE_PATH;
+    static {
+        CONSUME_BASE_PATH = config.getString("consume.basePath");
+    }
+
     @BeforeClass
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
-
-        // Initializing DTO's
-        // This works with serviceAgreement's signature
-        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
-
-        // This doesn't
-        //keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
-        //keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
-
+        keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
 
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
-        /*
-        didRegistry= ManagerHelper.deployDIDRegistryContract(keeperPublisher);
-        saContract= ManagerHelper.deployServiceAgreementContract(keeperPublisher);
-        accessConditions= ManagerHelper.deployAccessConditionsContract(keeperPublisher, saContract.getContractAddress());
-        paymentConditions= ManagerHelper.deployPaymentConditionsContract(keeperPublisher, saContract.getContractAddress(), accessConditions.getContractAddress());
-*/
+
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
         saContract= ManagerHelper.loadServiceAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
@@ -111,7 +114,6 @@ public class OceanManagerIT {
                 .setServiceAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions);
-
 
         // Initializing the OceanController for the Consumer
         managerConsumer = OceanController.getInstance(keeperConsumer, aquarius);
@@ -134,11 +136,10 @@ public class OceanManagerIT {
     public void getInstance() {
         // Checking if web3j driver included in KeeperDto implements the Web3j interface
         assertTrue(
-                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Web3j.class));
+                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
         assertTrue(
                 managerPublisher.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }
-
 
     @Test
     public void searchOrders() {
@@ -189,25 +190,6 @@ public class OceanManagerIT {
 
     }
 
-
-    @Test
-    public void purchaseAsset() throws Exception {
-
-        String serviceDefinitionId = "1";
-
-        DDO ddo= newRegisteredAsset();
-        DID did= new DID(ddo.id);
-
-        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
-
-        Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address"), serviceAgreementId);
-
-        // blocking for testing purpose
-        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
-        assertEquals(serviceAgreementId, event.serviceId);
-    }
-
     @Test
     public void resolveDID() throws Exception {
 
@@ -233,9 +215,29 @@ public class OceanManagerIT {
 
 
     @Test
+    public void purchaseAsset() throws Exception {
+
+        DDO ddo= newRegisteredAsset();
+        DID did= new DID(ddo.id);
+
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
+
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        assertTrue(accountUnlocked);
+
+        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
+
+        // blocking for testing purpose
+        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+        assertEquals("0x" + serviceAgreementId, EncodingHelper.toHexString(event.serviceId));
+    }
+
+    @Test
     public void consumerAsset() throws Exception {
 
-        String serviceDefinitionId = "1";
 
         DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
@@ -244,17 +246,23 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        assertTrue(accountUnlocked);
+
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, config.getString("account.parity.address2"), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
 
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, config.getString("account.parity.address"), "~/tmp/");
+        managerConsumer.consume(SERVICE_DEFINITION_ID, "0x" + serviceAgreementId, did, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
 
     }
+
 
     @Test
     public void getOrder() {

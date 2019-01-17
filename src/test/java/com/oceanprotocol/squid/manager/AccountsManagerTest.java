@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.EthAccounts;
@@ -55,7 +56,7 @@ public class AccountsManagerTest {
         expectedAccounts.add("0x789");
 
         KeeperDto _keeper= mock(KeeperDto.class);
-        Web3j _web3j= mock(Web3j.class);
+        Admin _web3j= mock(Admin.class);
         Credentials _credentials= mock(Credentials.class);
 
         Request<?, EthAccounts> _request= (Request<?, EthAccounts>) mock(Request.class);
@@ -82,7 +83,7 @@ public class AccountsManagerTest {
         BigInteger oceanBalance= BigInteger.valueOf(12);
 
         KeeperDto _keeper= mock(KeeperDto.class);
-        Web3j _web3j= mock(Web3j.class);
+        Admin _web3j= mock(Admin.class);
         Credentials _credentials= mock(Credentials.class);
         OceanToken _token= mock(OceanToken.class);
         Request<?, EthGetBalance> _request= (Request<?, EthGetBalance>) mock(Request.class);
