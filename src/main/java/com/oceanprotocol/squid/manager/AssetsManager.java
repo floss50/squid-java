@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AssetsController extends BaseController {
+public class AssetsManager extends BaseManager {
 
-    static final Logger log= LogManager.getLogger(AssetsController.class);
+    static final Logger log= LogManager.getLogger(AssetsManager.class);
 
-    public AssetsController(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public AssetsManager(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
         super(keeperDto, aquariusDto);
     }
 
-    public static AssetsController getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public static AssetsManager getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
-        return new AssetsController(keeperDto, aquariusDto);
+        return new AssetsManager(keeperDto, aquariusDto);
     }
 
     public DDO publishMetadata(DDO ddo) throws Exception {

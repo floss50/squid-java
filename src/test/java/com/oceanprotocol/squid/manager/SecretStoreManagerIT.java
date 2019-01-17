@@ -17,10 +17,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SecretStoreControllerIT {
+public class SecretStoreManagerIT {
 
 
-    static final Logger log= LogManager.getLogger(SecretStoreControllerIT.class);
+    static final Logger log= LogManager.getLogger(SecretStoreManagerIT.class);
 
     private static PublisherWorker publisherWorker;
     private static ConsumerWorker consumerWorker;

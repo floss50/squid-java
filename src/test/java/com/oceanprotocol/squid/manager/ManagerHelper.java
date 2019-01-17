@@ -67,8 +67,8 @@ public abstract class ManagerHelper {
         );
     }
 
-    public static SecretStoreController getSecretStoreController(Config config, VmClient client) {
-        return SecretStoreController.getInstance(getSecretStoreDto(config),getEvmDto(config, client));
+    public static SecretStoreManager getSecretStoreController(Config config, VmClient client) {
+        return SecretStoreManager.getInstance(getSecretStoreDto(config),getEvmDto(config, client));
     }
 
 
