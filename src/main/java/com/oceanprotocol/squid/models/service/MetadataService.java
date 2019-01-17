@@ -14,6 +14,11 @@ public class MetadataService extends Service {
     @JsonProperty
     public AssetMetadata metadata;
 
+    public MetadataService()    {
+        this.type= serviceTypes.Metadata.toString();
+        this.serviceDefinitionId= DEFAULT_SERVICE_DEFINITION_ID;
+    }
+
     public MetadataService(AssetMetadata metadata, String serviceEndpoint) {
         this(metadata, serviceEndpoint, DEFAULT_SERVICE_DEFINITION_ID);
     }

@@ -62,10 +62,16 @@ public class DID {
         return this;
     }
 
+
     public class DIDFormatException extends Exception {
         public DIDFormatException(String s) {
             super(s);
         }
     }
 
+    public static class DIDGenerationException extends Exception {
+        public DIDGenerationException(String s) {
+            super(s);
+        }
+    }
 }

@@ -6,6 +6,9 @@ public class Endpoints {
     private String purchaseEndpoint;
     private String metadataEndpoint;
 
+    public Endpoints() {
+    }
+
     public Endpoints(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint) {
         this.accessEndpoint = accessEndpoint;
         this.purchaseEndpoint = purchaseEndpoint;

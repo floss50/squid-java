@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.core.FromJsonToModel;
 import com.oceanprotocol.squid.models.AbstractModel;
 
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic=true)
 public class Service extends AbstractModel implements FromJsonToModel {
+
 
     @JsonIgnore
     public static final String CONSUMER_ADDRESS_PARAM = "consumerAddress";
@@ -38,6 +40,8 @@ public class Service extends AbstractModel implements FromJsonToModel {
 
     @JsonProperty
     public String serviceEndpoint;
+
+    public Service() {}
 
     public Service(serviceTypes type, String serviceEndpoint, String serviceDefinitionId) {
         this.type= type.toString();

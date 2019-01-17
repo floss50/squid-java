@@ -21,6 +21,8 @@ public class InitializeAccessSLA extends AbstractModel implements FromJsonToMode
     @JsonProperty
     public String consumerAddress;
 
+    public InitializeAccessSLA() {}
+
     public InitializeAccessSLA(String did, String serviceAgreementId, String serviceDefinitionId, String signature, String consumerAddress) {
         this.did = did;
         this.serviceAgreementId = serviceAgreementId;

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
 
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

@@ -30,6 +30,7 @@ public class AccessService extends Service {
     @JsonProperty
     public ServiceAgreementContract serviceAgreementContract;
 
+    //@JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
     public static class ServiceAgreementContract {
 
@@ -45,10 +46,17 @@ public class AccessService extends Service {
         public ServiceAgreementContract() {}
     }
 
+
+
+    public AccessService() {
+        this.type= serviceTypes.Access.toString();
+    }
+
     public AccessService(String serviceEndpoint, String serviceDefinitionId)  {
         super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
         this.templateId= ACCESS_TEMPLATE_ID;
     }
+
 
     public AccessService(String serviceEndpoint, String serviceDefinitionId,
                          ServiceAgreementContract serviceAgreementContract
@@ -68,15 +76,15 @@ public class AccessService extends Service {
      */
     public String generateServiceAgreementHash(String serviceAgreementId) throws IOException  {
         String params=
-                    templateId
-                    + fetchConditionKeys()
-                    + fetchConditionValues()
-                    + fetchTimeout()
-                    + serviceAgreementId;
+                templateId
+                        + fetchConditionKeys()
+                        + fetchConditionValues()
+                        + fetchTimeout()
+                        + serviceAgreementId;
+
 
         return Hash.sha3(EthereumHelper.remove0x(params));
     }
-
     public String generateServiceAgreementSignatureFromHash(Web3j web3, String address, String hash) throws IOException {
         return EthereumHelper.ethSignMessage(web3, hash, address);
     }
@@ -86,14 +94,18 @@ public class AccessService extends Service {
         return EthereumHelper.ethSignMessage(web3, hash, address);
     }
 
+
     public String fetchConditionKeys()  {
         String conditionKeys= "";
 
+        int counter= 0;
         for (Condition condition: conditions)   {
             conditionKeys= conditionKeys + EthereumHelper.remove0x(condition.conditionKey);
+            counter++;
         }
         return conditionKeys;
     }
+
 
     public String fetchConditionValues() throws UnsupportedEncodingException {
         String data= "";
@@ -107,10 +119,11 @@ public class AccessService extends Service {
                 else if (param.type.contains("bytes32"))
                     token= token + EthereumHelper.remove0x((String) param.value);
                 else if (param.type.contains("int"))
-                  if (param.value instanceof String)
+                    // token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                    if (param.value instanceof String)
                         token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", Integer.parseInt((String)param.value)));
-                else
-                      token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
+                    else
+                        token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
 
             }
             data= data + EthereumHelper.remove0x(Hash.sha3(token));
@@ -129,5 +142,6 @@ public class AccessService extends Service {
 
         return data;
     }
+
 
 }

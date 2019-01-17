@@ -41,6 +41,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public List<Authentication> authentication= new ArrayList<>();
 
+    //@JsonProperty("service")
     @JsonIgnore
     public List<Service> services= new ArrayList<>();
 
@@ -57,6 +58,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
     @JsonProperty
     public Date updated;
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
