@@ -20,11 +20,11 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-public class AssetsControllerIT {
+public class AssetsManagerIT {
 
-    private static final Logger log = LogManager.getLogger(AssetsControllerIT.class);
+    private static final Logger log = LogManager.getLogger(AssetsManagerIT.class);
 
-    private static AssetsController manager;
+    private static AssetsManager manager;
     private static KeeperDto keeper;
     private static AquariusDto aquarius;
 
@@ -46,7 +46,7 @@ public class AssetsControllerIT {
 
         keeper = ManagerHelper.getKeeper(config);
         aquarius = ManagerHelper.getAquarius(config);
-        manager = AssetsController.getInstance(keeper, aquarius);
+        manager = AssetsManager.getInstance(keeper, aquarius);
 
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         ddoBase = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);

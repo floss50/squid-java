@@ -8,13 +8,13 @@ import com.oceanprotocol.squid.dto.KeeperDto;
 import org.web3j.crypto.CipherException;
 import java.io.IOException;
 
-public abstract class BaseController {
+public abstract class BaseManager {
 
     private KeeperDto keeperDto;
     private AquariusDto aquariusDto;
     private SecretStoreDto secretStoreDto;
     private EvmDto evmDto;
-    private SecretStoreController secretStoreController;
+    private SecretStoreManager secretStoreManager;
     protected OceanToken tokenContract;
     protected OceanMarket oceanMarket;
     protected DIDRegistry didRegistry;
@@ -54,7 +54,7 @@ public abstract class BaseController {
      * @throws IOException
      * @throws CipherException
      */
-    public BaseController(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
+    public BaseManager(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
         this.keeperDto= keeperDto;
         this.aquariusDto = aquariusDto;
     }
@@ -77,7 +77,7 @@ public abstract class BaseController {
      * @param keeperDto KeeperDto
      * @return this
      */
-    public BaseController setKeeperDto(KeeperDto keeperDto) {
+    public BaseManager setKeeperDto(KeeperDto keeperDto) {
         this.keeperDto = keeperDto;
         return this;
     }
@@ -95,7 +95,7 @@ public abstract class BaseController {
      * @param aquariusDto AquariusDto
      * @return this
      */
-    public BaseController setAquariusDto(AquariusDto aquariusDto) {
+    public BaseManager setAquariusDto(AquariusDto aquariusDto) {
         this.aquariusDto = aquariusDto;
         return this;
     }
@@ -113,26 +113,26 @@ public abstract class BaseController {
      * @param secretStoreDto SecretStoreDto
      * @return this
      */
-    public BaseController setSecretStoreDto(SecretStoreDto secretStoreDto) {
+    public BaseManager setSecretStoreDto(SecretStoreDto secretStoreDto) {
         this.secretStoreDto = secretStoreDto;
         return this;
     }
 
     /**
-     * Get the SecretStoreController
+     * Get the SecretStoreManager
      * @return SecretStoreDto
      */
-    public SecretStoreController getSecretStoreController() {
-        return secretStoreController;
+    public SecretStoreManager getSecretStoreManager() {
+        return secretStoreManager;
     }
 
     /**
-     * Set the SecretStoreController
-     * @param secretStoreController SecretStoreDto
+     * Set the SecretStoreManager
+     * @param secretStoreManager SecretStoreDto
      * @return this
      */
-    public BaseController setSecretStoreController(SecretStoreController secretStoreController) {
-        this.secretStoreController = secretStoreController;
+    public BaseManager setSecretStoreManager(SecretStoreManager secretStoreManager) {
+        this.secretStoreManager = secretStoreManager;
         return this;
     }
 
@@ -149,7 +149,7 @@ public abstract class BaseController {
      * @param evmDto EvmDto
      * @return this
      */
-    public BaseController setEvmDto(EvmDto evmDto) {
+    public BaseManager setEvmDto(EvmDto evmDto) {
         this.evmDto = evmDto;
         return this;
     }
@@ -157,11 +157,11 @@ public abstract class BaseController {
     /**
      * Initialize the OceanToken object using the address given as parameter to point to the deployed contract
      * @param address OceanToken contract address
-     * @return AccountsController instance
+     * @return AccountsManager instance
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public BaseController setTokenContract(String address) throws IOException, CipherException {
+    public BaseManager setTokenContract(String address) throws IOException, CipherException {
         this.tokenContract= OceanToken.load(address,
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
@@ -172,9 +172,9 @@ public abstract class BaseController {
     /**
      * It sets the OceanToken stub instance
      * @param contract OceanToken instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setTokenContract(OceanToken contract)   {
+    public BaseManager setTokenContract(OceanToken contract)   {
         this.tokenContract= contract;
         return this;
     }
@@ -182,9 +182,9 @@ public abstract class BaseController {
     /**
      * Initialize the Token Contract given a contract address
      * @param address OceanToken contract address
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController initializeTokenContract(String address) throws Exception {
+    public BaseManager initializeTokenContract(String address) throws Exception {
         this.tokenContract= OceanToken.load(address,
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
@@ -196,9 +196,9 @@ public abstract class BaseController {
     /**
      * It sets the OceanMarket stub instance
      * @param contract OceanMarket instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setOceanMarketContract(OceanMarket contract)    {
+    public BaseManager setOceanMarketContract(OceanMarket contract)    {
         this.oceanMarket= contract;
         return this;
     }
@@ -207,9 +207,9 @@ public abstract class BaseController {
     /**
      * Initialize the OceanMarket Contract given a contract address
      * @param address OceanMarket contract address
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController initializeOceanMarketContract(String address) throws Exception {
+    public BaseManager initializeOceanMarketContract(String address) throws Exception {
         this.oceanMarket= OceanMarket.load(address,
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
@@ -221,11 +221,11 @@ public abstract class BaseController {
     /**
      * Initialize the DIDRegistry object using the address given as parameter to point to the deployed contract
      * @param address DIDRegistry contract address
-     * @return BaseController instance
+     * @return BaseManager instance
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public BaseController setDidRegistryContract(String address) throws IOException, CipherException {
+    public BaseManager setDidRegistryContract(String address) throws IOException, CipherException {
         this.didRegistry= DIDRegistry.load(address,
                 getKeeperDto().getWeb3(),
                 getKeeperDto().getCredentials(),
@@ -236,9 +236,9 @@ public abstract class BaseController {
     /**
      * It sets the ServiceAgreement stub instance
      * @param contract ServiceAgreement instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setServiceAgreementContract(ServiceAgreement contract)    {
+    public BaseManager setServiceAgreementContract(ServiceAgreement contract)    {
         this.serviceAgreement= contract;
         return this;
     }
@@ -246,9 +246,9 @@ public abstract class BaseController {
     /**
      * It sets the PaymentConditions stub instance
      * @param contract PaymentConditions instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setPaymentConditionsContract(PaymentConditions contract)    {
+    public BaseManager setPaymentConditionsContract(PaymentConditions contract)    {
         this.paymentConditions= contract;
         this.contractAddresses.setPaymentConditionsAddress(this.paymentConditions.getContractAddress());
         return this;
@@ -257,9 +257,9 @@ public abstract class BaseController {
     /**
      * It sets the AccessConditions stub instance
      * @param contract AccessConditions instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setAccessConditionsContract(AccessConditions contract)    {
+    public BaseManager setAccessConditionsContract(AccessConditions contract)    {
         this.accessConditions= contract;
         this.contractAddresses.setAccessConditionsAddres(this.accessConditions.getContractAddress());
         return this;
@@ -268,16 +268,16 @@ public abstract class BaseController {
     /**
      * It sets the DIDRegistry stub instance
      * @param contract DIDRegistry instance
-     * @return BaseController instance
+     * @return BaseManager instance
      */
-    public BaseController setDidRegistryContract(DIDRegistry contract)    {
+    public BaseManager setDidRegistryContract(DIDRegistry contract)    {
         this.didRegistry= contract;
         return this;
     }
 
     @Override
     public String toString() {
-        return "BaseController{" +
+        return "BaseManager{" +
                 "keeperDto=" + keeperDto +
                 ", aquariusDto=" + aquariusDto +
                 '}';

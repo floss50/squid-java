@@ -40,29 +40,29 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 
-public class OceanController extends BaseController {
+public class OceanManager extends BaseManager {
 
-    static final Logger log= LogManager.getLogger(OceanController.class);
+    static final Logger log= LogManager.getLogger(OceanManager.class);
 
     // TODO  Check the business logic in squid-py related with this DID Types !!!
     static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
 
 
-    protected OceanController(KeeperDto keeperDto, AquariusDto aquariusDto)
+    protected OceanManager(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
         super(keeperDto, aquariusDto);
     }
 
     /**
-     * Given the KeeperDto and AquariusDto, returns a new instance of OceanController
+     * Given the KeeperDto and AquariusDto, returns a new instance of OceanManager
      * using them as attributes
      * @param keeperDto Keeper Dto
      * @param aquariusDto Provider Dto
-     * @return OceanController
+     * @return OceanManager
      */
-    public static OceanController getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public static OceanManager getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
-        return new OceanController(keeperDto, aquariusDto);
+        return new OceanManager(keeperDto, aquariusDto);
     }
 
     /**
@@ -347,13 +347,13 @@ public class OceanController extends BaseController {
     private String encryptContentUrls(DID did, ArrayList<String> contentUrls, int threshold) throws IOException {
         String urls= "[" + StringsHelper.wrapWithQuotesAndJoin(contentUrls) + "]";
         log.debug("Encrypting did: "+ did.getHash());
-        return getSecretStoreController().encryptDocument(did.getHash(), urls, threshold);
+        return getSecretStoreManager().encryptDocument(did.getHash(), urls, threshold);
 
     }
 
     private String decryptContentUrls(DID did, String encryptedUrls, int threshold) throws IOException {
         log.debug("Decrypting did: "+ did.getHash());
-        return getSecretStoreController().decryptDocument(did.getHash(), encryptedUrls);
+        return getSecretStoreManager().decryptDocument(did.getHash(), encryptedUrls);
 
     }
 

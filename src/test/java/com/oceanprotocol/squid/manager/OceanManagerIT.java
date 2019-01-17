@@ -37,14 +37,14 @@ public class OceanManagerIT {
     private static DDO ddoBase;
     private static AssetMetadata metadataBase;
 
-    private static OceanController managerPublisher;
-    private static OceanController managerConsumer;
+    private static OceanManager managerPublisher;
+    private static OceanManager managerConsumer;
 
     private static KeeperDto keeperPublisher;
     private static KeeperDto keeperConsumer;
 
     private static AquariusDto aquarius;
-    private static SecretStoreController secretStore;
+    private static SecretStoreManager secretStore;
 
     private static DIDRegistry didRegistry;
     private static ServiceAgreement saContract;
@@ -105,17 +105,17 @@ public class OceanManagerIT {
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
 
-        // Initializing the OceanController for the Publisher
-        managerPublisher = OceanController.getInstance(keeperPublisher, aquarius);
-        managerPublisher.setSecretStoreController(secretStore)
+        // Initializing the OceanManager for the Publisher
+        managerPublisher = OceanManager.getInstance(keeperPublisher, aquarius);
+        managerPublisher.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
                 .setServiceAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions);
 
-        // Initializing the OceanController for the Consumer
-        managerConsumer = OceanController.getInstance(keeperConsumer, aquarius);
-        managerConsumer.setSecretStoreController(secretStore)
+        // Initializing the OceanManager for the Consumer
+        managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
+        managerConsumer.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
                 .setServiceAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)

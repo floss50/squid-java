@@ -5,7 +5,7 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
-import com.oceanprotocol.squid.manager.BaseController;
+import com.oceanprotocol.squid.manager.BaseManager;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
@@ -67,7 +67,7 @@ public class AccessSLA implements SlaFunctions {
         return accessConditions.accessGrantedEventFlowable(grantedFilter);
     }
 
-    public List<Condition> initializeConditions(String templateId, BaseController.ContractAddresses addresses, Map<String, Object> params) throws IOException {
+    public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws IOException {
 
         params.putAll(getFunctionsFingerprints(templateId, addresses));
 
@@ -97,7 +97,7 @@ public class AccessSLA implements SlaFunctions {
      * (serviceAgreementTemplateId, address, signature)
      * @return Map of (varible name => conditionKeys)
      */
-    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseController.ContractAddresses addresses) throws UnsupportedEncodingException {
+    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
 
 
         String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());

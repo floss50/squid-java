@@ -63,7 +63,7 @@ public class AccountsManagerTest {
         when(_keeper.getWeb3()).thenReturn(_web3j);
         when(_keeper.getCredentials()).thenReturn(_credentials);
 
-        AccountsController fakeManager= AccountsController.getInstance(_keeper, aquarius);
+        AccountsManager fakeManager= AccountsManager.getInstance(_keeper, aquarius);
 
         List<Account> accounts= fakeManager.getAccounts();
 
@@ -95,7 +95,7 @@ public class AccountsManagerTest {
         when(_call.send()).thenReturn(oceanBalance);
         Mockito.doReturn(_call).when(_token).balanceOf(any());
 
-        AccountsController manager= AccountsController.getInstance(_keeper, aquarius);
+        AccountsManager manager= AccountsManager.getInstance(_keeper, aquarius);
         manager.setTokenContract(_token);
 
         Balance balance= manager.getAccountBalance(address);

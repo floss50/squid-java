@@ -10,16 +10,16 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public class SecretStoreController {
+public class SecretStoreManager {
 
-    static final Logger log= LogManager.getLogger(SecretStoreController.class);
+    static final Logger log= LogManager.getLogger(SecretStoreManager.class);
 
     private SecretStoreDto secretStoreDto;
     private EvmDto evmDto;
     private PublisherWorker publisherWorker;
     private ConsumerWorker consumerWorker;
 
-    private SecretStoreController(SecretStoreDto ssDto, EvmDto evmDto) {
+    private SecretStoreManager(SecretStoreDto ssDto, EvmDto evmDto) {
         this.secretStoreDto= ssDto;
         this.evmDto= evmDto;
         this.publisherWorker= new PublisherWorker(ssDto, evmDto);
@@ -27,8 +27,8 @@ public class SecretStoreController {
     }
 
 
-    public static SecretStoreController getInstance(SecretStoreDto ssDto, EvmDto evmDto) {
-        return new SecretStoreController(ssDto, evmDto);
+    public static SecretStoreManager getInstance(SecretStoreDto ssDto, EvmDto evmDto) {
+        return new SecretStoreManager(ssDto, evmDto);
     }
 
     public String encryptDocument(String resourceId, String content, int threshold) throws IOException    {

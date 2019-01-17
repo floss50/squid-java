@@ -19,27 +19,27 @@ import java.util.List;
 /**
  * Controller class to manage the token functions
  */
-public class AccountsController extends BaseController {
+public class AccountsManager extends BaseManager {
 
-    static final Logger log= LogManager.getLogger(AccountsController.class);
+    static final Logger log= LogManager.getLogger(AccountsManager.class);
 
     private BigInteger ERROR_BALANCE= BigInteger.ZERO;
 
-    private AccountsController(KeeperDto keeperDto, AquariusDto aquariusDto)
+    private AccountsManager(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
         super(keeperDto, aquariusDto);
     }
 
     /**
-     * Given the KeeperDto and AquariusDto, returns a new instance of AccountsController
+     * Given the KeeperDto and AquariusDto, returns a new instance of AccountsManager
      * using them as attributes
      * @param keeperDto Keeper Dto
      * @param aquariusDto Provider Dto
-     * @return AccountsController
+     * @return AccountsManager
      */
-    public static AccountsController getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public static AccountsManager getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
             throws IOException, CipherException {
-        return new AccountsController(keeperDto, aquariusDto);
+        return new AccountsManager(keeperDto, aquariusDto);
     }
 
 

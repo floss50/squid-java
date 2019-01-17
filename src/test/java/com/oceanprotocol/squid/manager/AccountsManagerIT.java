@@ -24,7 +24,7 @@ public class AccountsManagerIT {
 
     private static final Logger log = LogManager.getLogger(AccountsManagerIT.class);
 
-    private static AccountsController manager;
+    private static AccountsManager manager;
     private static KeeperDto keeper;
     private static AquariusDto aquarius;
 
@@ -40,7 +40,7 @@ public class AccountsManagerIT {
 
         keeper= ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
         aquarius= ManagerHelper.getAquarius(config);
-        manager= AccountsController.getInstance(keeper, aquarius);
+        manager= AccountsManager.getInstance(keeper, aquarius);
 
         // Deploying OceanToken Smart Contract
         oceanToken= ManagerHelper.deployOceanTokenContract(keeper);
