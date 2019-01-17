@@ -219,7 +219,7 @@ public class OceanManagerIT {
 
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
         assertTrue(accountUnlocked);
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =
@@ -246,7 +246,7 @@ public class OceanManagerIT {
 
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
         assertTrue(accountUnlocked);
 
         Flowable<AccessConditions.AccessGrantedEventResponse> response =

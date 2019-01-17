@@ -230,42 +230,7 @@ public class OceanController extends BaseController {
         return SlaManager.generateSlaId();
     }
 
-    // TODO should  the user have the responsibility of calling this method?
-    // Or should be integrated with purchase logic?
-    public boolean unlockAccount(String address, String password) throws Exception {
 
-        PersonalUnlockAccount personalUnlockAccount =
-                        this.getKeeperDto()
-                        .getWeb3()
-                        // From JsonRpc2_0Admin:
-                        // Parity has a bug where it won't support a duration
-                        // See https://github.com/ethcore/parity/issues/1215
-
-                        //From https://wiki.parity.io/JSONRPC-personal-module#personal_unlockaccount
-                        /*
-                        If permanent unlocking is disabled (the default) then the duration argument will be ignored,
-                        and the account will be unlocked for a single signing. With permanent locking enabled, the duration sets the number
-                        of seconds to hold the account open for. It will default to 300 seconds. Passing 0 unlocks the account indefinitely.
-
-                        There can only be one unlocked account at a time. (?????)
-
-                        https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
-
-                        The sign method calculates an Ethereum specific signature with:
-                        sign(keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))).
-
-                         By adding a prefix to the message makes the calculated signature recognisable as an Ethereum specific signature.
-                         This prevents misuse where a malicious DApp can sign arbitrary data (e.g. transaction) and use the signature to impersonate the victim.
-
-                         Note the address to sign with must be unlocked.
-
-                         */
-                        .personalUnlockAccount(address, password, null)
-                        // TODO Note: The Passphrasse is in plain text!!
-                        .sendAsync().get();
-
-        return personalUnlockAccount.accountUnlocked();
-    }
 
     public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
