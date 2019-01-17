@@ -45,17 +45,19 @@ public class BrizoDto {
         return true;
     }
 
+
     /**
      * Calls a Brizo´s endpoint to download an asset
      * @param serviceEndpoint
      * @param consumerAddress
      * @param serviceAgreementId
      * @param url
-     * @return An InputStream with the binary content of the asset
+     * @param destinationPath
+     * @return Boolean flag
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static InputStream consumeUrl(String serviceEndpoint, String consumerAddress, String serviceAgreementId, String url) throws IOException, URISyntaxException {
+    public static Boolean consumeUrl(String serviceEndpoint, String consumerAddress, String serviceAgreementId, String url, String destinationPath) throws IOException, URISyntaxException {
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(Service.CONSUMER_ADDRESS_PARAM, consumerAddress);
@@ -66,7 +68,9 @@ public class BrizoDto {
 
         log.debug("Consuming URL[" + url + "]: for service Agreement " + serviceAgreementId);
 
-        return HttpHelper.downloadResource(endpoint);
+        return HttpHelper.downloadResource(endpoint, destinationPath);
 
     }
+
+
 }

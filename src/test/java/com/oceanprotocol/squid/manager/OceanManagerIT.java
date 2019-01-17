@@ -19,11 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
-import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -60,12 +57,12 @@ public class OceanManagerIT {
 
     private static final String PURCHASE_ADDRESS;
     static {
-        PURCHASE_ADDRESS = config.getString("account.parity.address2");
+        PURCHASE_ADDRESS = config.getString("account.parity.address");
     }
 
     private static final String PURCHASE_PASSWORD;
     static {
-        PURCHASE_PASSWORD = config.getString("account.parity.password2");
+        PURCHASE_PASSWORD = config.getString("account.parity.password");
     }
 
     private static final String DID_REGISTRY_CONTRACT;
@@ -98,18 +95,10 @@ public class OceanManagerIT {
         aquarius= ManagerHelper.getAquarius(config);
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
 
-        /*
-        didRegistry= ManagerHelper.deployDIDRegistryContract(keeperPublisher);
-        saContract= ManagerHelper.deployServiceAgreementContract(keeperPublisher);
-        accessConditions= ManagerHelper.deployAccessConditionsContract(keeperPublisher, saContract.getContractAddress());
-        paymentConditions= ManagerHelper.deployPaymentConditionsContract(keeperPublisher, saContract.getContractAddress(), accessConditions.getContractAddress());
-        */
-
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
         saContract= ManagerHelper.loadServiceAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
-
 
         // Initializing the OceanController for the Publisher
         managerPublisher = OceanController.getInstance(keeperPublisher, aquarius);
@@ -118,7 +107,6 @@ public class OceanManagerIT {
                 .setServiceAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions);
-
 
         // Initializing the OceanController for the Consumer
         managerConsumer = OceanController.getInstance(keeperConsumer, aquarius);
@@ -145,7 +133,6 @@ public class OceanManagerIT {
         assertTrue(
                 managerPublisher.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
     }
-
 
     @Test
     public void searchOrders() {
@@ -196,35 +183,6 @@ public class OceanManagerIT {
 
     }
 
-
-
-
-
-
-    @Test
-    public void purchaseAsset() throws Exception {
-
-        String serviceDefinitionId = "1";
-
-        DDO ddo= newRegisteredAsset();
-        DID did= new DID(ddo.id);
-
-        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
-
-        // We need to unlock the account before calling the purchase method
-        // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
-        assertTrue(accountUnlocked);
-
-        Flowable<AccessConditions.AccessGrantedEventResponse> response =
-                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
-
-        // blocking for testing purpose
-        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
-        assertEquals(serviceAgreementId, event.serviceId);
-    }
-
-
     @Test
     public void resolveDID() throws Exception {
 
@@ -249,6 +207,30 @@ public class OceanManagerIT {
     }
 
 
+    @Test
+    public void purchaseAsset() throws Exception {
+
+        String serviceDefinitionId = "1";
+
+        DDO ddo= newRegisteredAsset();
+        DID did= new DID(ddo.id);
+
+        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
+
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        boolean accountUnlocked = managerConsumer.unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
+        assertTrue(accountUnlocked);
+
+        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+                managerConsumer.purchaseAsset(did, serviceDefinitionId, PURCHASE_ADDRESS, serviceAgreementId);
+
+        ManagerHelper.checkExecuteAgreementEvents(serviceAgreementId, saContract, keeperPublisher);
+
+        // blocking for testing purpose
+        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+        assertEquals("0x" + serviceAgreementId, EncodingHelper.toHexString(event.serviceId));
+    }
 
     @Test
     public void consumerAsset() throws Exception {
@@ -274,8 +256,10 @@ public class OceanManagerIT {
         log.debug("Waiting for granted Access............");
         AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
 
+        // ManagerHelper.checkExecuteAgreementEvents(serviceAgreementId, saContract, keeperPublisher);
+
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        managerConsumer.consume(serviceDefinitionId, serviceAgreementId, did, PURCHASE_ADDRESS, "~/tmp/");
+        managerConsumer.consume(serviceDefinitionId, "0x" + serviceAgreementId, did, PURCHASE_ADDRESS, "/tmp");
 
     }
 

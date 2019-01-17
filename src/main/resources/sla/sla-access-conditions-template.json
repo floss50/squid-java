@@ -35,7 +35,7 @@
       "name": "lockPayment",
       "timeout": 0
     }],
-    "timeout": 0,
+    "timeout": 3,
     "isTerminalCondition": 0,
     "conditionKey": "{function.grantAccess.conditionKey}",
     "contractName": "AccessConditions",
@@ -126,7 +126,7 @@
       "timeout": 1
     }
   ],
-  "timeout": 86400,
+  "timeout": 3,
   "isTerminalCondition": 1,
   "conditionKey": "{function.refundPayment.conditionKey}",
   "contractName": "PaymentConditions",
@@ -146,7 +146,7 @@
   "events": [
     {
       "name": "PaymentRefund",
-      "actorType": "publisher",
+      "actorType": "consumer",
       "handler": {
         "moduleName": "serviceAgreement",
         "functionName": "terminateAgreement",

@@ -13,6 +13,7 @@ import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
+import com.oceanprotocol.squid.models.HttpResponse;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
@@ -281,7 +282,7 @@ public class OceanController extends BaseController {
 
 
         return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
-                .map(event -> EncodingHelper.toHexString(event.serviceAgreementId))
+                .map(event ->  EncodingHelper.toHexString(event.serviceAgreementId))
                 .switchMap(eventServiceAgreementId -> {
                     if (eventServiceAgreementId.isEmpty())
                         return Flowable.empty();
@@ -353,20 +354,24 @@ public class OceanController extends BaseController {
             throw new IOException(e.getMessage());
         }
 
+        String checkConsumerAddress = Keys.toChecksumAddress(consumerAddress);
+
         String serviceEndpoint = ddo.getAccessService(serviceDefinitionId).serviceEndpoint;
-        List<String> contentUrls = StringsHelper.getStringsFromJoin( decryptContentUrls(did,  ddo.metadata.base.contentUrls.get(0), threshold));
+        String decryptedUrls = decryptContentUrls(did,  ddo.metadata.base.contentUrls.get(0), threshold).replace("[","").replace("]", "");
+        List<String> contentUrls = StringsHelper.getStringsFromJoin( decryptedUrls);
 
         for (String url: contentUrls) {
 
             // For each url we call to consume Brizo endpoint that requires consumerAddress, serviceAgreementId and url as a parameters
             try {
 
-                String fileName = url.substring(url.lastIndexOf("/"));
-
-                InputStream dataStream = BrizoDto.consumeUrl(serviceEndpoint, consumerAddress, serviceAgreementId, url);
+                String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String destinationPath = basePath + File.separator + fileName;
 
-                FileUtils.copyInputStreamToFile(dataStream, new File(destinationPath));
+                Boolean flag = BrizoDto.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
+                if (!flag){
+                    log.error("Error downloading " + url);
+                }
 
             } catch (URISyntaxException e) {
                 log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Malformed URL. " + e.getMessage());

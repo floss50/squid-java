@@ -40,11 +40,8 @@ public class LockPayment {
             }
             return true;
 
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             log.error("Exception encoding serviceAgreement " + e.getMessage());
-        }
-
-        finally {
             return false;
         }
 

@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -17,6 +18,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -34,11 +36,27 @@ public abstract class HttpHelper {
     private HttpHelper() {
     }
 
-    static class DownloadResponseHandler implements ResponseHandler<InputStream> {
+    static class DownloadResponseHandler implements ResponseHandler<Boolean> {
+
+        String destinationPath;
+
+        public DownloadResponseHandler(String  destinationPath) {
+
+            this.destinationPath = destinationPath;
+        }
 
         @Override
-        public InputStream handleResponse(org.apache.http.HttpResponse response) throws ClientProtocolException, IOException {
-            return  response.getEntity().getContent();
+        public Boolean handleResponse(org.apache.http.HttpResponse response)  {
+
+            try {
+
+                FileUtils.copyInputStreamToFile( response.getEntity().getContent(), new File(destinationPath));
+                return true;
+
+            } catch (IOException e) {
+                log.error("Error downloading content " + e.getMessage());
+                return false;
+            }
         }
     }
 
@@ -173,15 +191,15 @@ public abstract class HttpHelper {
         return response;
     }
 
-
     /**
      * Download the content of a resource
      * @param url
-     * @return InputStream with the binary content of the resource
+     * @param destinationPath
+     * @return Boolean flag
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static InputStream downloadResource(String url) throws IOException, URISyntaxException {
+    public static Boolean downloadResource(String url, String destinationPath) throws IOException, URISyntaxException {
 
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy()) // adds HTTP REDIRECT support to GET and POST methods
@@ -190,7 +208,7 @@ public abstract class HttpHelper {
         try {
 
             HttpGet get = new HttpGet(new URL(url).toURI()); // we're using GET but it could be via POST as well
-            return httpclient.execute(get, new DownloadResponseHandler());
+            return httpclient.execute(get, new DownloadResponseHandler(destinationPath));
 
         } catch (IOException e) {
             throw e;
@@ -201,8 +219,6 @@ public abstract class HttpHelper {
         }
 
     }
-
-
 
 
 }
