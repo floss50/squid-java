@@ -12,10 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.web3j.crypto.CipherException;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
@@ -76,9 +73,7 @@ public class AccountsManagerIT {
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
 
-
         log.debug("Balance is " + balance.toString());
-        //log.debug("Eth balance is " + Convert.fromWei(balance.getEth().toString(), Convert.Unit.ETHER).intValue());
         log.debug("Eth balance is " + balance.getEth().toString());
 
         assertEquals(1, balance.getEth().compareTo(BigInteger.ZERO));

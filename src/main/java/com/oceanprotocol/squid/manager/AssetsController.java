@@ -1,16 +1,10 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.core.sla.AccessSLA;
-import com.oceanprotocol.squid.core.sla.SlaManager;
 import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.BrizoDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
-import com.oceanprotocol.squid.models.service.AccessService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
@@ -44,20 +38,8 @@ public class AssetsController extends BaseController {
 
     }
 
-    public DDO getByDID(DID did) throws Exception   {
-        return getByDID(did.toString());
-    }
-
     public DDO getByDID(String id) throws Exception {
         return getAquariusDto().getDDOUsingId(id);
-    }
-
-    public DDO getByDIDUsingUrl(String url) throws Exception {
-        return getAquariusDto().getDDO(url);
-    }
-
-    public DDO getMetadata(String id) throws Exception {
-        return getByDID(id);
     }
 
     public boolean updateMetadata(String id, DDO ddo) throws Exception  {
@@ -83,7 +65,6 @@ public class AssetsController extends BaseController {
         }
         return new ArrayList<>();
     }
-
 
 
 }

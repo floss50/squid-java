@@ -2,17 +2,11 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oceanprotocol.squid.core.sla.AccessSLA;
-import com.oceanprotocol.squid.helpers.CryptoHelper;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.Condition;
 import com.oceanprotocol.squid.models.service.MetadataService;
-import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -21,9 +15,7 @@ import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +53,6 @@ public class DDOTest {
     @Test
     public void generateRandomDID() throws Exception {
         DID did= DID.builder();
-        //String token= EncodingHelper.encodeToHex(did.getHash());
-
         assertEquals(64, did.getHash().length());
     }
 

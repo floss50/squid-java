@@ -20,10 +20,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.admin.Admin;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

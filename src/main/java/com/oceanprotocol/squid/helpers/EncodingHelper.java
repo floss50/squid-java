@@ -32,10 +32,6 @@ public abstract class EncodingHelper {
         return byteValueLen32;
     }
 
-//    public static byte[] soliditySha3(String... params) {
-//        List<byte[]> arrays= Stream.of(params).map(Hash::sha3).collect(Collectors.toList());
-//    }
-
     public static byte[] integerToBytes(int input) {
         return ByteBuffer.allocate(Integer.BYTES).putInt(input).array();
     }
@@ -47,7 +43,6 @@ public abstract class EncodingHelper {
      * @throws UnsupportedEncodingException Error encoding to Hex
      */
     public static String encodeToHex(String input) throws UnsupportedEncodingException {
-        //return DatatypeConverter.printHexBinary(input.getBytes("UTF-8"));
         return Hex.encodeHexString(input.getBytes("UTF-8"));
     }
 
@@ -95,11 +90,7 @@ public abstract class EncodingHelper {
      * @param value
      * @return
      */
-
-
     public static String hexEncodeAbiType(String type, Object value) throws UnsupportedEncodingException {
-
-        //int size = EthereumHelper.sizeOfAbiType(type);
 
         if (type.contains("[")) {
             String subType= type.replaceAll("\\[\\]", "");

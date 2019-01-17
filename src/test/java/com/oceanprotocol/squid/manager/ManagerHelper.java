@@ -5,24 +5,12 @@ import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.EventsHelper;
 import com.typesafe.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.EventValues;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Type;
-import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.CipherException;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
-import org.web3j.protocol.core.methods.response.EthLog;
-
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
 
 public abstract class ManagerHelper {
 
@@ -69,10 +57,6 @@ public abstract class ManagerHelper {
 
     public static SecretStoreDto getSecretStoreDto(Config config) {
         return SecretStoreDto.builder(config.getString("secretstore.url"));
-    }
-
-    public static EvmDto getEvmDto(Config config) {
-        return getEvmDto(config, VmClient.ganache);
     }
 
     public static EvmDto getEvmDto(Config config, VmClient client) {

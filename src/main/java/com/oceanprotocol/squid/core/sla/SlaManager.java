@@ -22,13 +22,5 @@ public class SlaManager {
         return token.replaceAll("-", "");
     }
 
-    public void registerExecuteAgreementFlowable(Flowable<ServiceAgreement.ExecuteAgreementEventResponse> flowable) {
-        flowable.subscribe(event -> {
-            String did= EncodingHelper.toHexString(event.did);
-            String templateId= EncodingHelper.toHexString(event.templateId);
-            log.debug("Receiving event - " + EncodingHelper.toHexString(event.serviceAgreementId));
-            // 1. Resolve DID
-        });
-    }
 
 }

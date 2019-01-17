@@ -6,15 +6,7 @@ import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
 import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.tx.Contract;
-import org.web3j.tx.gas.ContractGasProvider;
-
-
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public abstract class BaseController {
 
@@ -23,17 +15,13 @@ public abstract class BaseController {
     private SecretStoreDto secretStoreDto;
     private EvmDto evmDto;
     private SecretStoreController secretStoreController;
-
     protected OceanToken tokenContract;
     protected OceanMarket oceanMarket;
     protected DIDRegistry didRegistry;
     protected ServiceAgreement serviceAgreement;
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
-
-
     protected ContractAddresses contractAddresses  = new ContractAddresses();
-
 
     public static class ContractAddresses {
 
@@ -41,11 +29,6 @@ public abstract class BaseController {
         private String accessConditionsAddres;
 
         public ContractAddresses(){}
-
-        public ContractAddresses(String paymentConditionsAddress, String accessConditionsAddres){
-            this.paymentConditionsAddress = paymentConditionsAddress;
-            this.accessConditionsAddres = accessConditionsAddres;
-        }
 
         public String getPaymentConditionsAddress() {
             return paymentConditionsAddress;
@@ -291,31 +274,6 @@ public abstract class BaseController {
         this.didRegistry= contract;
         return this;
     }
-
-
-    /**
-     * Generic Contract Stub initialization method using reflection
-     * @param address Contract address
-     * @param classz Contract.class
-     * @return contract instance instance
-     * @throws IOException IOException
-     * @throws CipherException CipherException
-     */
-    public Contract loadGenericContract(String address, Class classz)
-            throws NoSuchMethodException, IOException, CipherException, InvocationTargetException, IllegalAccessException {
-
-        Method method= classz.getMethod("load", String.class, Web3j.class, Credentials.class, ContractGasProvider.class);
-        return (Contract) method.invoke(
-                null,
-                address,
-                getKeeperDto().getWeb3(),
-                getKeeperDto().getCredentials(),
-                getKeeperDto().getContractGasProvider());
-
-    }
-
-
-
 
     @Override
     public String toString() {

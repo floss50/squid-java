@@ -7,11 +7,8 @@ import com.typesafe.config.ConfigFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Hash;
 import org.web3j.crypto.Sign;
-
 import java.io.IOException;
-
 import static org.junit.Assert.*;
 
 public class EthereumHelperTestIT {

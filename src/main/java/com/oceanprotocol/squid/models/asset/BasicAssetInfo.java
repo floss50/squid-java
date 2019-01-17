@@ -2,10 +2,8 @@ package com.oceanprotocol.squid.models.asset;
 
 public class BasicAssetInfo {
 
-
     byte[] assetId;
     Integer price;
-    String documentKeyId;
 
     public byte[] getAssetId() {
         return assetId;
@@ -23,11 +21,4 @@ public class BasicAssetInfo {
         this.price = price;
     }
 
-    public String getDocumentKeyId() {
-        return documentKeyId;
-    }
-
-    public void setDocumentKeyId(String documentKeyId) {
-        this.documentKeyId = documentKeyId;
-    }
 }

@@ -30,9 +30,6 @@ public class Order {
 //    @JsonProperty
     public int status= 0;
 
-    private Order() {
-    }
-
     public Order(String id, AssetMetadata name, int timeout) {
         this.id = id;
         this.name = name;
