@@ -146,6 +146,8 @@ public class OceanManagerIT {
 
     private DDO newRegisteredAsset() throws Exception {
 
+        metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
+
         String publicKey= config.getString("account.parity.address");
         String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
