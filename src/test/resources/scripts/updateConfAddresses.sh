@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 DIDREGISTRY_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/DIDRegistry.spree.json")
 SERVICEAGREEMENT_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/ServiceAgreement.spree.json")
