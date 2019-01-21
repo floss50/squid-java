@@ -27,7 +27,7 @@ before_install:
       sleep 5
       [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
     done
-    ls -la "${HOME}/.ocean/keeper-contracts/artifacts/
+    ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
     DIDREGISTRY_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/DIDRegistry.spree.json")
     SERVICEAGREEMENT_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/ServiceAgreement.spree.json")
     PAYMENTCONDITIONS_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/PaymentConditions.spree.json")
