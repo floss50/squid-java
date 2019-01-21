@@ -197,6 +197,10 @@
 	<build>
         <finalName>${final-name}-${project.version}</finalName>
 
+        <filters>
+            <filter>profiles/${build.profile.id}/config.properties</filter>
+        </filters>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

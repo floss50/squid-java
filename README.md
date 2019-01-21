@@ -107,26 +107,48 @@ Typically in Maven you could add the dependency:
 <dependency>
   <groupId>com.oceanprotocol</groupId>
   <artifactId>squid</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
 
-## How to run the integration tests
+## How to run the tests
 
-To run the integration tests you need to run Ganache using the following command:
+### Unit Tests
 
-```bash
-ganache-cli --account="0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7,100000000000000000000000000000000000"
-```
-
-To run the integration tests using maven:
+You can execute the unit tests using the following command:
 
 ```bash
-mvn clean -Dtest=*IT test
+mvn clean test
 ```
 
-Run the Secret Store methods require to connect to a Parity EVM client, so if you are using Ganache it's not going to work.
+### Integration Tests
+
+The execution of the integration tests require to have running the complete Ocean stack using [Ocean Barge](https://github.com/oceanprotocol/barge).
+
+After having `barge` in your environment, you can run the components needed running:
+
+```bash
+./start_ocean.sh --latest --local-spree-node --no-pleuston
+```
+
+You can execute the integration tests using the following command:
+
+```bash
+mvn clean verify -P integration-test
+```
+
+### All the tests
+
+You can run the unit and integration tests running:
+
+```bash
+mvn clean verify -P all-test
+```
+
+### Code Coverage
+
+The code coverage reports are generated using the JaCoCo Maven plugin. Reports are generated in the `target/site` folder.
 
 
 ## New Version
