@@ -38,6 +38,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class OceanManager extends BaseManager {
@@ -232,13 +233,27 @@ public class OceanManager extends BaseManager {
         }
 
         return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
-                .map(event ->  EncodingHelper.toHexString(event.serviceAgreementId))
+                .map(event -> {
+                    if (!event.state)
+                        // TODO Define a SQuid Exception to Handle this error
+                        throw new Exception("There was an error with the initialization of the serviceAgreement "
+                                                + EncodingHelper.toHexString(event.serviceAgreementId));
+                    return EncodingHelper.toHexString(event.serviceAgreementId);
+                })
                 .switchMap(eventServiceAgreementId -> {
                     if (eventServiceAgreementId.isEmpty())
                         return Flowable.empty();
                     else {
-                        this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
-                        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                        log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
+                        Boolean paymentDone = this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
+                        if (!paymentDone)
+                            // TODO Define a SQuid Exception to Handle this error
+                            throw new Exception("There was an error with LockPayment for serviceAgreement " + eventServiceAgreementId);
+                        return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId)
+                                .timeout(60, TimeUnit.SECONDS
+                                )
+                                // TODO Define a SQuid Exception to Handle this error
+                                .doOnError( throwable ->  { throw new Exception("Timeout waiting for AccessGranted"); });
                     }
                 });
 
@@ -285,13 +300,13 @@ public class OceanManager extends BaseManager {
     }
 
 
-    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws IOException {
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws Exception {
 
         return consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
     }
 
 
-    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath, int threshold) throws IOException {
+    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath, int threshold) throws Exception {
 
         DDO ddo;
 
@@ -320,18 +335,19 @@ public class OceanManager extends BaseManager {
                 Boolean flag = BrizoDto.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
                 if (!flag){
                     log.error("Error downloading " + url);
+                    // TODO Define a SQuid Exception to Handle this error
+                    throw new Exception("Error downloading " + url);
                 }
 
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException|IOException e) {
                 log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Malformed URL. " + e.getMessage());
-            } catch (IOException e) {
-                log.error("Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId + " . Error downloading. " + e.getMessage());
+                // TODO Define a SQuid Exception to Handle this error
+                throw new Exception("Error downloading " + url + " ." + e.getMessage());
             }
 
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     // TODO: to be implemented

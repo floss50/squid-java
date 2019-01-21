@@ -35,13 +35,15 @@ public class LockPayment {
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {
-                log.error("The Status received is not valid: " + receipt.getStatus());
+                log.error("The Status received is not valid executing lockPayment: " + receipt.getStatus());
                 return false;
             }
+
+            log.debug("LockPayment transactionReceipt OK");
             return true;
 
         } catch (Exception e) {
-            log.error("Exception encoding serviceAgreement " + e.getMessage());
+            log.error("Error executing lockPayment " + e.getMessage());
             return false;
         }
 
