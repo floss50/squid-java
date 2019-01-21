@@ -22,6 +22,19 @@ before_install:
 - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 - sudo apt-get install jq
 - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
+- |
+    for i in $(seq 1 50); do
+      sleep 5
+      [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
+    done
+    DIDREGISTRY_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/DIDRegistry.spree.json")
+    SERVICEAGREEMENT_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/ServiceAgreement.spree.json")
+    PAYMENTCONDITIONS_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/PaymentConditions.spree.json")
+    ACCESSCONDITIONS_ADDRESS=$(jq -r .address "${HOME}/.ocean/keeper-contracts/artifacts/AccessConditions.spree.json")
+    sed "s/contract.didRegistry.address=.*/contract.didRegistry.address=\"$DIDREGISTRY_ADDRESS\"/g" src/test/resources/application.conf
+    sed "s/contract.serviceAgreement.address=.*/contract.serviceAgreement.address=\"$SERVICEAGREEMENT_ADDRESS\"/g" src/test/resources/application.conf
+    sed "s/contract.paymentConditions.address=.*/contract.paymentConditions.address=\"$PAYMENTCONDITIONS_ADDRESS\"/g" src/test/resources/application.conf
+    sed "s/contract.accessConditions.address=.*/contract.accessConditions.address=\"$ACCESSCONDITIONS_ADDRESS\"/g" src/test/resources/application.conf
 
 install:
 - mvn --settings .maven.xml install -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
