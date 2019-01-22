@@ -32,7 +32,8 @@ before_install:
     /bin/sh src/test/resources/scripts/updateConfAddresses.sh
 
 install:
-- mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+#- mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # TODO: uncomment this when barge run properly in travis
 - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
 - export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
 
