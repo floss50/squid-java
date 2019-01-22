@@ -68,7 +68,7 @@ public class AccountsManagerTest {
         List<Account> accounts= fakeManager.getAccounts();
 
         assertTrue(accounts.size() == expectedAccounts.size());
-        assertTrue(accounts.get(0).name.startsWith("0x"));
+        assertTrue(accounts.get(0).address.startsWith("0x"));
     }
 
     @Test

@@ -16,6 +16,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
+import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
@@ -150,7 +151,7 @@ public class OceanManager extends BaseManager {
         return true;
     }
 
-    public DDO registerAsset(AssetMetadata metadata, String address, Endpoints serviceEndpoints, int threshold) throws Exception {
+    public DDO registerAsset(AssetMetadata metadata, String address, ServiceEndpoints serviceEndpoints, int threshold) throws Exception {
 
         // Initializing DDO
         DDO ddo= new DDO(address);
@@ -219,7 +220,7 @@ public class OceanManager extends BaseManager {
     }
 
 
-    public Flowable<AccessConditions.AccessGrantedEventResponse> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
+    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
 
         DDO ddo;
 
@@ -250,10 +251,14 @@ public class OceanManager extends BaseManager {
                             // TODO Define a SQuid Exception to Handle this error
                             throw new Exception("There was an error with LockPayment for serviceAgreement " + eventServiceAgreementId);
                         return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId)
+                                .map(event -> {
+                                    OrderResult result = new OrderResult(serviceAgreementId, true, false);
+                                    return result;
+                                })
                                 .timeout(60, TimeUnit.SECONDS
                                 )
                                 // TODO Define a SQuid Exception to Handle this error
-                                .doOnError( throwable ->  { throw new Exception("Timeout waiting for AccessGranted"); });
+                                .doOnError( throwable ->  { throw new Exception("Timeout waiting for AccessGranted for service agreement " + eventServiceAgreementId); });
                     }
                 });
 
@@ -300,13 +305,13 @@ public class OceanManager extends BaseManager {
     }
 
 
-    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath) throws Exception {
+    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String consumerAddress, String basePath) throws Exception {
 
-        return consume(serviceDefinitionId, serviceAgreementId, did, consumerAddress, basePath,0);
+        return consume(serviceAgreementId, did, serviceDefinitionId, consumerAddress, basePath,0);
     }
 
 
-    public boolean consume(String serviceDefinitionId, String serviceAgreementId, DID did, String consumerAddress, String basePath, int threshold) throws Exception {
+    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String consumerAddress, String basePath, int threshold) throws Exception {
 
         DDO ddo;
 
