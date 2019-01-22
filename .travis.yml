@@ -38,7 +38,7 @@ install:
 - export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
 
 script:
-- mvn clean verify -P dev
+#- mvn clean verify -P dev
 #- mvn clean verify -P all-test # TODO: uncomment this when barge run properly in travis
 
 after_success:
