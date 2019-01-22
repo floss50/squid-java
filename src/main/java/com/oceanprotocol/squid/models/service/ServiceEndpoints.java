@@ -1,15 +1,15 @@
 package com.oceanprotocol.squid.models.service;
 
-public class Endpoints {
+public class ServiceEndpoints {
 
     private String accessEndpoint;
     private String purchaseEndpoint;
     private String metadataEndpoint;
 
-    public Endpoints() {
+    public ServiceEndpoints() {
     }
 
-    public Endpoints(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint) {
+    public ServiceEndpoints(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint) {
         this.accessEndpoint = accessEndpoint;
         this.purchaseEndpoint = purchaseEndpoint;
         this.metadataEndpoint = metadataEndpoint;
@@ -19,7 +19,7 @@ public class Endpoints {
         return accessEndpoint;
     }
 
-    public Endpoints setAccessEndpoint(String accessEndpoint) {
+    public ServiceEndpoints setAccessEndpoint(String accessEndpoint) {
         this.accessEndpoint = accessEndpoint;
         return this;
     }
@@ -28,7 +28,7 @@ public class Endpoints {
         return purchaseEndpoint;
     }
 
-    public Endpoints setPurchaseEndpoint(String purchaseEndpoint) {
+    public ServiceEndpoints setPurchaseEndpoint(String purchaseEndpoint) {
         this.purchaseEndpoint = purchaseEndpoint;
         return this;
     }
@@ -37,7 +37,7 @@ public class Endpoints {
         return metadataEndpoint;
     }
 
-    public Endpoints setMetadataEndpoint(String metadataEndpoint) {
+    public ServiceEndpoints setMetadataEndpoint(String metadataEndpoint) {
         this.metadataEndpoint = metadataEndpoint;
         return this;
     }

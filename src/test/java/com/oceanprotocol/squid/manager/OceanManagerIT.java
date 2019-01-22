@@ -11,7 +11,8 @@ import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.Endpoints;
+import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.service.ServiceEndpoints;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.reactivex.Flowable;
@@ -155,7 +156,7 @@ public class OceanManagerIT {
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
-        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+        ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         return managerPublisher.registerAsset(metadataBase,
                 serviceAgreementAddress,
@@ -174,7 +175,7 @@ public class OceanManagerIT {
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
-        Endpoints serviceEndpoints= new Endpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+        ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         DDO ddo= managerPublisher.registerAsset(metadataBase,
                 serviceAgreementAddress,
@@ -227,12 +228,13 @@ public class OceanManagerIT {
         boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
         assertTrue(accountUnlocked);
 
-        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+        Flowable<OrderResult> response =
                 managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
-        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
-        assertEquals("0x" + serviceAgreementId, EncodingHelper.toHexString(event.serviceId));
+        OrderResult result = response.blockingFirst();
+        assertEquals(serviceAgreementId, result.getServiceAgreementId());
+        assertEquals(true, result.isAccessGranted());
     }
 
     @Test
@@ -251,15 +253,17 @@ public class OceanManagerIT {
         boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
         assertTrue(accountUnlocked);
 
-        Flowable<AccessConditions.AccessGrantedEventResponse> response =
+        Flowable<OrderResult> response =
                 managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
-        AccessConditions.AccessGrantedEventResponse event = response.blockingFirst();
+        OrderResult orderResult = response.blockingFirst();
+        assertEquals(true, orderResult.isAccessGranted());
 
         log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        managerConsumer.consume(SERVICE_DEFINITION_ID, "0x" + serviceAgreementId, did, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
+        boolean result = managerConsumer.consume("0x" + serviceAgreementId, did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
+        assertEquals(true, result);
 
     }
 
