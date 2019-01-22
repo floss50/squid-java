@@ -36,28 +36,6 @@ public abstract class CryptoHelper {
     private static final BigInteger MASK_256 = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
 
 
-    public static byte[] sign(byte[] hash, EdDSAPrivateKey privateKey)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature edDsaSigner= new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-        edDsaSigner.initSign(privateKey);
-        edDsaSigner.update(hash);
-        return edDsaSigner.sign();
-
-    }
-
-    public static byte[] getSha3HashRaw(byte[] input) {
-        SHA3.DigestSHA3 md = new SHA3.DigestSHA3(256); //same as DigestSHA3 md = new SHA3.Digest256();
-        md.update(input);
-        return md.digest();
-    }
-
-    public static String getSha3HashHex(byte[] input) {
-        SHA3.DigestSHA3 md = new SHA3.DigestSHA3(256); //same as DigestSHA3 md = new SHA3.Digest256();
-        md.update(input);
-        String id = getHex(md.digest());
-        return id;
-    }
-
     public static byte[] soliditySha3(Object... data) {
         if (data.length == 1) {
             return Hash.sha3(toBytes(data[0]));
@@ -103,35 +81,6 @@ public abstract class CryptoHelper {
 
         return privKey;
 
-    }
-
-    public static PrivateKey getPrivateKeyFromString(String key) throws InvalidKeySpecException, UnsupportedEncodingException {
-        return getPrivateKeyFromHex(stringToHex(key));
-    }
-
-
-    /**
-     * Public key from hex.
-     *
-     * @param hex the hex
-     * @return the public key
-     * @throws InvalidKeySpecException the invalid key spec exception
-     */
-    public static PublicKey getPublicKeyFromHex(String hex) throws InvalidKeySpecException {
-        final X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(Utils.hexToBytes(hex));
-        final PublicKey pubKey = new EdDSAPublicKey(pubKeySpec);
-
-        return pubKey;
-    }
-
-    public static PublicKey getPublicKeyFromString(String key) throws InvalidKeySpecException, UnsupportedEncodingException {
-        if (key.startsWith("0x"))
-            key= key.replaceAll("0x", "");
-        return getPublicKeyFromHex(key);
-    }
-
-    public static String stringToHex(String arg) throws UnsupportedEncodingException {
-        return String.format("%x", new BigInteger(1, arg.getBytes("UTF-8")));
     }
 
     public static byte[] toBytes(Object obj) {
