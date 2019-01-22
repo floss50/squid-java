@@ -7,7 +7,7 @@ import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -223,13 +223,8 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        // We need to unlock the account before calling the purchase method
-        // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
-        assertTrue(accountUnlocked);
-
         Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD), serviceAgreementId);
 
         // blocking for testing purpose
         OrderResult result = response.blockingFirst();
@@ -248,13 +243,8 @@ public class OceanManagerIT {
 
         String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
 
-        // We need to unlock the account before calling the purchase method
-        // to be able to generate the sign of the serviceAgreement
-        boolean accountUnlocked = managerConsumer.getKeeperDto().unlockAccount(PURCHASE_ADDRESS, PURCHASE_PASSWORD);
-        assertTrue(accountUnlocked);
-
         Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS, serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD), serviceAgreementId);
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
