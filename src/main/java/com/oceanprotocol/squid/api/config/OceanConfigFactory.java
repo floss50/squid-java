@@ -16,10 +16,6 @@ public class OceanConfigFactory {
     private static final String DEFAULT_CONSUME_PATH  = "/tmp";
 
 
-    public static OceanConfig getOceanConfig(Config config) {
-        return null;
-    }
-
     public static OceanConfig getOceanConfig(Properties properties){
 
         OceanConfig oceanConfig = new OceanConfig();

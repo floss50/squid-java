@@ -12,6 +12,9 @@ public class OceanConfig {
     public static final String KEEPER_GAS_PRICE = "keeper.gasPrice";
     public static final String AQUARIUS_URL = "aquarius.url";
     public static final String SECRETSTORE_URL = "secretstore.url";
+    public static final String MAIN_ACCOUNT_ADDRESS = "account.main.address";
+    public static final String MAIN_ACCOUNT_PASSWORD = "account.main.address";
+    public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
     public static final String DID_REGISTRY_ADDRESS = "contract.didRegistry.address";
     public static final String SERVICE_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
     public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
@@ -19,16 +22,19 @@ public class OceanConfig {
     public static final String CONSUME_BASE_PATH = "consume.basePath";
 
 
-    private String keeperUrl = "http://localhost:8545" ;
-    private BigInteger keeperGasLimit = BigInteger.valueOf(4712388l) ;
-    private BigInteger keeperGasPrice = BigInteger.valueOf(100000000000l);
-    private String aquariusUrl = "http://localhost:5000";
-    private String secretStoreUrl = "http://localhost:12001";
+    private String keeperUrl;
+    private BigInteger keeperGasLimit;
+    private BigInteger keeperGasPrice;
+    private String aquariusUrl;
+    private String secretStoreUrl;
+    private String mainAccountAddress;
+    private String mainAccountPassword;
+    private String mainAccountCredentialsFile;
     private String didRegistryAddress;
     private String serviceAgreementAddress;
     private String paymentConditionsAddress;
     private String accessConditionsAddress;
-    private String consumeBasePath = "/tmp";
+    private String consumeBasePath;
 
     public static class OceanConfigValidation {
 
@@ -80,6 +86,24 @@ public class OceanConfig {
             validation.setValid(false);
             validation.addErrorMessage("The Address of AccessConditions Contract must be set with the property "
                     + OceanConfig.ACCESS_CONDITIONS_ADDRESS);
+        }
+
+        if (oceanConfig.getMainAccountAddress() == null || oceanConfig.getMainAccountAddress().isEmpty()) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Address of the Main Account must be set with the property "
+                    + OceanConfig.MAIN_ACCOUNT_ADDRESS);
+        }
+
+        if (oceanConfig.getMainAccountPassword() == null) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Password of the Main Account must be set with the property "
+                    + OceanConfig.MAIN_ACCOUNT_PASSWORD);
+        }
+
+        if (oceanConfig.getMainAccountCredentialsFile() == null) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Credentials File of the Main Account must be set with the property "
+                    + OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE);
         }
 
         return validation;
@@ -163,5 +187,29 @@ public class OceanConfig {
 
     public void setConsumeBasePath(String consumeBasePath) {
         this.consumeBasePath = consumeBasePath;
+    }
+
+    public String getMainAccountAddress() {
+        return mainAccountAddress;
+    }
+
+    public void setMainAccountAddress(String mainAccountAddress) {
+        this.mainAccountAddress = mainAccountAddress;
+    }
+
+    public String getMainAccountPassword() {
+        return mainAccountPassword;
+    }
+
+    public void setMainAccountPassword(String mainAccountPassword) {
+        this.mainAccountPassword = mainAccountPassword;
+    }
+
+    public String getMainAccountCredentialsFile() {
+        return mainAccountCredentialsFile;
+    }
+
+    public void setMainAccountCredentialsFile(String mainAccountCredentialsFile) {
+        this.mainAccountCredentialsFile = mainAccountCredentialsFile;
     }
 }
