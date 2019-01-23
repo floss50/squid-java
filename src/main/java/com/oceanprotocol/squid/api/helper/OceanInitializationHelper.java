@@ -74,7 +74,7 @@ public class OceanInitializationHelper {
 
     public OceanToken loadOceanTokenContract(KeeperDto keeper) throws Exception, IOException, CipherException {
         return OceanToken.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getTokenAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());
@@ -83,7 +83,7 @@ public class OceanInitializationHelper {
     public OceanMarket loadOceanMarketContract(KeeperDto keeper)
             throws Exception {
         return OceanMarket.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getOceanMarketAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()
@@ -94,7 +94,7 @@ public class OceanInitializationHelper {
             throws Exception {
 
         return DIDRegistry.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getDidRegistryAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()
@@ -103,7 +103,7 @@ public class OceanInitializationHelper {
 
     public ServiceAgreement loadServiceAgreementContract(KeeperDto keeper) throws Exception, IOException, CipherException {
         return ServiceAgreement.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getServiceAgreementAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());
@@ -111,7 +111,7 @@ public class OceanInitializationHelper {
 
     public PaymentConditions loadPaymentConditionsContract(KeeperDto keeper) throws Exception, IOException, CipherException {
         return PaymentConditions.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getPaymentConditionsAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()
@@ -120,7 +120,7 @@ public class OceanInitializationHelper {
 
     public AccessConditions loadAccessConditionsContract(KeeperDto keeper) throws Exception, IOException, CipherException {
         return AccessConditions.load(
-                oceanConfig.getMainAccountAddress(),
+                oceanConfig.getAccessConditionsAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()

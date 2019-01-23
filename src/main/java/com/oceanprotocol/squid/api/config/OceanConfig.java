@@ -19,6 +19,8 @@ public class OceanConfig {
     public static final String SERVICE_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
     public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
     public static final String ACCESS_CONDITIONS_ADDRESS = "contract.accessConditions.address";
+    public static final String TOKEN_ADDRESS = "contract.token.address";
+    public static final String OCEAN_MARKET_ADDRESS = "contract.oceanmarket.address";
     public static final String CONSUME_BASE_PATH = "consume.basePath";
 
 
@@ -34,6 +36,8 @@ public class OceanConfig {
     private String serviceAgreementAddress;
     private String paymentConditionsAddress;
     private String accessConditionsAddress;
+    private String tokenAddress;
+    private String oceanMarketAddress;
     private String consumeBasePath;
 
     public static class OceanConfigValidation {
@@ -211,5 +215,21 @@ public class OceanConfig {
 
     public void setMainAccountCredentialsFile(String mainAccountCredentialsFile) {
         this.mainAccountCredentialsFile = mainAccountCredentialsFile;
+    }
+
+    public String getTokenAddress() {
+        return tokenAddress;
+    }
+
+    public void setTokenAddress(String tokenAddress) {
+        this.tokenAddress = tokenAddress;
+    }
+
+    public String getOceanMarketAddress() {
+        return oceanMarketAddress;
+    }
+
+    public void setOceanMarketAddress(String oceanMarketAddress) {
+        this.oceanMarketAddress = oceanMarketAddress;
     }
 }

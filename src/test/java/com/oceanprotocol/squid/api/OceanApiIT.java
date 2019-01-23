@@ -37,6 +37,8 @@ public class OceanApiIT {
         properties.put(OceanConfig.SERVICE_AGREEMENT_ADDRESS, "0x21668cE2116Dbc48AC116F31678CfaaeF911F7aA");
         properties.put(OceanConfig.PAYMENT_CONDITIONS_ADDRESS, "0x38A531cc85A58adCb01D6a249E33c27CE277a2D1");
         properties.put(OceanConfig.ACCESS_CONDITIONS_ADDRESS, "0x605FAF898Fc7c2Aa847Ba0D558b5251c0F128Fd7");
+        properties.put(OceanConfig.TOKEN_ADDRESS, "0xxxx");
+        properties.put(OceanConfig.OCEAN_MARKET_ADDRESS, "0xxxxx");
 
         OceanAPI oceanAPI = OceanAPI.getInstance(properties);
         assertEquals(properties.getProperty("account.main.address"), oceanAPI.getMainAccount().address);
