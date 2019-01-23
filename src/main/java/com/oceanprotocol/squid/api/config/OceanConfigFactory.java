@@ -23,8 +23,8 @@ public class OceanConfigFactory {
         properties.getOrDefault(OceanConfig.CONSUME_BASE_PATH, DEFAULT_CONSUME_PATH);
 
         oceanConfig.setKeeperUrl((String)properties.getOrDefault(OceanConfig.KEEPER_URL, DEFAULT_KEEPER_URL));
-        oceanConfig.setKeeperGasLimit(BigInteger.valueOf((Long)properties.getOrDefault(OceanConfig.KEEPER_GAS_LIMIT, DEFAULT_KEEPER_GAS_LIMIT)));
-        oceanConfig.setKeeperGasPrice(BigInteger.valueOf((Long)properties.getOrDefault(OceanConfig.KEEPER_GAS_PRICE, DEFAULT_KEEPER_GAS_PRICE)));
+        oceanConfig.setKeeperGasLimit(new BigInteger((String)properties.getOrDefault(OceanConfig.KEEPER_GAS_LIMIT, DEFAULT_KEEPER_GAS_LIMIT.toString())));
+        oceanConfig.setKeeperGasPrice(new BigInteger((String)properties.getOrDefault(OceanConfig.KEEPER_GAS_PRICE, DEFAULT_KEEPER_GAS_PRICE.toString())));
         oceanConfig.setAquariusUrl((String)properties.getOrDefault(OceanConfig.AQUARIUS_URL, DEFAULT_AQUARIUS_URL));
         oceanConfig.setSecretStoreUrl((String)properties.getOrDefault(OceanConfig.SECRETSTORE_URL, DEFAULT_SECRET_STORE_URL));
         oceanConfig.setDidRegistryAddress((String)properties.getOrDefault(OceanConfig.DID_REGISTRY_ADDRESS, ""));
@@ -32,7 +32,9 @@ public class OceanConfigFactory {
         oceanConfig.setPaymentConditionsAddress((String)properties.getOrDefault(OceanConfig.PAYMENT_CONDITIONS_ADDRESS, ""));
         oceanConfig.setAccessConditionsAddress((String)properties.getOrDefault(OceanConfig.ACCESS_CONDITIONS_ADDRESS, ""));
         oceanConfig.setConsumeBasePath((String)properties.getOrDefault(OceanConfig.CONSUME_BASE_PATH, DEFAULT_CONSUME_PATH));
-
+        oceanConfig.setMainAccountAddress((String)properties.getOrDefault(OceanConfig.MAIN_ACCOUNT_ADDRESS, ""));
+        oceanConfig.setMainAccountPassword((String)properties.getOrDefault(OceanConfig.MAIN_ACCOUNT_PASSWORD, ""));
+        oceanConfig.setMainAccountCredentialsFile((String)properties.getOrDefault(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, ""));
 
         return oceanConfig;
 

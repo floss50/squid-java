@@ -13,7 +13,7 @@ public class OceanConfig {
     public static final String AQUARIUS_URL = "aquarius.url";
     public static final String SECRETSTORE_URL = "secretstore.url";
     public static final String MAIN_ACCOUNT_ADDRESS = "account.main.address";
-    public static final String MAIN_ACCOUNT_PASSWORD = "account.main.address";
+    public static final String MAIN_ACCOUNT_PASSWORD = "account.main.password";
     public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
     public static final String DID_REGISTRY_ADDRESS = "contract.didRegistry.address";
     public static final String SERVICE_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
@@ -38,7 +38,7 @@ public class OceanConfig {
 
     public static class OceanConfigValidation {
 
-        private Boolean valid;
+        private Boolean valid = true;
         private List<String> errors = new ArrayList<>();
 
         public Boolean isValid() {

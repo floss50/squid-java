@@ -15,6 +15,7 @@ import com.oceanprotocol.squid.manager.AccountsManager;
 import com.oceanprotocol.squid.manager.AssetsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
+import com.oceanprotocol.squid.models.Account;
 import com.typesafe.config.Config;
 
 import java.util.Properties;
@@ -44,6 +45,8 @@ public class OceanAPI {
     private AssetsAPI assetsAPI;
     private SecretStoreAPI secretStoreAPI;
 
+    private Account mainAccount;
+
     private static OceanAPI oceanAPI = null;
 
 
@@ -71,6 +74,8 @@ public class OceanAPI {
         }
 
         oceanAPI = new OceanAPI(oceanConfig);
+
+        oceanAPI.mainAccount = new Account(oceanConfig.getMainAccountAddress(), oceanConfig.getMainAccountPassword());
 
         OceanInitializationHelper oceanInitializationHelper = new OceanInitializationHelper(oceanConfig);
         oceanAPI.oceanConfig = oceanConfig;
@@ -112,16 +117,20 @@ public class OceanAPI {
        return OceanAPI.getInstance(OceanAPI.toProperties(config));
     }
 
+    public Account getMainAccount() {
+        return this.mainAccount;
+    }
+
     public AccountsAPI getAccountsAPI() {
-        return accountsAPI;
+        return this.accountsAPI;
     }
 
     public AssetsAPI getAssetsAPI() {
-        return assetsAPI;
+        return this.assetsAPI;
     }
 
     public SecretStoreAPI getSecretStoreAPI() {
-        return secretStoreAPI;
+        return this.secretStoreAPI;
     }
 
 }
