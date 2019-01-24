@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class OceanApiIT {
@@ -103,11 +104,10 @@ public class OceanApiIT {
         DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
         DID did= new DID(ddo.id);
 
-        String serviceAgreementId= SlaManager.generateSlaId();
-        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount(), serviceAgreementId);
+        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
 
         OrderResult result = response.blockingFirst();
-        assertEquals(serviceAgreementId, result.getServiceAgreementId());
+        assertNotNull(result.getServiceAgreementId());
         assertEquals(true, result.isAccessGranted());
 
     }

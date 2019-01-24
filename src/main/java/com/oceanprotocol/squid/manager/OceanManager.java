@@ -214,13 +214,10 @@ public class OceanManager extends BaseManager {
         return createdDDO;
     }
 
-    public String getNewServiceAgreementId() {
 
-        return SlaManager.generateSlaId();
-    }
+    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, Account consumerAccount) throws Exception {
 
-
-    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, Account consumerAccount, String serviceAgreementId) throws Exception {
+        String serviceAgreementId = SlaManager.generateSlaId();
 
         DDO ddo;
 

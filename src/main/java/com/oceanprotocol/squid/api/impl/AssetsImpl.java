@@ -114,11 +114,11 @@ public class AssetsImpl implements AssetsAPI {
     }
 
     @Override
-    public Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount, String serviceAgreementId) {
+    public Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) {
 
         // TODO HANDLE Exception
         try {
-            return oceanManager.purchaseAsset(did, serviceDefinitionId, consumerAccount , serviceAgreementId);
+            return oceanManager.purchaseAsset(did, serviceDefinitionId, consumerAccount);
         } catch (Exception e) {
             e.printStackTrace();
         }

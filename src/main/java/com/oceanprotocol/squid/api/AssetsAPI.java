@@ -29,7 +29,7 @@ public interface AssetsAPI {
 
     public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold);
     public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath);
-    Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount, String serviceAgreementId);
+    Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount);
 
 
 
