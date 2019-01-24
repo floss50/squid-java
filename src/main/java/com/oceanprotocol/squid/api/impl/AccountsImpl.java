@@ -40,9 +40,8 @@ public class AccountsImpl implements AccountsAPI{
     }
 
     @Override
-    public TransactionReceipt requestTokens(Account account, BigInteger amount) {
+    public TransactionReceipt requestTokens(BigInteger amount) {
 
-        // TODO y el account???
         return accountsManager.requestTokens(amount);
     }
 }

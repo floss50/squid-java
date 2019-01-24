@@ -18,10 +18,9 @@ public class SecretStoreImpl implements SecretStoreAPI{
 
 
     @Override
-    public String encrypt(String documentId, String content, Account account, int threshold) {
+    public String encrypt(String documentId, String content, int threshold) {
 
         // TODO HAndle Exception
-        // TODO and the account???
         try {
             return secretStoreManager.encryptDocument(documentId, content, threshold);
         } catch (IOException e) {
@@ -32,10 +31,9 @@ public class SecretStoreImpl implements SecretStoreAPI{
     }
 
     @Override
-    public String decrypt(String documentId, String encryptedContent, Account account) {
+    public String decrypt(String documentId, String encryptedContent) {
 
         // TODO Handle Exception
-        // TODO and the account???
         try {
             return secretStoreManager.decryptDocument(documentId, encryptedContent);
         } catch (IOException e) {

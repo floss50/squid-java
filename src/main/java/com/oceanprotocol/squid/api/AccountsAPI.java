@@ -15,7 +15,7 @@ public interface AccountsAPI {
 
     public List<Account> list();
     public Balance balance(Account account);
-    public TransactionReceipt requestTokens(Account account, BigInteger amount);
+    public TransactionReceipt requestTokens(BigInteger amount);
 
 
 }

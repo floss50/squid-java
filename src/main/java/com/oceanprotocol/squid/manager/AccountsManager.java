@@ -70,29 +70,29 @@ public class AccountsManager extends BaseManager {
 
     /**
      * Given an account returns a Balance object with the Ethereum and Ocean balance
-     * @param accountName account
+     * @param accountAddress account
      * @return Balance
      */
-    public Balance getAccountBalance(String accountName)    {
+    public Balance getAccountBalance(String accountAddress)    {
         return new Balance(
-                getEthAccountBalance(accountName),
-                getOceanAccountBalance(accountName)
+                getEthAccountBalance(accountAddress),
+                getOceanAccountBalance(accountAddress)
         );
     }
 
     /**
      * Given an account returns the Ethereum balance
-     * @param accountName account
+     * @param accountAddress account
      * @return ethereum balance
      */
-    public BigInteger getEthAccountBalance(String accountName)    {
+    public BigInteger getEthAccountBalance(String accountAddress)    {
         try {
             return getKeeperDto()
                     .getWeb3()
-                    .ethGetBalance(accountName, DefaultBlockParameterName.LATEST).send()
+                    .ethGetBalance(accountAddress, DefaultBlockParameterName.LATEST).send()
                     .getBalance();
         } catch (Exception ex)  {
-            log.debug("Unable to get account(" + accountName + ") Ocean balance: " + ex.getMessage());
+            log.debug("Unable to get account(" + accountAddress + ") Ocean balance: " + ex.getMessage());
         }
         return ERROR_BALANCE;
     }
@@ -101,14 +101,14 @@ public class AccountsManager extends BaseManager {
      * Given an account returns the Ocean balance
      * Contract: OceanToken
      * Method: balanceOf
-     * @param accountName account
+     * @param accountAddress account
      * @return ocean balance
      */
-    public BigInteger getOceanAccountBalance(String accountName)    {
+    public BigInteger getOceanAccountBalance(String accountAddress)    {
         try{
-            return tokenContract.balanceOf(accountName).send();
+            return tokenContract.balanceOf(accountAddress).send();
         } catch (Exception ex)  {
-            log.debug("Unable to get account(" + accountName + ") Ocean balance: " + ex.getMessage());
+            log.debug("Unable to get account(" + accountAddress + ") Ocean balance: " + ex.getMessage());
         }
         return ERROR_BALANCE;
     }
