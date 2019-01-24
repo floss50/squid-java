@@ -24,6 +24,7 @@ import org.web3j.protocol.admin.Admin;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class OceanManagerIT {
@@ -221,38 +222,33 @@ public class OceanManagerIT {
         DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
-        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
-
         Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD));
 
         // blocking for testing purpose
         OrderResult result = response.blockingFirst();
-        assertEquals(serviceAgreementId, result.getServiceAgreementId());
+        assertNotNull(result.getServiceAgreementId());
         assertEquals(true, result.isAccessGranted());
     }
 
     @Test
     public void consumerAsset() throws Exception {
 
-
         DDO ddo= newRegisteredAsset();
         DID did= new DID(ddo.id);
 
         log.debug("DDO registered!");
 
-        String serviceAgreementId= managerConsumer.getNewServiceAgreementId();
-
         Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD), serviceAgreementId);
+                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD));
 
         // blocking for testing purpose
         log.debug("Waiting for granted Access............");
         OrderResult orderResult = response.blockingFirst();
         assertEquals(true, orderResult.isAccessGranted());
 
-        log.debug("Granted Access Received for the service Agreement " + serviceAgreementId);
-        boolean result = managerConsumer.consume("0x" + serviceAgreementId, did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
+        log.debug("Granted Access Received for the service Agreement " + orderResult.getServiceAgreementId());
+        boolean result = managerConsumer.consume("0x" + orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
         assertEquals(true, result);
 
     }
