@@ -1,6 +1,5 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.AccessSLA;
 import com.oceanprotocol.squid.core.sla.SlaManager;
@@ -11,6 +10,7 @@ import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
@@ -214,13 +214,10 @@ public class OceanManager extends BaseManager {
         return createdDDO;
     }
 
-    public String getNewServiceAgreementId() {
 
-        return SlaManager.generateSlaId();
-    }
+    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, Account consumerAccount) throws Exception {
 
-
-    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
+        String serviceAgreementId = SlaManager.generateSlaId();
 
         DDO ddo;
 
@@ -233,7 +230,8 @@ public class OceanManager extends BaseManager {
             throw new IOException(e.getMessage());
         }
 
-        return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, address, serviceAgreementId)
+        // TODO Handle Exception from initializeServiceAgreement
+        return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, consumerAccount, serviceAgreementId)
                 .map(event -> {
                     if (!event.state)
                         // TODO Define a SQuid Exception to Handle this error
@@ -264,7 +262,15 @@ public class OceanManager extends BaseManager {
 
     }
 
-    private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String address, String serviceAgreementId) throws IOException {
+    private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId,  Account consumerAccount, String serviceAgreementId) throws Exception {
+
+
+        // We need to unlock the account before calling the purchase method
+        // to be able to generate the sign of the serviceAgreement
+        // TODO Handle Exceptions
+        boolean accountUnlocked = this.getKeeperDto().unlockAccount(consumerAccount);
+        if (!accountUnlocked)
+            throw new Exception("Account has not been unnlocked");
 
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
 
@@ -272,7 +278,7 @@ public class OceanManager extends BaseManager {
         // (templateId, conditionKeys, valuesHashList, timeoutValues, serviceAgreementId)
         String agreementSignature= accessService.generateServiceAgreementSignature(
                 getKeeperDto().getWeb3(),
-                address,
+                consumerAccount.getAddress(),
                 serviceAgreementId
                 );
 
@@ -281,7 +287,7 @@ public class OceanManager extends BaseManager {
                 "0x".concat(serviceAgreementId),
                 serviceDefinitionId,
                 agreementSignature,
-                Keys.toChecksumAddress(address)
+                Keys.toChecksumAddress(consumerAccount.getAddress())
         );
 
         // 3. Send agreement details to Publisher (Brizo endpoint)

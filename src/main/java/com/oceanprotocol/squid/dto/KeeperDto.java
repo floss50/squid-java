@@ -1,5 +1,6 @@
 package com.oceanprotocol.squid.dto;
 
+import com.oceanprotocol.squid.models.Account;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
@@ -132,9 +133,7 @@ public class KeeperDto {
         return address;
     }
 
-    // TODO should  the user have the responsibility of calling this method?
-    // Or should be integrated with purchase logic?
-    public boolean unlockAccount(String address, String password) throws Exception {
+    public boolean unlockAccount(Account account) throws Exception {
 
         PersonalUnlockAccount personalUnlockAccount =
                 this
@@ -162,8 +161,7 @@ public class KeeperDto {
                          Note the address to sign with must be unlocked.
 
                          */
-                        .personalUnlockAccount(address, password, null)
-                        // TODO Note: The Passphrasse is in plain text!!
+                        .personalUnlockAccount(account.getAddress(), account.getPassword(), null)
                         .sendAsync().get();
 
         return personalUnlockAccount.accountUnlocked();
