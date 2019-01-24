@@ -1,10 +1,8 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.SecretStoreAPI;
+import com.oceanprotocol.squid.exceptions.EncryptionOceanException;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
-import com.oceanprotocol.squid.models.Account;
-
-import java.io.IOException;
 
 public class SecretStoreImpl implements SecretStoreAPI{
 
@@ -18,28 +16,16 @@ public class SecretStoreImpl implements SecretStoreAPI{
 
 
     @Override
-    public String encrypt(String documentId, String content, int threshold) {
+    public String encrypt(String documentId, String content, int threshold) throws EncryptionOceanException {
 
-        // TODO HAndle Exception
-        try {
             return secretStoreManager.encryptDocument(documentId, content, threshold);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return null;
     }
 
     @Override
-    public String decrypt(String documentId, String encryptedContent) {
+    public String decrypt(String documentId, String encryptedContent) throws EncryptionOceanException {
 
-        // TODO Handle Exception
-        try {
             return secretStoreManager.decryptDocument(documentId, encryptedContent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
+
 }

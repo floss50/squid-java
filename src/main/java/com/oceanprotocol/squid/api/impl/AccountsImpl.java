@@ -1,6 +1,7 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AccountsAPI;
+import com.oceanprotocol.squid.exceptions.EthereumOceanException;
 import com.oceanprotocol.squid.manager.AccountsManager;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
@@ -21,26 +22,19 @@ public class AccountsImpl implements AccountsAPI{
     }
 
     @Override
-    public List<Account> list() {
+    public List<Account> list() throws EthereumOceanException {
 
-        // TODO Handle Exception
-        try {
             return accountsManager.getAccounts();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     @Override
-    public Balance balance(Account account) {
+    public Balance balance(Account account) throws EthereumOceanException {
 
         return accountsManager.getAccountBalance(account.address);
     }
 
     @Override
-    public TransactionReceipt requestTokens(BigInteger amount) {
+    public TransactionReceipt requestTokens(BigInteger amount) throws EthereumOceanException {
 
         return accountsManager.requestTokens(amount);
     }

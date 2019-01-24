@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.exceptions.EthereumOceanException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import org.apache.logging.log4j.LogManager;
@@ -49,22 +50,31 @@ public class AccountsManager extends BaseManager {
      * If getBalance is true, get the ethereum and ocean balance of each account
      * @return List<Account> List of accounts
      */
-    public List<Account> getAccounts(boolean getBalance) throws IOException {
-        EthAccounts ethAccounts = getKeeperDto().getWeb3().ethAccounts().send();
+    public List<Account> getAccounts(boolean getBalance) throws EthereumOceanException {
 
-        List<Account> accounts= new ArrayList<>();
-        for (String account: ethAccounts.getAccounts())    {
-            accounts.add(new Account(account));
+        try {
+
+            EthAccounts ethAccounts = getKeeperDto().getWeb3().ethAccounts().send();
+
+            List<Account> accounts = new ArrayList<>();
+            for (String account : ethAccounts.getAccounts()) {
+                accounts.add(new Account(account));
+            }
+
+            return accounts;
+
+        } catch (IOException e) {
+            log.error("Error getting etherum accounts from keeper");
+            throw new EthereumOceanException("Error getting etherum accounts from keeper", e);
+
         }
-
-        return accounts;
     }
 
     /**
      * Returns the list of ethereum accounts registered in the Keeper node
      * @return List<Account> List of accounts without Balance information
      */
-    public List<Account> getAccounts() throws IOException {
+    public List<Account> getAccounts() throws EthereumOceanException {
         return getAccounts(false);
     }
 
@@ -73,7 +83,7 @@ public class AccountsManager extends BaseManager {
      * @param accountAddress account
      * @return Balance
      */
-    public Balance getAccountBalance(String accountAddress)    {
+    public Balance getAccountBalance(String accountAddress) throws EthereumOceanException {
         return new Balance(
                 getEthAccountBalance(accountAddress),
                 getOceanAccountBalance(accountAddress)
@@ -85,16 +95,17 @@ public class AccountsManager extends BaseManager {
      * @param accountAddress account
      * @return ethereum balance
      */
-    public BigInteger getEthAccountBalance(String accountAddress)    {
+    public BigInteger getEthAccountBalance(String accountAddress) throws EthereumOceanException {
         try {
             return getKeeperDto()
                     .getWeb3()
                     .ethGetBalance(accountAddress, DefaultBlockParameterName.LATEST).send()
                     .getBalance();
         } catch (Exception ex)  {
-            log.debug("Unable to get account(" + accountAddress + ") Ocean balance: " + ex.getMessage());
+            String msg = "Unable to get account(" + accountAddress + ") Ocean balance";
+            log.debug(msg + ": " + ex.getMessage());
+            throw new EthereumOceanException(msg, ex);
         }
-        return ERROR_BALANCE;
     }
 
     /**
@@ -104,13 +115,14 @@ public class AccountsManager extends BaseManager {
      * @param accountAddress account
      * @return ocean balance
      */
-    public BigInteger getOceanAccountBalance(String accountAddress)    {
+    public BigInteger getOceanAccountBalance(String accountAddress) throws EthereumOceanException {
         try{
             return tokenContract.balanceOf(accountAddress).send();
         } catch (Exception ex)  {
-            log.debug("Unable to get account(" + accountAddress + ") Ocean balance: " + ex.getMessage());
+            String msg = "Unable to get account(" + accountAddress + ") Ocean balance";
+            log.debug(msg + ": " + ex.getMessage());
+            throw new EthereumOceanException(msg, ex);
         }
-        return ERROR_BALANCE;
     }
 
 
@@ -121,13 +133,14 @@ public class AccountsManager extends BaseManager {
      * @param amount amount of tokens requestsd
      * @return TransactionReceipt
      */
-    public TransactionReceipt requestTokens(BigInteger amount)    {
+    public TransactionReceipt requestTokens(BigInteger amount) throws EthereumOceanException {
         try{
             return oceanMarket.requestTokens(amount).send();
         } catch (Exception ex)  {
-            log.error("Unable request tokens " + amount.intValue()+"  " + ex.getMessage());
+            String msg = "Unable request tokens " + amount.intValue();
+            log.debug(msg + ": " + ex.getMessage());
+            throw new EthereumOceanException(msg, ex);
         }
-        return null;
     }
 
 }
