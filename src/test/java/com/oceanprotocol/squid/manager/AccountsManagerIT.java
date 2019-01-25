@@ -4,6 +4,7 @@ import com.oceanprotocol.keeper.contracts.OceanMarket;
 import com.oceanprotocol.keeper.contracts.OceanToken;
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import com.typesafe.config.Config;
@@ -62,13 +63,13 @@ public class AccountsManagerIT {
     }
 
     @Test
-    public void getAccounts() throws IOException {
+    public void getAccounts() throws IOException, EthereumException {
         List<Account> accounts= manager.getAccounts();
         assertTrue(accounts.size()>0);
     }
 
     @Test
-    public void getAccountsBalance()  {
+    public void getAccountsBalance() throws EthereumException {
         manager.requestTokens(BigInteger.valueOf(100));
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
