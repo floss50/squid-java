@@ -1,5 +1,9 @@
 package com.oceanprotocol.squid.api;
 
+import com.oceanprotocol.squid.exceptions.ConsumeServiceException;
+import com.oceanprotocol.squid.exceptions.DDOException;
+import com.oceanprotocol.squid.exceptions.EthereumException;
+import com.oceanprotocol.squid.exceptions.OrderException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
@@ -14,22 +18,20 @@ import java.util.Map;
 /**
  *
  */
-// TODO Define SquidExceptions
 public interface AssetsAPI {
 
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold);
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints);
-    public DDO resolve(DID did);
+    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException;
+    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) throws DDOException;
+    public DDO resolve(DID did) throws EthereumException, DDOException;
 
-    public List<DDO> search(String text);
-    public List<DDO> search(String text,  int offset, int page);
-    public List<DDO> search(Map<String, Object> params, int offset, int page, int sort);
-    // TODO Not implemented
-    public List<DDO> query(String query);
+    public List<DDO> search(String text) throws DDOException;
+    public List<DDO> search(String text,  int offset, int page) throws DDOException;
+    public List<DDO> query(Map<String, Object> params, int offset, int page, int sort) throws DDOException;
+    public List<DDO> query(Map<String, Object> params) throws DDOException;
 
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold);
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath);
-    Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount);
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) throws ConsumeServiceException;
+    Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) throws OrderException;
 
 
 

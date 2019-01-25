@@ -1,6 +1,7 @@
 package com.oceanprotocol.squid.core.sla.func;
 
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
+import com.oceanprotocol.squid.exceptions.LockPaymentException;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
@@ -18,7 +19,7 @@ public class LockPayment {
 
     public static Boolean  executeLockPayment(PaymentConditions paymentConditions,
                                               String serviceAgreementId,
-                                              BasicAssetInfo assetInfo) {
+                                              BasicAssetInfo assetInfo) throws LockPaymentException {
 
         byte[] serviceId;
         byte[] assetId;
@@ -35,16 +36,19 @@ public class LockPayment {
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {
-                log.error("The Status received is not valid executing lockPayment: " + receipt.getStatus());
-                return false;
+                String msg = "The Status received is not valid executing lockPayment: " + receipt.getStatus() + " for serviceAgreement " + serviceAgreementId;
+                log.error(msg);
+                throw new LockPaymentException(msg);
             }
 
-            log.debug("LockPayment transactionReceipt OK");
+            log.debug("LockPayment transactionReceipt OK for serviceAgreement " + serviceAgreementId);
             return true;
 
         } catch (Exception e) {
-            log.error("Error executing lockPayment " + e.getMessage());
-            return false;
+
+            String msg = "Error executing lockPayment for serviceAgreement " + serviceAgreementId;
+            log.error(msg+ ": " + e.getMessage());
+            throw new LockPaymentException(msg, e);
         }
 
     }

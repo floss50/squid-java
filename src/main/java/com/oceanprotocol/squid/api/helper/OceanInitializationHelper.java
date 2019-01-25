@@ -72,7 +72,7 @@ public class OceanInitializationHelper {
         return AssetsManager.getInstance(keeperDto, aquariusDto);
     }
 
-    public OceanToken loadOceanTokenContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public OceanToken loadOceanTokenContract(KeeperDto keeper) throws IOException, CipherException {
         return OceanToken.load(
                 oceanConfig.getTokenAddress(),
                 keeper.getWeb3(),
@@ -101,7 +101,7 @@ public class OceanInitializationHelper {
         );
     }
 
-    public ServiceAgreement loadServiceAgreementContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public ServiceAgreement loadServiceAgreementContract(KeeperDto keeper) throws IOException, CipherException {
         return ServiceAgreement.load(
                 oceanConfig.getServiceAgreementAddress(),
                 keeper.getWeb3(),
@@ -109,7 +109,7 @@ public class OceanInitializationHelper {
                 keeper.getContractGasProvider());
     }
 
-    public PaymentConditions loadPaymentConditionsContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public PaymentConditions loadPaymentConditionsContract(KeeperDto keeper) throws  IOException, CipherException {
         return PaymentConditions.load(
                 oceanConfig.getPaymentConditionsAddress(),
                 keeper.getWeb3(),
@@ -118,7 +118,7 @@ public class OceanInitializationHelper {
         );
     }
 
-    public AccessConditions loadAccessConditionsContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public AccessConditions loadAccessConditionsContract(KeeperDto keeper) throws IOException, CipherException {
         return AccessConditions.load(
                 oceanConfig.getAccessConditionsAddress(),
                 keeper.getWeb3(),

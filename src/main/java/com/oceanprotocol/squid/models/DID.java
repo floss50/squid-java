@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
 
 import java.util.UUID;
 
@@ -63,15 +64,4 @@ public class DID {
     }
 
 
-    public class DIDFormatException extends Exception {
-        public DIDFormatException(String s) {
-            super(s);
-        }
-    }
-
-    public static class DIDGenerationException extends Exception {
-        public DIDGenerationException(String s) {
-            super(s);
-        }
-    }
 }

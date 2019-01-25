@@ -5,6 +5,7 @@ import com.oceanprotocol.secretstore.auth.ConsumerWorker;
 import com.oceanprotocol.secretstore.auth.PublisherWorker;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,11 +32,25 @@ public class SecretStoreManager {
         return new SecretStoreManager(ssDto, evmDto);
     }
 
-    public String encryptDocument(String resourceId, String content, int threshold) throws IOException    {
-        return publisherWorker.encryptDocument(resourceId, content, threshold);
+    public String encryptDocument(String resourceId, String content, int threshold) throws EncryptionException {
+
+        try {
+
+            return publisherWorker.encryptDocument(resourceId, content, threshold);
+
+        }catch (IOException e){
+            throw new EncryptionException("Error encrypting Document", e);
+        }
     }
 
-    public String decryptDocument(String resourceId, String encryptedContent) throws IOException {
-        return consumerWorker.decryptDocument(resourceId, encryptedContent);
+    public String decryptDocument(String resourceId, String encryptedContent) throws EncryptionException {
+
+        try {
+
+            return consumerWorker.decryptDocument(resourceId, encryptedContent);
+
+        }catch (IOException e){
+            throw new EncryptionException("Error decrypting Document", e);
+        }
     }
 }

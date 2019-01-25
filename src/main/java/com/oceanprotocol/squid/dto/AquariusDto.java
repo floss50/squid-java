@@ -1,14 +1,19 @@
 package com.oceanprotocol.squid.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.helpers.HttpHelper;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.HttpResponse;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class AquariusDto {
@@ -34,26 +39,46 @@ public class AquariusDto {
         return ddoEndpoint;
     }
 
-    public DDO createDDO(DDO ddo) throws Exception {
+    public DDO createDDO(DDO ddo) throws DDOException {
+
         log.debug("Creating DDO: " + ddo.id);
 
-        HttpResponse response= HttpHelper.httpClientPost(
-                this.ddoEndpoint, new ArrayList<>(), ddo.toJson());
-        if (response.getStatusCode() != 201)    {
-            throw new Exception("Unable to create DDO: " + response.toString());
+        try {
+
+            HttpResponse response= HttpHelper.httpClientPost(
+                    this.ddoEndpoint, new ArrayList<>(), ddo.toJson());
+
+            if (response.getStatusCode() != 201)    {
+                throw new DDOException("Unable to create DDO: " + response.toString());
+            }
+
+            return DDO.fromJSON(new TypeReference<DDO>() {}, response.getBody());
+
+        } catch (Exception e){
+            throw new DDOException("Error building DDO from JSON", e);
         }
-        return DDO.fromJSON(new TypeReference<DDO>() {}, response.getBody());
+
     }
 
-    public DDO getDDO(String url) throws Exception {
-        log.debug("Getting DDO: " + url);
+    public DDO getDDO(String url) throws DDOException {
 
-        HttpResponse response= HttpHelper.httpClientGet(url);
+        log.debug("Getting DDO: " + url);
+        HttpResponse response;
+
+        try {
+             response = HttpHelper.httpClientGet(url);
+        } catch (HttpException e) {
+            throw new DDOException("Unable to get DDO", e);
+        }
 
         if (response.getStatusCode() != 200)    {
-            throw new Exception("Unable to get DDO: " + response.toString());
+            throw new DDOException("Unable to get DDO: " + response.toString());
         }
-        return DDO.fromJSON(new TypeReference<DDO>() {}, response.getBody());
+        try {
+            return DDO.fromJSON(new TypeReference<DDO>() {}, response.getBody());
+        } catch (Exception e){
+            throw new DDOException("Error building DDO from JSON", e);
+        }
     }
 
     public DDO getDDOUsingId(String id) throws Exception {
@@ -72,33 +97,53 @@ public class AquariusDto {
         throw new Exception("Unable to update DDO: " + response.toString());
     }
 
-    public ArrayList<DDO> searchDDO(String param, int offset, int page) throws Exception  {
+    public ArrayList<DDO> searchDDO(String param, int offset, int page) throws DDOException  {
+
         String url= this.ddoEndpoint + "/query?text=" + param + "&page=" + page + "&offset=" + offset;
+        HttpResponse response;
 
-        HttpResponse response= HttpHelper.httpClientGet(url);
-
-        if (response.getStatusCode() != 200)    {
-            throw new Exception("Unable to search for DDO's: " + response.toString());
+        try {
+            response= HttpHelper.httpClientGet(url);
+        } catch (HttpException e) {
+            throw new DDOException("Unable to get DDO: ", e);
         }
 
-        return AbstractModel
-                .getMapperInstance()
-                .readValue(response.getBody(), new TypeReference<ArrayList<DDO>>() {});
+        if (response.getStatusCode() != 200)    {
+            throw new DDOException("Unable to search for DDO's: " + response.toString());
+        }
+
+        try {
+            return AbstractModel
+                    .getMapperInstance()
+                    .readValue(response.getBody(), new TypeReference<ArrayList<DDO>>() {});
+        } catch (IOException e) {
+            throw new DDOException("Unable to search for DDO's: ", e);
+        }
 
     }
 
-    public ArrayList<DDO> searchDDO(SearchQuery searchQuery) throws Exception  {
-        HttpResponse response= HttpHelper.httpClientPost(
-                this.ddoEndpoint + "/query", new ArrayList<>(), searchQuery.toJson()
-        );
+    public ArrayList<DDO> searchDDO(SearchQuery searchQuery) throws DDOException {
 
-        if (response.getStatusCode() != 200)    {
-            throw new Exception("Unable to search for DDO's: " + response.toString());
+        HttpResponse response;
+
+        try {
+            response = HttpHelper.httpClientPost(
+                     this.ddoEndpoint + "/query", new ArrayList<>(), searchQuery.toJson());
+        } catch (Exception e) {
+            throw new DDOException("Unable to get DDO", e);
         }
 
-        return AbstractModel
-                .getMapperInstance()
-                .readValue(response.getBody(), new TypeReference<ArrayList<DDO>>() {});
+        if (response.getStatusCode() != 200)    {
+            throw new DDOException("Unable to search for DDO's: " + response.toString());
+        }
+
+        try {
+            return AbstractModel
+                    .getMapperInstance()
+                    .readValue(response.getBody(), new TypeReference<ArrayList<DDO>>() {});
+        } catch (IOException e) {
+            throw new DDOException("Unable to search for DDO's", e);
+        }
 
     }
 

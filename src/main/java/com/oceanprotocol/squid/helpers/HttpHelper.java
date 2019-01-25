@@ -230,7 +230,7 @@ public abstract class HttpHelper {
                 .setRedirectStrategy(new LaxRedirectStrategy()) // adds HTTP REDIRECT support to GET and POST methods
                 .build();
 
-        try {
+       try {
 
             HttpGet get = new HttpGet(new URL(url).toURI()); // we're using GET but it could be via POST as well
             return httpclient.execute(get, new DownloadResponseHandler(destinationPath));

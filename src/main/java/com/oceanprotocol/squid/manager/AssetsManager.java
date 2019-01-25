@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.dto.AquariusDto;
 import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -46,24 +47,13 @@ public class AssetsManager extends BaseManager {
         return getAquariusDto().updateDDO(id, ddo);
     }
 
-    public List<DDO> searchAssets(String text, int offset, int page)   {
-        try {
+    public List<DDO> searchAssets(String text, int offset, int page) throws DDOException {
             return getAquariusDto().searchDDO(text, offset, page);
-        } catch (Exception ex)  {
-            log.error("Error searching for DDO's " + ex.getMessage());
-        }
-        return new ArrayList<>();
     }
 
-    public List<DDO> searchAssets(Map<String, Object> params, int offset, int page, int sort)   {
+    public List<DDO> searchAssets(Map<String, Object> params, int offset, int page, int sort) throws DDOException  {
         SearchQuery searchQuery= new SearchQuery(params, offset, page, sort);
-
-        try {
-            return getAquariusDto().searchDDO(searchQuery);
-        } catch (Exception ex)  {
-            log.error("Error searching for DDO's " + ex.getMessage());
-        }
-        return new ArrayList<>();
+        return getAquariusDto().searchDDO(searchQuery);
     }
 
 

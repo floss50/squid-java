@@ -61,6 +61,10 @@ public class OceanConfig {
             errors.add(error);
         }
 
+        public String errorsToString(){
+            return String.join("; ", this.errors);
+        }
+
     }
 
 

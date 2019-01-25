@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.dto.KeeperDto;
 import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.keeper.contracts.OceanToken;
@@ -44,7 +45,7 @@ public class AccountsManagerTest {
     }
 
     @Test
-    public void getAccounts()  throws IOException, CipherException {
+    public void getAccounts()  throws IOException, CipherException, EthereumException {
         List<String> expectedAccounts= new ArrayList<>();
         expectedAccounts.add("0x123");
         expectedAccounts.add("0x456");
