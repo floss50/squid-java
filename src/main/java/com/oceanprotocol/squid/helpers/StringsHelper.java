@@ -11,10 +11,20 @@ import static java.util.stream.Collectors.toList;
 
 public class StringsHelper {
 
+    /**
+     * Given a list of strings join all of them using quotes wrapping each item with quotes
+     * @param listOfStrings
+     * @return output string
+     */
     public static String wrapWithQuotesAndJoin(List<String> listOfStrings)   {
         return listOfStrings.isEmpty() ? "" : "\"" + String.join("\",\"", listOfStrings) + "\"";
     }
 
+    /**
+     * Given a string with joined items by comma, return a list of items. Each item will have replaced the double quoutes
+     * @param joinedString
+     * @return list of items
+     */
     public static List<String> getStringsFromJoin(String joinedString) {
 
         return Stream.of(joinedString.split(","))
@@ -24,6 +34,14 @@ public class StringsHelper {
     }
 
 
+    /**
+     * Given a String and a map of key values, search in the string the variables using the ${xxx} format
+     * and replace by the correspondant value of the map
+     * Example: given: xxx${key1}yyy and "key1" -> "000" the output will be xxx000yyy
+     * @param format input string with ${xxx} variables
+     * @param values map with key values to replace in the string
+     * @return output string with the variables replaced
+     */
     public static String format(String format, Map<String, Object> values) {
 
         StringBuilder formatter = new StringBuilder(format);

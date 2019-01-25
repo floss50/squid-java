@@ -26,14 +26,15 @@ public abstract class EncodingHelper {
         return new Bytes32(byteValueLen32);
     }
 
+    /**
+     * Given a byte array returns the first 32 bytes in a new byte array
+     * @param byteValue byte[]
+     * @return byte[]
+     */
     public static byte[] byteArrayToByteArray32(byte[] byteValue) {
         byte[] byteValueLen32 = new byte[32];
         System.arraycopy(byteValue, 0, byteValueLen32, 0, byteValue.length);
         return byteValueLen32;
-    }
-
-    public static byte[] integerToBytes(int input) {
-        return ByteBuffer.allocate(Integer.BYTES).putInt(input).array();
     }
 
     /**
@@ -46,49 +47,65 @@ public abstract class EncodingHelper {
         return Hex.encodeHexString(input.getBytes("UTF-8"));
     }
 
+    /**
+     * Encodes a Hex String in a byte array
+     * @param input hex string to encode
+     * @return byte[]
+     * @throws UnsupportedEncodingException Error encoding to byte array
+     */
     public static byte[] hexStringToBytes(String input) throws UnsupportedEncodingException {
         return Numeric.hexStringToByteArray(input);
     }
 
+    /**
+     * Convert a string to hex and after to a byte array
+     * @param input
+     * @return byte[]
+     * @throws UnsupportedEncodingException
+     */
     public static byte[] stringToBytes(String input) throws UnsupportedEncodingException {
         return hexStringToBytes(encodeToHex(input));
     }
 
-    public static Bytes32 stringHexToBytes32(String input) throws UnsupportedEncodingException {
-        return stringToBytes32(encodeToHex(input));
-    }
-
+    /**
+     * Pad a string with zero given a specific length
+     * @param input string
+     * @param len length of the output string
+     * @return string
+     */
     public static String padRightWithZero(String input, int len) {
-        return String.format("%-"+ len +"s", input).replace(' ', '0');
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            sb.append('0');
+        }
+        return input + sb.substring(input.length());
 
     }
 
+    /**
+     * Convert a byte[] to a hex string with 0x appended
+     * @param input byte[]
+     * @return hex string
+     */
     public static String toHexString(byte[] input)  {
         return Numeric.toHexString(input);
     }
 
     /**
-     *     if is_array_type(abi_type):
-     *         sub_type = sub_type_of_array_type(abi_type)
-     *         return "".join([remove_0x_prefix(hex_encode_abi_type(sub_type, v, 256)) for v in value])
-     *     elif is_bool_type(abi_type):
-     *         return to_hex_with_size(value, data_size)
-     *     elif is_uint_type(abi_type):
-     *         return to_hex_with_size(value, data_size)
-     *     elif is_int_type(abi_type):
-     *         return to_hex_twos_compliment(value, data_size)
-     *     elif is_address_type(abi_type):
-     *         return pad_hex(value, data_size)
-     *     elif is_bytes_type(abi_type):
-     *         if is_bytes(value):
-     *             return encode_hex(value)
-     *         else:
-     *             return value
-     *     elif is_string_type(abi_type):
-     *         return to_hex(text=value)
+     * Return true or false if a input string is in hex format
+     * @param input
+     * @return
+     */
+    public static boolean isHexString(String input) {
+        return input.matches("-?[0-9a-fA-F]+");
+    }
+
+    /**
+     * Given a type and an object, convert to the proper web3j abi type
      * @param type
      * @param value
-     * @return
+     * @return String in hex format
+     * @throws UnsupportedEncodingException
      */
     public static String hexEncodeAbiType(String type, Object value) throws UnsupportedEncodingException {
 

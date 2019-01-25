@@ -111,15 +111,32 @@ public abstract class HttpHelper {
 
     /**
      * Send a HTTP request with parameters and return the HttpResponse object
-     * @param list parameters
-     * @return HttpResponse returned
-     * @throws HttpException Http error
+     * @param method EntityEnclosingMethod
+     * @param list list of params
+     * @param payload payload to add to the request
+     * @return HttpResponse
+     * @throws HttpException
+     * @throws UnsupportedEncodingException
      */
+
     public static final HttpResponse httpClientGenericMethod(EntityEnclosingMethod method, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
+        return httpClientGenericMethod(new HttpClient(), method, list, payload);
+    }
+
+    /**
+     * Send a HTTP request with parameters and return the HttpResponse object
+     * @param client HttpClient
+     * @param method EntityEnclosingMethod
+     * @param list list of params
+     * @param payload payload to add to the request
+     * @return HttpResponse
+     * @throws HttpException
+     * @throws UnsupportedEncodingException
+     */
+    public static final HttpResponse httpClientGenericMethod(HttpClient client, EntityEnclosingMethod method, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
 
         HttpResponse response;
         StringRequestEntity requestEntity= null;
-        HttpClient client = new HttpClient();
 
         if (null != payload && payload.length() >0) {
             requestEntity = new StringRequestEntity(
@@ -159,17 +176,27 @@ public abstract class HttpHelper {
 
     /**
      * Send a HTTP GET request and return the HttpResponse object
-     * @param url url to call
-     * @return HttpResponse returned
-     * @throws HttpException Http error
+     * @param url
+     * @return HttpResponse
+     * @throws HttpException
      */
     public static final HttpResponse httpClientGet(String url) throws HttpException {
+        return httpClientGet(new HttpClient(), new GetMethod(url));
+    }
 
-        log.debug("Getting URL: "+ url);
+
+    /**
+     * Send a HTTP GET request and return the HttpResponse object
+     * @param client HttpClient
+     * @param getMethod GetMethod
+     * @return HttpResponse
+     * @throws HttpException
+     */
+    public static final HttpResponse httpClientGet(HttpClient client, GetMethod getMethod) throws HttpException {
+
+        log.debug("Getting URL: "+ getMethod.getURI());
 
         HttpResponse response;
-        HttpClient client = new HttpClient();
-        GetMethod getMethod = new GetMethod(url);
         try {
 
             client.executeMethod(getMethod);
