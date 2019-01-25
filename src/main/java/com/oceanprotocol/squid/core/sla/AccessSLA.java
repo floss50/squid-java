@@ -3,12 +3,15 @@ package com.oceanprotocol.squid.core.sla;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.BaseManager;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.crypto.Hash;
@@ -16,7 +19,6 @@ import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,6 +28,8 @@ import java.util.Map;
 
 
 public class AccessSLA implements SlaFunctions {
+
+    static final Logger log= LogManager.getLogger(AccessSLA.class);
 
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
@@ -67,23 +71,30 @@ public class AccessSLA implements SlaFunctions {
         return accessConditions.accessGrantedEventFlowable(grantedFilter);
     }
 
-    public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws IOException {
+    public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws InitializeConditionsException {
 
-        params.putAll(getFunctionsFingerprints(templateId, addresses));
+        try {
+            params.putAll(getFunctionsFingerprints(templateId, addresses));
 
-        if (conditionsTemplate == null)
-            conditionsTemplate = new String(Files.readAllBytes(Paths.get(ACCESS_CONDITIONS_FILE_TEMPLATE)));
+            if (conditionsTemplate == null)
+                conditionsTemplate = new String(Files.readAllBytes(Paths.get(ACCESS_CONDITIONS_FILE_TEMPLATE)));
 
-        params.forEach( (_name, _func) -> {
-            if (_func instanceof byte[])
-                conditionsTemplate= conditionsTemplate.replaceAll("\\{" + _name + "\\}", CryptoHelper.getHex((byte[]) _func));
-            else
-                conditionsTemplate= conditionsTemplate.replaceAll("\\{" + _name + "\\}", _func.toString());
-        });
+            params.forEach((_name, _func) -> {
+                if (_func instanceof byte[])
+                    conditionsTemplate = conditionsTemplate.replaceAll("\\{" + _name + "\\}", CryptoHelper.getHex((byte[]) _func));
+                else
+                    conditionsTemplate = conditionsTemplate.replaceAll("\\{" + _name + "\\}", _func.toString());
+            });
 
-        return AbstractModel
-                .getMapperInstance()
-                .readValue(conditionsTemplate, new TypeReference<List<Condition>>() {});
+            return AbstractModel
+                    .getMapperInstance()
+                    .readValue(conditionsTemplate, new TypeReference<List<Condition>>() {
+                    });
+        }catch (Exception e) {
+            String msg = "Error initializing conditions for template: " +  templateId;
+            log.error(msg);
+            throw new InitializeConditionsException(msg, e);
+        }
     }
 
     private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";

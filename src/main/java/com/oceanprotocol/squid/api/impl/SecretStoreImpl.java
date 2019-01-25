@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.SecretStoreAPI;
-import com.oceanprotocol.squid.exceptions.EncryptionOceanException;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
 
 public class SecretStoreImpl implements SecretStoreAPI{
@@ -16,14 +16,14 @@ public class SecretStoreImpl implements SecretStoreAPI{
 
 
     @Override
-    public String encrypt(String documentId, String content, int threshold) throws EncryptionOceanException {
+    public String encrypt(String documentId, String content, int threshold) throws EncryptionException {
 
             return secretStoreManager.encryptDocument(documentId, content, threshold);
 
     }
 
     @Override
-    public String decrypt(String documentId, String encryptedContent) throws EncryptionOceanException {
+    public String decrypt(String documentId, String encryptedContent) throws EncryptionException {
 
             return secretStoreManager.decryptDocument(documentId, encryptedContent);
     }

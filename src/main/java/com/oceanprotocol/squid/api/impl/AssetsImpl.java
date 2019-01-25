@@ -1,6 +1,10 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AssetsAPI;
+import com.oceanprotocol.squid.exceptions.ConsumeServiceException;
+import com.oceanprotocol.squid.exceptions.DDOException;
+import com.oceanprotocol.squid.exceptions.EthereumException;
+import com.oceanprotocol.squid.exceptions.OrderException;
 import com.oceanprotocol.squid.manager.AssetsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.Account;
@@ -28,101 +32,52 @@ public class AssetsImpl implements AssetsAPI {
 
 
     @Override
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, threshold);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException{
+        return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, threshold);
     }
 
     @Override
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) throws DDOException{
+        return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, 0);
     }
 
     @Override
-    public DDO resolve(DID did) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.resolveDID(did);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public DDO resolve(DID did) throws EthereumException, DDOException {
+        return oceanManager.resolveDID(did);
     }
 
     @Override
-    public List<DDO> search(String text) {
-
-        // TODO
+    public List<DDO> search(String text) throws DDOException{
         return assetsManager.searchAssets(text, 0, 0);
     }
 
     @Override
-    public List<DDO> search(String text, int offset, int page) {
+    public List<DDO> search(String text, int offset, int page) throws DDOException {
         return assetsManager.searchAssets(text, offset, page);
     }
 
     @Override
-    public List<DDO> search(Map<String, Object> params, int offset, int page, int sort) {
+    public List<DDO> query(Map<String, Object> params, int offset, int page, int sort)  throws DDOException {
         return assetsManager.searchAssets(params, offset, page, sort);
     }
 
-    // TODO Not Implemented
     @Override
-    public List<DDO> query(String query) {
-        return null;
+    public List<DDO> query(Map<String, Object> params)  throws DDOException {
+        return assetsManager.searchAssets(params, 0, 0, 0);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath, threshold);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold) throws ConsumeServiceException {
+        return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath, threshold);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) throws ConsumeServiceException {
+        return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath);
     }
 
     @Override
-    public Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) {
-
-        // TODO HANDLE Exception
-        try {
-            return oceanManager.purchaseAsset(did, serviceDefinitionId, consumerAccount);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) throws OrderException{
+        return oceanManager.purchaseAsset(did, serviceDefinitionId, consumerAccount);
     }
 }

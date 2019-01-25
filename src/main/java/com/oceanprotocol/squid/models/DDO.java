@@ -3,6 +3,8 @@ package com.oceanprotocol.squid.models;
 import com.fasterxml.jackson.annotation.*;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.core.FromJsonToModel;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
+import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.MetadataService;
@@ -135,12 +137,12 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
-    public DDO() throws DID.DIDFormatException {
+    public DDO() throws DIDFormatException {
         this.did= generateDID();
         this.id= this.did.toString();
     }
 
-    public DDO(String publicKey) throws DID.DIDFormatException {
+    public DDO(String publicKey) throws DIDFormatException {
         this(generateDID(), publicKey);
     }
 
@@ -152,7 +154,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.publicKeys.add( new DDO.PublicKey(this.id, ETHEREUM_KEY_TYPE, this.id));
     }
 
-    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DID.DIDFormatException {
+    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DIDFormatException {
         this(publicKey);
         MetadataService service= new MetadataService(metadata, serviceUrl);
         this.metadata= metadata;
@@ -215,7 +217,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
-    public static DID generateDID() throws DID.DIDFormatException {
+    public static DID generateDID() throws DIDFormatException {
         DID did= DID.builder();
         log.debug("Id generated: " + did.toString());
         return did;
@@ -228,13 +230,13 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
 
 
-    public AccessService getAccessService(String serviceDefinitionId) throws IOException {
+    public AccessService getAccessService(String serviceDefinitionId) throws ServiceException {
         for (Service service: services) {
             if (service.serviceDefinitionId.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.Access.toString())) {
                 return (AccessService) service;
             }
         }
-        throw new IOException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
+        throw new ServiceException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
     }
 
 
