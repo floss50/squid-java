@@ -1,6 +1,5 @@
-package com.oceanprotocol.squid.dto;
+package com.oceanprotocol.squid.external;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.helpers.HttpHelper;
@@ -13,24 +12,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-public class AquariusDto {
+public class AquariusService {
 
-    private static final Logger log = LogManager.getLogger(AquariusDto.class);
+    private static final Logger log = LogManager.getLogger(AquariusService.class);
 
     private static final String DDO_URI = "/api/v1/aquarius/assets/ddo";
     private String ddoEndpoint;
 
     private String url;
 
-    public static AquariusDto getInstance(String url)    {
+    public static AquariusService getInstance(String url)    {
         log.debug("Getting Aquarius instance: " + url);
-        return new AquariusDto(url);
+        return new AquariusService(url);
     }
 
-    private AquariusDto(String url) {
+    private AquariusService(String url) {
         this.url= url.replaceAll("/$", "");
         this.ddoEndpoint = this.url + DDO_URI;
     }

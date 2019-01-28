@@ -3,8 +3,8 @@ package com.oceanprotocol.squid.manager;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.typesafe.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +18,12 @@ public abstract class ManagerHelper {
 
     public enum VmClient { ganache, parity}
 
-    public static KeeperDto getKeeper(Config config) throws IOException, CipherException {
+    public static KeeperService getKeeper(Config config) throws IOException, CipherException {
         return getKeeper(config, VmClient.ganache);
     }
 
-    public static KeeperDto getKeeper(Config config, VmClient client) throws IOException, CipherException {
-        KeeperDto keeper= KeeperDto.getInstance(
+    public static KeeperService getKeeper(Config config, VmClient client) throws IOException, CipherException {
+        KeeperService keeper= KeeperService.getInstance(
                 config.getString("keeper.url"),
                 config.getString("account." + client.toString() + ".address"),
                 config.getString("account." + client.toString() + ".password"),
@@ -37,8 +37,8 @@ public abstract class ManagerHelper {
     }
 
 
-    public static KeeperDto getKeeper(Config config, VmClient client, String nAddress) throws IOException, CipherException {
-        KeeperDto keeper= KeeperDto.getInstance(
+    public static KeeperService getKeeper(Config config, VmClient client, String nAddress) throws IOException, CipherException {
+        KeeperService keeper= KeeperService.getInstance(
                 config.getString("keeper.url"),
                 config.getString("account." + client.toString() + ".address" + nAddress),
                 config.getString("account." + client.toString() + ".password" + nAddress),
@@ -51,8 +51,8 @@ public abstract class ManagerHelper {
         return keeper;
     }
 
-    public static AquariusDto getAquarius(Config config) {
-        return AquariusDto.getInstance(config.getString("aquarius.url"));
+    public static AquariusService getAquarius(Config config) {
+        return AquariusService.getInstance(config.getString("aquarius.url"));
     }
 
     public static SecretStoreDto getSecretStoreDto(Config config) {
@@ -72,14 +72,14 @@ public abstract class ManagerHelper {
     }
 
 
-    public static OceanToken deployOceanTokenContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public static OceanToken deployOceanTokenContract(KeeperService keeper) throws Exception, IOException, CipherException {
         return OceanToken.deploy(
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()).send();
     }
 
-    public static OceanToken loadOceanTokenContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+    public static OceanToken loadOceanTokenContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return OceanToken.load(
                 address,
                 keeper.getWeb3(),
@@ -87,7 +87,7 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider());
     }
 
-    public static OceanMarket deployOceanMarketContract(KeeperDto keeper, String tokenAddress)
+    public static OceanMarket deployOceanMarketContract(KeeperService keeper, String tokenAddress)
             throws Exception {
         return OceanMarket.deploy(
                 keeper.getWeb3(),
@@ -97,7 +97,7 @@ public abstract class ManagerHelper {
                 ).send();
     }
 
-    public static OceanMarket loadOceanMarketContract(KeeperDto keeper, String address)
+    public static OceanMarket loadOceanMarketContract(KeeperService keeper, String address)
             throws Exception {
         return OceanMarket.load(
                 address,
@@ -107,7 +107,7 @@ public abstract class ManagerHelper {
         );
     }
 
-    public static DIDRegistry deployDIDRegistryContract(KeeperDto keeper)
+    public static DIDRegistry deployDIDRegistryContract(KeeperService keeper)
             throws Exception {
 
         return DIDRegistry.deploy(
@@ -117,7 +117,7 @@ public abstract class ManagerHelper {
         ).send();
     }
 
-    public static DIDRegistry loadDIDRegistryContract(KeeperDto keeper, String address)
+    public static DIDRegistry loadDIDRegistryContract(KeeperService keeper, String address)
             throws Exception {
 
         return DIDRegistry.load(
@@ -128,14 +128,14 @@ public abstract class ManagerHelper {
         );
     }
 
-    public static ServiceAgreement deployServiceAgreementContract(KeeperDto keeper) throws Exception, IOException, CipherException {
+    public static ServiceAgreement deployServiceAgreementContract(KeeperService keeper) throws Exception, IOException, CipherException {
         return ServiceAgreement.deploy(
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()).send();
     }
 
-    public static ServiceAgreement loadServiceAgreementContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+    public static ServiceAgreement loadServiceAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return ServiceAgreement.load(
                 address,
                 keeper.getWeb3(),
@@ -144,7 +144,7 @@ public abstract class ManagerHelper {
     }
 
 
-    public static PaymentConditions deployPaymentConditionsContract(KeeperDto keeper, String saAddress, String tokenAddress) throws Exception, IOException, CipherException {
+    public static PaymentConditions deployPaymentConditionsContract(KeeperService keeper, String saAddress, String tokenAddress) throws Exception, IOException, CipherException {
         return PaymentConditions.deploy(
                 keeper.getWeb3(),
                 keeper.getCredentials(),
@@ -154,7 +154,7 @@ public abstract class ManagerHelper {
         ).send();
     }
 
-    public static PaymentConditions loadPaymentConditionsContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+    public static PaymentConditions loadPaymentConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return PaymentConditions.load(
                 address,
                 keeper.getWeb3(),
@@ -164,7 +164,7 @@ public abstract class ManagerHelper {
     }
 
 
-    public static AccessConditions deployAccessConditionsContract(KeeperDto keeper, String saAddress) throws Exception, IOException, CipherException {
+    public static AccessConditions deployAccessConditionsContract(KeeperService keeper, String saAddress) throws Exception, IOException, CipherException {
         return AccessConditions.deploy(
                 keeper.getWeb3(),
                 keeper.getCredentials(),
@@ -173,7 +173,7 @@ public abstract class ManagerHelper {
         ).send();
     }
 
-    public static AccessConditions loadAccessConditionsContract(KeeperDto keeper, String address) throws Exception, IOException, CipherException {
+    public static AccessConditions loadAccessConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return AccessConditions.load(address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),

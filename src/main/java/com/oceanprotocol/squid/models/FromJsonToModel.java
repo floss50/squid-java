@@ -1,4 +1,4 @@
-package com.oceanprotocol.squid.core;
+package com.oceanprotocol.squid.models;
 
 import com.oceanprotocol.squid.models.AbstractModel;
 

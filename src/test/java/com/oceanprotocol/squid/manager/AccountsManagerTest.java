@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.dto.KeeperDto;
-import com.oceanprotocol.squid.dto.AquariusDto;
+import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
@@ -34,7 +34,7 @@ public class AccountsManagerTest {
 
     private static final Logger log = LogManager.getLogger(AccountsManagerTest.class);
 
-    private static AquariusDto aquarius;
+    private static AquariusService aquarius;
     private static final Config config = ConfigFactory.load();
 
     @BeforeClass
@@ -51,7 +51,7 @@ public class AccountsManagerTest {
         expectedAccounts.add("0x456");
         expectedAccounts.add("0x789");
 
-        KeeperDto _keeper= mock(KeeperDto.class);
+        KeeperService _keeper= mock(KeeperService.class);
         Admin _web3j= mock(Admin.class);
         Credentials _credentials= mock(Credentials.class);
 
@@ -78,7 +78,7 @@ public class AccountsManagerTest {
         BigInteger ethBalance= BigInteger.valueOf(3);
         BigInteger oceanBalance= BigInteger.valueOf(12);
 
-        KeeperDto _keeper= mock(KeeperDto.class);
+        KeeperService _keeper= mock(KeeperService.class);
         Admin _web3j= mock(Admin.class);
         Credentials _credentials= mock(Credentials.class);
         OceanToken _token= mock(OceanToken.class);

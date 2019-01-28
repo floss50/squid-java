@@ -1,6 +1,6 @@
 package com.oceanprotocol.squid.helpers;
 
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 public class EthereumHelperTestIT {
 
     private static final Config config = ConfigFactory.load();
-    private static KeeperDto keeper;
+    private static KeeperService keeper;
 
 
     @BeforeClass
