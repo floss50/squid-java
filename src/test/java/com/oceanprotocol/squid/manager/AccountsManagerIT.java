@@ -2,8 +2,8 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.OceanMarket;
 import com.oceanprotocol.keeper.contracts.OceanToken;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
@@ -26,8 +26,8 @@ public class AccountsManagerIT {
     private static final Logger log = LogManager.getLogger(AccountsManagerIT.class);
 
     private static AccountsManager manager;
-    private static KeeperDto keeper;
-    private static AquariusDto aquarius;
+    private static KeeperService keeper;
+    private static AquariusService aquarius;
 
     private static OceanToken oceanToken;
     private static OceanMarket oceanMarket;
@@ -55,11 +55,11 @@ public class AccountsManagerIT {
 
     @Test
     public void getInstance() {
-        // Checking if web3j driver included in KeeperDto implements the Web3j interface
+        // Checking if web3j driver included in KeeperService implements the Web3j interface
         assertTrue(
-                manager.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
+                manager.getKeeperService().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
         assertTrue(
-                manager.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
+                manager.getAquariusService().getClass().isAssignableFrom(AquariusService.class));
     }
 
     @Test

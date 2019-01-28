@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.DDO;
@@ -20,14 +20,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 
-public class AccessSLATest {
+public class ServiceAgreementHandlerTest {
 
-    static final Logger log= LogManager.getLogger(AccessSLATest.class);
+    static final Logger log= LogManager.getLogger(ServiceAgreementHandlerTest.class);
 
-    private static AccessSLA sla;
+    private static ServiceAgreementHandler sla;
 
     private static final Config config = ConfigFactory.load();
-    private static KeeperDto keeper;
+    private static KeeperService keeper;
 
     private static final String TEMPLATE_ID= "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
     private static final String ADDRESS= "0x00bd138abd70e2f00903268f3db08f2d25677c9e";
@@ -44,7 +44,7 @@ public class AccessSLATest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        sla= new AccessSLA();
+        sla= new ServiceAgreementHandler();
         keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
 
         jsonContent = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
@@ -109,10 +109,10 @@ public class AccessSLATest {
         String grantAccessFingerprint = EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF);
         String lockPaymentFingerprint = EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF);
 
-        String grantAccessConditionKey = AccessSLA.fetchConditionKey(templateId, address, grantAccessFingerprint);
+        String grantAccessConditionKey = ServiceAgreementHandler.fetchConditionKey(templateId, address, grantAccessFingerprint);
         assertEquals(grantAccessConditionKey, targetGrantAccessConditionKey);
 
-        String lockPaymentConditionKey = AccessSLA.fetchConditionKey(templateId, address, lockPaymentFingerprint);
+        String lockPaymentConditionKey = ServiceAgreementHandler.fetchConditionKey(templateId, address, lockPaymentFingerprint);
         assertEquals(lockPaymentConditionKey, targetLockPaymentConditionKey);
 
     }

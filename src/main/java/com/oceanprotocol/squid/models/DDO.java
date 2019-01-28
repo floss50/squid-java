@@ -2,7 +2,6 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.*;
 import com.google.api.client.util.Base64;
-import com.oceanprotocol.squid.core.FromJsonToModel;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -12,7 +11,6 @@ import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;

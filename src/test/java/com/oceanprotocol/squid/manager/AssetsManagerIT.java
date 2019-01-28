@@ -2,8 +2,8 @@ package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -25,8 +25,8 @@ public class AssetsManagerIT {
     private static final Logger log = LogManager.getLogger(AssetsManagerIT.class);
 
     private static AssetsManager manager;
-    private static KeeperDto keeper;
-    private static AquariusDto aquarius;
+    private static KeeperService keeper;
+    private static AquariusService aquarius;
 
     private static final String METADATA_URL = "http://myaquarius.org/api/v1/provider/assets/metadata/{did}";
     private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-example.json";

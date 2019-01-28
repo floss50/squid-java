@@ -3,15 +3,15 @@ package com.oceanprotocol.squid.manager;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import org.web3j.crypto.CipherException;
 import java.io.IOException;
 
 public abstract class BaseManager {
 
-    private KeeperDto keeperDto;
-    private AquariusDto aquariusDto;
+    private KeeperService keeperService;
+    private AquariusService aquariusService;
     private SecretStoreDto secretStoreDto;
     private EvmDto evmDto;
     private SecretStoreManager secretStoreManager;
@@ -49,14 +49,14 @@ public abstract class BaseManager {
 
     /**
      * Constructor
-     * @param keeperDto KeeperDto
-     * @param aquariusDto AquariusDto
+     * @param keeperService KeeperService
+     * @param aquariusService AquariusService
      * @throws IOException
      * @throws CipherException
      */
-    public BaseManager(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
-        this.keeperDto= keeperDto;
-        this.aquariusDto = aquariusDto;
+    public BaseManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
+        this.keeperService = keeperService;
+        this.aquariusService = aquariusService;
     }
 
 
@@ -65,38 +65,38 @@ public abstract class BaseManager {
     }
 
     /**
-     * Get the KeeperDto
-     * @return KeeperDto
+     * Get the KeeperService
+     * @return KeeperService
      */
-    public KeeperDto getKeeperDto() {
-        return keeperDto;
+    public KeeperService getKeeperService() {
+        return keeperService;
     }
 
     /**
-     * Set the KeeperDto
-     * @param keeperDto KeeperDto
+     * Set the KeeperService
+     * @param keeperService KeeperService
      * @return this
      */
-    public BaseManager setKeeperDto(KeeperDto keeperDto) {
-        this.keeperDto = keeperDto;
+    public BaseManager setKeeperService(KeeperService keeperService) {
+        this.keeperService = keeperService;
         return this;
     }
 
     /**
-     * Get the AquariusDto
-     * @return AquariusDto
+     * Get the AquariusService
+     * @return AquariusService
      */
-    public AquariusDto getAquariusDto() {
-        return aquariusDto;
+    public AquariusService getAquariusService() {
+        return aquariusService;
     }
 
     /**
-     * Set the AquariusDto
-     * @param aquariusDto AquariusDto
+     * Set the AquariusService
+     * @param aquariusService AquariusService
      * @return this
      */
-    public BaseManager setAquariusDto(AquariusDto aquariusDto) {
-        this.aquariusDto = aquariusDto;
+    public BaseManager setAquariusService(AquariusService aquariusService) {
+        this.aquariusService = aquariusService;
         return this;
     }
 
@@ -163,9 +163,9 @@ public abstract class BaseManager {
      */
     public BaseManager setTokenContract(String address) throws IOException, CipherException {
         this.tokenContract= OceanToken.load(address,
-                getKeeperDto().getWeb3(),
-                getKeeperDto().getCredentials(),
-                getKeeperDto().getContractGasProvider());
+                getKeeperService().getWeb3(),
+                getKeeperService().getCredentials(),
+                getKeeperService().getContractGasProvider());
         return this;
     }
 
@@ -186,9 +186,9 @@ public abstract class BaseManager {
      */
     public BaseManager initializeTokenContract(String address) throws Exception {
         this.tokenContract= OceanToken.load(address,
-                getKeeperDto().getWeb3(),
-                getKeeperDto().getCredentials(),
-                getKeeperDto().getContractGasProvider()
+                getKeeperService().getWeb3(),
+                getKeeperService().getCredentials(),
+                getKeeperService().getContractGasProvider()
                 );
         return this;
     }
@@ -211,9 +211,9 @@ public abstract class BaseManager {
      */
     public BaseManager initializeOceanMarketContract(String address) throws Exception {
         this.oceanMarket= OceanMarket.load(address,
-                getKeeperDto().getWeb3(),
-                getKeeperDto().getCredentials(),
-                getKeeperDto().getContractGasProvider()
+                getKeeperService().getWeb3(),
+                getKeeperService().getCredentials(),
+                getKeeperService().getContractGasProvider()
         );
         return this;
     }
@@ -227,9 +227,9 @@ public abstract class BaseManager {
      */
     public BaseManager setDidRegistryContract(String address) throws IOException, CipherException {
         this.didRegistry= DIDRegistry.load(address,
-                getKeeperDto().getWeb3(),
-                getKeeperDto().getCredentials(),
-                getKeeperDto().getContractGasProvider());
+                getKeeperService().getWeb3(),
+                getKeeperService().getCredentials(),
+                getKeeperService().getContractGasProvider());
         return this;
     }
 
@@ -278,8 +278,8 @@ public abstract class BaseManager {
     @Override
     public String toString() {
         return "BaseManager{" +
-                "keeperDto=" + keeperDto +
-                ", aquariusDto=" + aquariusDto +
+                "keeperService=" + keeperService +
+                ", aquariusService=" + aquariusService +
                 '}';
     }
 }

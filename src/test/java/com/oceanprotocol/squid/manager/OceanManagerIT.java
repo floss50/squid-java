@@ -5,8 +5,8 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
@@ -42,10 +42,10 @@ public class OceanManagerIT {
     private static OceanManager managerPublisher;
     private static OceanManager managerConsumer;
 
-    private static KeeperDto keeperPublisher;
-    private static KeeperDto keeperConsumer;
+    private static KeeperService keeperPublisher;
+    private static KeeperService keeperConsumer;
 
-    private static AquariusDto aquarius;
+    private static AquariusService aquarius;
     private static SecretStoreManager secretStore;
 
     private static DIDRegistry didRegistry;
@@ -134,11 +134,11 @@ public class OceanManagerIT {
 
     @Test
     public void getInstance() {
-        // Checking if web3j driver included in KeeperDto implements the Web3j interface
+        // Checking if web3j driver included in KeeperService implements the Web3j interface
         assertTrue(
-                managerPublisher.getKeeperDto().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
+                managerPublisher.getKeeperService().getWeb3().getClass().getInterfaces()[0].isAssignableFrom(Admin.class));
         assertTrue(
-                managerPublisher.getAquariusDto().getClass().isAssignableFrom(AquariusDto.class));
+                managerPublisher.getAquariusService().getClass().isAssignableFrom(AquariusService.class));
     }
 
     @Test
