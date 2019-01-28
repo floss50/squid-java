@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.UUID;
 
 
+/**
+ *
+ */
 public class ServiceAgreementHandler {
 
     static final Logger log= LogManager.getLogger(ServiceAgreementHandler.class);
@@ -36,11 +39,21 @@ public class ServiceAgreementHandler {
     private String conditionsTemplate= null;
 
 
+    /**
+     * Generates a new and random Service Agreement Id
+     * @return a String with the new Service Agreement Id
+     */
     public static String generateSlaId()    {
         String token= UUID.randomUUID().toString() + UUID.randomUUID().toString();
         return token.replaceAll("-", "");
     }
 
+    /**
+     * Define and execute a Filter over the Service Agreement Contract to listen for an ExecuteAgreement event
+     * @param slaContract
+     * @param serviceAgreementId
+     * @return a Flowable over the Event to handle it in an asynchronous fashion
+     */
     public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
@@ -58,6 +71,12 @@ public class ServiceAgreementHandler {
     }
 
 
+    /**
+     * Define and execute a Filter over the Access Condition Contract to listen for an AccesGranted event
+     * @param accessConditions
+     * @param serviceAgreementId
+     * @return a Flowable over the Event to handle it in an asynchronous fashion
+     */
     public static Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
                                                                                                   String serviceAgreementId)   {
 
@@ -78,6 +97,14 @@ public class ServiceAgreementHandler {
         return accessConditions.accessGrantedEventFlowable(grantedFilter);
     }
 
+    /**
+     * Gets and Initializes all the conditions associated with a template
+     * @param templateId
+     * @param addresses
+     * @param params
+     * @return a List with all the conditions of the template
+     * @throws InitializeConditionsException
+     */
     public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws InitializeConditionsException {
 
         try {
@@ -155,7 +182,7 @@ public class ServiceAgreementHandler {
      * @param templateId
      * @param address Checksum address
      * @param fingerprint
-     * @return
+     * @return a String with the condition key
      */
     public static String fetchConditionKey(String templateId, String address, String fingerprint)   {
 
