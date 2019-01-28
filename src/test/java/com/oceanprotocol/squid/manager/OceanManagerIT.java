@@ -151,9 +151,9 @@ public class OceanManagerIT {
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
 
         String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
-        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
@@ -170,9 +170,9 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
 
         String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= "http://brizo:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
-        String purchaseEndpoint= "http://brizo:8030/api/v1/brizo/services/access/initialize";
+        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
@@ -197,7 +197,7 @@ public class OceanManagerIT {
 
         DID did= DID.builder();
         String oldUrl= "http://mymetadata.io/api";
-        String newUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String newUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
 
         ddoBase.id = did.toString();
 
