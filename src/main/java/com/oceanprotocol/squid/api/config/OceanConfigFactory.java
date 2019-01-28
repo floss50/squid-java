@@ -1,10 +1,13 @@
 package com.oceanprotocol.squid.api.config;
 
-import com.typesafe.config.Config;
 
 import java.math.BigInteger;
 import java.util.Properties;
 
+
+/**
+ * Factory to get instances of OceanConfig
+ */
 public class OceanConfigFactory {
 
 
@@ -16,6 +19,11 @@ public class OceanConfigFactory {
     private static final String DEFAULT_CONSUME_PATH  = "/tmp";
 
 
+    /**
+     * Creates an OceanConfig object from a set of properties
+     * @param properties
+     * @return an OceanConfig value with all the values set
+     */
     public static OceanConfig getOceanConfig(Properties properties){
 
         OceanConfig oceanConfig = new OceanConfig();

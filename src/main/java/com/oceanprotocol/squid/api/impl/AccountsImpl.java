@@ -10,11 +10,18 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.math.BigInteger;
 import java.util.List;
 
+/**
+ * Implementation of AccountsAPI
+ */
 public class AccountsImpl implements AccountsAPI{
 
     private AccountsManager accountsManager;
 
 
+    /**
+     * Constructor
+     * @param accountsManager
+     */
     public AccountsImpl(AccountsManager accountsManager) {
 
         this.accountsManager = accountsManager;

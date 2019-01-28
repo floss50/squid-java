@@ -4,11 +4,18 @@ import com.oceanprotocol.squid.api.SecretStoreAPI;
 import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
 
+/**
+ * Implementation of SecretStoreAPI
+ */
 public class SecretStoreImpl implements SecretStoreAPI{
 
 
     private SecretStoreManager secretStoreManager;
 
+    /**
+     * Constructor
+     * @param secretStoreManager
+     */
     public SecretStoreImpl(SecretStoreManager secretStoreManager){
 
         this.secretStoreManager = secretStoreManager;

@@ -5,6 +5,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that keeps all the configurations to initialize the API
+ */
 public class OceanConfig {
 
     public static final String KEEPER_URL = "keeper.url";
@@ -40,6 +43,9 @@ public class OceanConfig {
     private String oceanMarketAddress;
     private String consumeBasePath;
 
+    /**
+     * Class to hold the result of a Configuration's validation
+     */
     public static class OceanConfigValidation {
 
         private Boolean valid = true;
@@ -68,6 +74,11 @@ public class OceanConfig {
     }
 
 
+    /**
+     * Validates that all the needed properties are set in the configuration
+     * @param oceanConfig
+     * @return an OceanConfigValidation object that indicates if the configuration is valid
+     */
     public static OceanConfigValidation validate(OceanConfig oceanConfig) {
 
         OceanConfigValidation validation = new OceanConfigValidation();
