@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
@@ -26,21 +26,21 @@ public class AccountsManager extends BaseManager {
 
     private BigInteger ERROR_BALANCE= BigInteger.ZERO;
 
-    private AccountsManager(KeeperDto keeperDto, AquariusDto aquariusDto)
+    private AccountsManager(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
-        super(keeperDto, aquariusDto);
+        super(keeperService, aquariusService);
     }
 
     /**
-     * Given the KeeperDto and AquariusDto, returns a new instance of AccountsManager
+     * Given the KeeperService and AquariusService, returns a new instance of AccountsManager
      * using them as attributes
-     * @param keeperDto Keeper Dto
-     * @param aquariusDto Provider Dto
+     * @param keeperService Keeper Dto
+     * @param aquariusService Provider Dto
      * @return AccountsManager
      */
-    public static AccountsManager getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public static AccountsManager getInstance(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
-        return new AccountsManager(keeperDto, aquariusDto);
+        return new AccountsManager(keeperService, aquariusService);
     }
 
 
@@ -54,7 +54,7 @@ public class AccountsManager extends BaseManager {
 
         try {
 
-            EthAccounts ethAccounts = getKeeperDto().getWeb3().ethAccounts().send();
+            EthAccounts ethAccounts = getKeeperService().getWeb3().ethAccounts().send();
 
             List<Account> accounts = new ArrayList<>();
             for (String account : ethAccounts.getAccounts()) {
@@ -97,7 +97,7 @@ public class AccountsManager extends BaseManager {
      */
     public BigInteger getEthAccountBalance(String accountAddress) throws EthereumException {
         try {
-            return getKeeperDto()
+            return getKeeperService()
                     .getWeb3()
                     .ethGetBalance(accountAddress, DefaultBlockParameterName.LATEST).send()
                     .getBalance();

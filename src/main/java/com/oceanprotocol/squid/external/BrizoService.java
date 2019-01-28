@@ -1,25 +1,22 @@
-package com.oceanprotocol.squid.dto;
+package com.oceanprotocol.squid.external;
 
 import com.oceanprotocol.squid.helpers.HttpHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.models.HttpResponse;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.Service;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BrizoDto {
+public class BrizoService {
 
-    private static final Logger log = LogManager.getLogger(BrizoDto.class);
+    private static final Logger log = LogManager.getLogger(BrizoService.class);
 
 
     public static boolean initializeAccessServiceAgreement(String url, InitializeAccessSLA payload)  {

@@ -3,7 +3,7 @@ package com.oceanprotocol.squid.models.service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.oceanprotocol.squid.core.FromJsonToModel;
+import com.oceanprotocol.squid.models.FromJsonToModel;
 import com.oceanprotocol.squid.models.AbstractModel;
 
 import java.util.ArrayList;
