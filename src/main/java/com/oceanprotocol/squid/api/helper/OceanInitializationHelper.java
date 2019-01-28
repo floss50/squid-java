@@ -4,8 +4,8 @@ import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.api.config.OceanConfig;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.manager.AccountsManager;
 import com.oceanprotocol.squid.manager.AssetsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
@@ -25,9 +25,9 @@ public class OceanInitializationHelper {
         this.oceanConfig = oceanConfig;
     }
 
-    public KeeperDto getKeeper() throws IOException, CipherException {
+    public KeeperService getKeeper() throws IOException, CipherException {
 
-        KeeperDto keeper= KeeperDto.getInstance(
+        KeeperService keeper= KeeperService.getInstance(
                 oceanConfig.getKeeperUrl(),
                 oceanConfig.getMainAccountAddress(),
                 oceanConfig.getMainAccountPassword(),
@@ -40,8 +40,8 @@ public class OceanInitializationHelper {
         return keeper;
     }
 
-    public AquariusDto getAquarius() {
-        return AquariusDto.getInstance(oceanConfig.getAquariusUrl());
+    public AquariusService getAquarius() {
+        return AquariusService.getInstance(oceanConfig.getAquariusUrl());
     }
 
     public SecretStoreDto getSecretStoreDto() {
@@ -60,19 +60,19 @@ public class OceanInitializationHelper {
         return SecretStoreManager.getInstance(secretStoreDto, evmDto);
     }
 
-    public OceanManager getOceanManager(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
-        return OceanManager.getInstance(keeperDto, aquariusDto);
+    public OceanManager getOceanManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
+        return OceanManager.getInstance(keeperService, aquariusService);
     }
 
-    public AccountsManager getAccountsManager(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
-        return AccountsManager.getInstance(keeperDto, aquariusDto);
+    public AccountsManager getAccountsManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
+        return AccountsManager.getInstance(keeperService, aquariusService);
     }
 
-    public AssetsManager getAssetsManager(KeeperDto keeperDto, AquariusDto aquariusDto) throws IOException, CipherException {
-        return AssetsManager.getInstance(keeperDto, aquariusDto);
+    public AssetsManager getAssetsManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
+        return AssetsManager.getInstance(keeperService, aquariusService);
     }
 
-    public OceanToken loadOceanTokenContract(KeeperDto keeper) throws IOException, CipherException {
+    public OceanToken loadOceanTokenContract(KeeperService keeper) throws IOException, CipherException {
         return OceanToken.load(
                 oceanConfig.getTokenAddress(),
                 keeper.getWeb3(),
@@ -80,7 +80,7 @@ public class OceanInitializationHelper {
                 keeper.getContractGasProvider());
     }
 
-    public OceanMarket loadOceanMarketContract(KeeperDto keeper)
+    public OceanMarket loadOceanMarketContract(KeeperService keeper)
             throws Exception {
         return OceanMarket.load(
                 oceanConfig.getOceanMarketAddress(),
@@ -90,7 +90,7 @@ public class OceanInitializationHelper {
         );
     }
 
-    public DIDRegistry loadDIDRegistryContract(KeeperDto keeper)
+    public DIDRegistry loadDIDRegistryContract(KeeperService keeper)
             throws Exception {
 
         return DIDRegistry.load(
@@ -101,7 +101,7 @@ public class OceanInitializationHelper {
         );
     }
 
-    public ServiceAgreement loadServiceAgreementContract(KeeperDto keeper) throws IOException, CipherException {
+    public ServiceAgreement loadServiceAgreementContract(KeeperService keeper) throws IOException, CipherException {
         return ServiceAgreement.load(
                 oceanConfig.getServiceAgreementAddress(),
                 keeper.getWeb3(),
@@ -109,7 +109,7 @@ public class OceanInitializationHelper {
                 keeper.getContractGasProvider());
     }
 
-    public PaymentConditions loadPaymentConditionsContract(KeeperDto keeper) throws  IOException, CipherException {
+    public PaymentConditions loadPaymentConditionsContract(KeeperService keeper) throws  IOException, CipherException {
         return PaymentConditions.load(
                 oceanConfig.getPaymentConditionsAddress(),
                 keeper.getWeb3(),
@@ -118,7 +118,7 @@ public class OceanInitializationHelper {
         );
     }
 
-    public AccessConditions loadAccessConditionsContract(KeeperDto keeper) throws IOException, CipherException {
+    public AccessConditions loadAccessConditionsContract(KeeperService keeper) throws IOException, CipherException {
         return AccessConditions.load(
                 oceanConfig.getAccessConditionsAddress(),
                 keeper.getWeb3(),

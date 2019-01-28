@@ -1,15 +1,13 @@
-package com.oceanprotocol.squid.core.sla.func;
+package com.oceanprotocol.squid.core.sla.functions;
 
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.exceptions.LockPaymentException;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 public class LockPayment {

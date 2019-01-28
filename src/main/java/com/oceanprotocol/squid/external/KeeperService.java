@@ -1,4 +1,4 @@
-package com.oceanprotocol.squid.dto;
+package com.oceanprotocol.squid.external;
 
 import com.oceanprotocol.squid.models.Account;
 import org.apache.logging.log4j.LogManager;
@@ -18,9 +18,9 @@ import org.web3j.tx.gas.StaticGasProvider;
 import java.io.IOException;
 import java.math.BigInteger;
 
-public class KeeperDto {
+public class KeeperService {
 
-    protected static final Logger log = LogManager.getLogger(KeeperDto.class);
+    protected static final Logger log = LogManager.getLogger(KeeperService.class);
 
     private Admin web3 = null;
     private String keeperUrl;
@@ -40,30 +40,30 @@ public class KeeperDto {
 
 
     /**
-     * Initializes the KeeperDto object given a Keeper url, user and password
+     * Initializes the KeeperService object given a Keeper url, user and password
      * @param url Parity Keeper url (ie. http://localhost:8545)
      * @param address User ethereum address
      * @param password User password
      * @param credentialsFile Path to the file with the local credentials
-     * @return KeeperDto
+     * @return KeeperService
      */
-    public static KeeperDto getInstance(String url, String address, String password, String credentialsFile)
+    public static KeeperService getInstance(String url, String address, String password, String credentialsFile)
             throws IOException, CipherException {
 
-        return new KeeperDto(url, address, password, credentialsFile);
+        return new KeeperService(url, address, password, credentialsFile);
     }
 
-    public static KeeperDto getInstance(Web3jService web3jService) {
-        return new KeeperDto(web3jService);
+    public static KeeperService getInstance(Web3jService web3jService) {
+        return new KeeperService(web3jService);
     }
 
-    private KeeperDto(Web3jService web3jService)  {
+    private KeeperService(Web3jService web3jService)  {
         this.web3= Admin.build(web3jService);
     }
 
-    private KeeperDto(String url, String address, String password, String credentialsFile) throws IOException, CipherException {
+    private KeeperService(String url, String address, String password, String credentialsFile) throws IOException, CipherException {
 
-        log.debug("Initializing KeeperDto: " + url);
+        log.debug("Initializing KeeperService: " + url);
         this.address= address;
         this.password= password;
         this.keeperUrl= url;
@@ -86,7 +86,7 @@ public class KeeperDto {
         return web3;
     }
 
-    public KeeperDto setCredentials(Credentials credentials) {
+    public KeeperService setCredentials(Credentials credentials) {
         this.credentials = credentials;
         return this;
     }
@@ -117,13 +117,13 @@ public class KeeperDto {
         return gasLimit;
     }
 
-    public KeeperDto setGasPrice(BigInteger gasPrice) {
+    public KeeperService setGasPrice(BigInteger gasPrice) {
         this.gasPrice = gasPrice;
         this.gasProvider= getContractGasProviderInstance(gasPrice, gasLimit);
         return this;
     }
 
-    public KeeperDto setGasLimit(BigInteger gasLimit) {
+    public KeeperService setGasLimit(BigInteger gasLimit) {
         this.gasLimit = gasLimit;
         this.gasProvider= getContractGasProviderInstance(gasPrice, gasLimit);
         return this;

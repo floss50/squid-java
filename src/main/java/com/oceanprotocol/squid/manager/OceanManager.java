@@ -1,12 +1,11 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
-import com.oceanprotocol.squid.core.sla.AccessSLA;
-import com.oceanprotocol.squid.core.sla.SlaManager;
-import com.oceanprotocol.squid.core.sla.func.LockPayment;
-import com.oceanprotocol.squid.dto.AquariusDto;
-import com.oceanprotocol.squid.dto.BrizoDto;
-import com.oceanprotocol.squid.dto.KeeperDto;
+import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.functions.LockPayment;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.BrizoService;
+import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
@@ -49,21 +48,21 @@ public class OceanManager extends BaseManager {
 
     static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
 
-    protected OceanManager(KeeperDto keeperDto, AquariusDto aquariusDto)
+    protected OceanManager(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
-        super(keeperDto, aquariusDto);
+        super(keeperService, aquariusService);
     }
 
     /**
-     * Given the KeeperDto and AquariusDto, returns a new instance of OceanManager
+     * Given the KeeperService and AquariusService, returns a new instance of OceanManager
      * using them as attributes
-     * @param keeperDto Keeper Dto
-     * @param aquariusDto Provider Dto
+     * @param keeperService Keeper Dto
+     * @param aquariusService Provider Dto
      * @return OceanManager
      */
-    public static OceanManager getInstance(KeeperDto keeperDto, AquariusDto aquariusDto)
+    public static OceanManager getInstance(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
-        return new OceanManager(keeperDto, aquariusDto);
+        return new OceanManager(keeperService, aquariusService);
     }
 
     /**
@@ -105,7 +104,7 @@ public class OceanManager extends BaseManager {
             EthLog ethLog;
 
             try {
-                ethLog = getKeeperDto().getWeb3().ethGetLogs(didFilter).send();
+                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
             }catch(IOException e){
                 throw new EthereumException("Error searching DID " + did.toString() + " onchain: " + e.getMessage());
             }
@@ -121,7 +120,7 @@ public class OceanManager extends BaseManager {
             String ddoUrl= nonIndexed.get(0).getValue().toString();
             String didUrl= UrlHelper.parseDDOUrl(ddoUrl, did.toString());
 
-            AquariusDto ddoAquariosDto= AquariusDto.getInstance(UrlHelper.getBaseUrl(didUrl));
+            AquariusService ddoAquariosDto= AquariusService.getInstance(UrlHelper.getBaseUrl(didUrl));
             return ddoAquariosDto.getDDO(didUrl);
 
         } catch (Exception ex)  {
@@ -174,7 +173,7 @@ public class OceanManager extends BaseManager {
             // Definition of service endpoints
             String metadataEndpoint;
             if (serviceEndpoints.getMetadataEndpoint() == null)
-                metadataEndpoint = getAquariusDto().getDdoEndpoint() + "/{did}";
+                metadataEndpoint = getAquariusService().getDdoEndpoint() + "/{did}";
             else
                 metadataEndpoint = serviceEndpoints.getMetadataEndpoint();
 
@@ -205,7 +204,7 @@ public class OceanManager extends BaseManager {
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
 
             // Initializing conditions and adding to Access service
-            AccessSLA sla = new AccessSLA();
+            ServiceAgreementHandler sla = new ServiceAgreementHandler();
             accessService.conditions = sla.initializeConditions(
                     accessService.templateId,
                     getContractAddresses(),
@@ -216,7 +215,7 @@ public class OceanManager extends BaseManager {
                     .addService(accessService);
 
             // Storing DDO
-            DDO createdDDO = getAquariusDto().createDDO(ddo);
+            DDO createdDDO = getAquariusService().createDDO(ddo);
 
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint);
@@ -234,7 +233,7 @@ public class OceanManager extends BaseManager {
     public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, Account consumerAccount)
             throws OrderException {
 
-        String serviceAgreementId = SlaManager.generateSlaId();
+        String serviceAgreementId = ServiceAgreementHandler.generateSlaId();
         DDO ddo;
         // Checking if DDO is already there and serviceDefinitionId is included
         try {
@@ -260,7 +259,7 @@ public class OceanManager extends BaseManager {
                         else {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
                             this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
-                            return AccessSLA.listenForGrantedAccess(accessConditions, serviceAgreementId)
+                            return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId)
                                     .map(event -> {
                                         OrderResult result = new OrderResult(serviceAgreementId, true, false);
                                         return result;
@@ -286,7 +285,7 @@ public class OceanManager extends BaseManager {
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
         try {
-            boolean accountUnlocked = this.getKeeperDto().unlockAccount(consumerAccount);
+            boolean accountUnlocked = this.getKeeperService().unlockAccount(consumerAccount);
             if (!accountUnlocked) {
                 String msg = "Account " + consumerAccount.address + " has not been unlocked";
                 log.error(msg);
@@ -307,7 +306,7 @@ public class OceanManager extends BaseManager {
         String agreementSignature;
         try {
             agreementSignature = accessService.generateServiceAgreementSignature(
-                    getKeeperDto().getWeb3(),
+                    getKeeperService().getWeb3(),
                     consumerAccount.getAddress(),
                     serviceAgreementId
             );
@@ -326,14 +325,14 @@ public class OceanManager extends BaseManager {
         );
 
         // 3. Send agreement details to Publisher (Brizo endpoint)
-        boolean isInitialized= BrizoDto.initializeAccessServiceAgreement(accessService.purchaseEndpoint, initializePayload);
+        boolean isInitialized= BrizoService.initializeAccessServiceAgreement(accessService.purchaseEndpoint, initializePayload);
 
         if (!isInitialized)  {
             throw new ServiceAgreementException(serviceAgreementId, "Unable to initialize SLA using Brizo. Payload: " + initializePayload);
         }
 
         // 4. Listening of events
-       return  AccessSLA.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+       return  ServiceAgreementHandler.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
 
     }
 
@@ -381,7 +380,7 @@ public class OceanManager extends BaseManager {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String destinationPath = basePath + File.separator + fileName;
 
-                Boolean flag = BrizoDto.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
+                Boolean flag = BrizoService.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
                 if (!flag){
                     String msg = "Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId;
                     log.error(msg);

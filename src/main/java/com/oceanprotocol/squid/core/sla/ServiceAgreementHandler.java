@@ -25,14 +25,21 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
-public class AccessSLA implements SlaFunctions {
+public class ServiceAgreementHandler {
 
-    static final Logger log= LogManager.getLogger(AccessSLA.class);
+    static final Logger log= LogManager.getLogger(ServiceAgreementHandler.class);
 
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
+
+
+    public static String generateSlaId()    {
+        String token= UUID.randomUUID().toString() + UUID.randomUUID().toString();
+        return token.replaceAll("-", "");
+    }
 
     public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(

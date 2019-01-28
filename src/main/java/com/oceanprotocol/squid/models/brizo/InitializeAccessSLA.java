@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.models.brizo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.oceanprotocol.squid.core.FromJsonToModel;
+import com.oceanprotocol.squid.models.FromJsonToModel;
 import com.oceanprotocol.squid.models.AbstractModel;
 
 public class InitializeAccessSLA extends AbstractModel implements FromJsonToModel {
