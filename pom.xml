@@ -199,7 +199,7 @@
                     </execution>
                     <execution>
                         <id>merge-results</id>
-                        <phase>ver1ify</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>merge</goal>
                         </goals>
