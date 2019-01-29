@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.MetadataService;
@@ -38,6 +39,18 @@ public class DDOTest {
     public static void setUp() throws Exception {
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    public void testDID() throws Exception {
+        assertEquals(0, new DID().toString().length());
+        assertEquals(0, new DID().setEmptyDID().toString().length());
+        assertEquals("did:op:123", DID.getFromHash("123").toString());
+    }
+
+    @Test(expected = DIDFormatException.class)
+    public void badDID() throws Exception {
+        DID did= new DID("did:kkdid:123");
     }
 
     @Test
