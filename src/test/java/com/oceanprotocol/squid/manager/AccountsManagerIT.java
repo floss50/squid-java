@@ -9,11 +9,15 @@ import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.web3j.crypto.CipherException;
 import org.web3j.protocol.admin.Admin;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
@@ -26,7 +30,9 @@ public class AccountsManagerIT {
     private static final Logger log = LogManager.getLogger(AccountsManagerIT.class);
 
     private static AccountsManager manager;
+    private static AccountsManager managerError;
     private static KeeperService keeper;
+    private static KeeperService keeperError;
     private static AquariusService aquarius;
 
     private static OceanToken oceanToken;
@@ -43,14 +49,25 @@ public class AccountsManagerIT {
         aquarius= ManagerHelper.getAquarius(config);
         manager= AccountsManager.getInstance(keeper, aquarius);
 
-        // Deploying OceanToken Smart Contract
-        oceanToken= ManagerHelper.deployOceanTokenContract(keeper);
-        oceanMarket= ManagerHelper.deployOceanMarketContract(keeper, oceanToken.getContractAddress());
-
+        // Loading Smart Contracts required
+        oceanToken= ManagerHelper.loadOceanTokenContract(keeper, config.getString("contract.token.address"));
+        oceanMarket= ManagerHelper.loadOceanMarketContract(keeper, config.getString("contract.oceanmarket.address"));
         manager.setTokenContract(oceanToken);
         manager.setOceanMarketContract(oceanMarket);
 
         TEST_ADDRESS= config.getString("account.parity.address");
+
+        Config badConfig= config.withValue(
+                "keeper.url", ConfigValueFactory.fromAnyRef("http://fdasdfsa.dasx:8545"));
+
+        keeperError= ManagerHelper.getKeeper(badConfig, ManagerHelper.VmClient.parity);
+        managerError= AccountsManager.getInstance(keeperError, aquarius);
+        managerError.setTokenContract(
+                ManagerHelper.loadOceanTokenContract(keeperError, config.getString("contract.token.address"))
+        );
+        managerError.setOceanMarketContract(
+                ManagerHelper.loadOceanMarketContract(keeperError, config.getString("contract.oceanmarket.address"))
+        );
     }
 
     @Test
@@ -70,17 +87,33 @@ public class AccountsManagerIT {
 
     @Test
     public void getAccountsBalance() throws EthereumException {
-        manager.requestTokens(BigInteger.valueOf(100));
+        manager.requestTokens(BigInteger.TEN);
+        log.debug("OceanToken Address: " + manager.tokenContract.getContractAddress());
+
+        log.debug("Requesting " + BigInteger.TEN + " ocean tokens for " + TEST_ADDRESS);
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
 
         log.debug("Balance is " + balance.toString());
         log.debug("Eth balance is " + balance.getEth().toString());
 
-        assertEquals(1, balance.getEth().compareTo(BigInteger.ZERO));
-        assertEquals(0, balance.getOcn().compareTo(BigInteger.valueOf(100)));
+        assertTrue(balance.getEth().intValue() > 0);
+        assertTrue(balance.getOcn().intValue() > 0);
 
     }
 
+    @Test(expected = EthereumException.class)
+    public void getAccountsException() throws IOException, EthereumException, CipherException {
+
+        List<Account> accounts= managerError.getAccounts();
+        assertTrue(accounts.size()>0);
+    }
+
+    @Test(expected = EthereumException.class)
+    public void getAccountsBalanceError() throws EthereumException, CipherException, IOException {
+        managerError.requestTokens(BigInteger.valueOf(100));
+
+        Balance balance= managerError.getAccountBalance(TEST_ADDRESS);
+    }
 
 }

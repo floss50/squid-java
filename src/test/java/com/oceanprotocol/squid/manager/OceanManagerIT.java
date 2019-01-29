@@ -5,6 +5,7 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.models.Account;
@@ -215,6 +216,22 @@ public class OceanManagerIT {
         assertEquals(newUrl, ddo.services.get(0).serviceEndpoint);
     }
 
+    @Test(expected = DDOException.class)
+    public void resolveDIDException() throws Exception {
+        DID did= DID.builder();
+        String url= "http://badhostname.inet:5000/api/v1/aquarius/assets/ddo/{did}";
+
+        ddoBase.id = did.toString();
+
+        ddoBase.services.get(0).serviceEndpoint = url;
+        aquarius.createDDO(ddoBase);
+
+        boolean didRegistered= managerPublisher.registerDID(did, url);
+        assertTrue(didRegistered);
+
+        DDO ddo= managerPublisher.resolveDID(did);
+
+    }
 
     @Test
     public void purchaseAsset() throws Exception {
@@ -256,6 +273,12 @@ public class OceanManagerIT {
 
     @Test
     public void getOrder() {
+    }
+
+    @Test
+    public void generateDID() throws Exception {
+        DID did= managerPublisher.generateDID(newRegisteredAsset());
+        assertEquals(64, did.getHash().length());
     }
 
 }
