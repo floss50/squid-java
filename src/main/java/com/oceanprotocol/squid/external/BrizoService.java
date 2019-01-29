@@ -23,7 +23,7 @@ public class BrizoService {
 
 
     /**
-     * Call's a Brizo's endpoint to request the initialization of a new Service Agreement
+     * Calls a Brizo's endpoint to request the initialization of a new Service Agreement
      * @param url
      * @param payload
      * @return a flag that indicates if Brizo initialized the Service Agreement correctly
