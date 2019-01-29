@@ -14,11 +14,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Service for Brizo's Integration
+ */
 public class BrizoService {
 
     private static final Logger log = LogManager.getLogger(BrizoService.class);
 
 
+    /**
+     * Call's a Brizo's endpoint to request the initialization of a new Service Agreement
+     * @param url
+     * @param payload
+     * @return a flag that indicates if Brizo initialized the Service Agreement correctly
+     */
     public static boolean initializeAccessServiceAgreement(String url, InitializeAccessSLA payload)  {
 
         log.debug("Initializing SLA[" + payload.serviceAgreementId + "]: " + url);
@@ -50,7 +59,7 @@ public class BrizoService {
      * @param serviceAgreementId
      * @param url
      * @param destinationPath
-     * @return Boolean flag
+     * @return a flag that indicates if the download was correct
      * @throws IOException
      * @throws URISyntaxException
      */

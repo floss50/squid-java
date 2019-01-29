@@ -11,6 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * Manages the functionality related with the Secret Store
+ */
 public class SecretStoreManager {
 
     static final Logger log= LogManager.getLogger(SecretStoreManager.class);
@@ -28,10 +31,24 @@ public class SecretStoreManager {
     }
 
 
+    /**
+     * Gets an instance of the SecretStoreManager
+     * @param ssDto
+     * @param evmDto
+     * @return an initialized instance of SecretStoreManager
+     */
     public static SecretStoreManager getInstance(SecretStoreDto ssDto, EvmDto evmDto) {
         return new SecretStoreManager(ssDto, evmDto);
     }
 
+    /**
+     * Encrypts a document using Secret Store
+     * @param resourceId
+     * @param content
+     * @param threshold
+     * @return a String with the encrypted content
+     * @throws EncryptionException
+     */
     public String encryptDocument(String resourceId, String content, int threshold) throws EncryptionException {
 
         try {
@@ -43,6 +60,13 @@ public class SecretStoreManager {
         }
     }
 
+    /**
+     * Decrypts a document using Secret Store
+     * @param resourceId
+     * @param encryptedContent
+     * @return a String with the decrypted content
+     * @throws EncryptionException
+     */
     public String decryptDocument(String resourceId, String encryptedContent) throws EncryptionException {
 
         try {
