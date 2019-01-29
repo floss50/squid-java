@@ -19,11 +19,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of AssetsAPI
+ */
 public class AssetsImpl implements AssetsAPI {
 
     private OceanManager oceanManager;
     private AssetsManager assetsManager;
 
+    /**
+     * Constructor
+     * @param oceanManager
+     * @param assetsManager
+     */
     public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager) {
 
         this.oceanManager = oceanManager;

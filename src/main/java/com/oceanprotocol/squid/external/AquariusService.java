@@ -14,6 +14,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Service for Aquarius's Integration
+ */
 public class AquariusService {
 
     private static final Logger log = LogManager.getLogger(AquariusService.class);
@@ -23,11 +26,20 @@ public class AquariusService {
 
     private String url;
 
+    /**
+     * Builds an instance of AquariusService
+     * @param url
+     * @return
+     */
     public static AquariusService getInstance(String url)    {
         log.debug("Getting Aquarius instance: " + url);
         return new AquariusService(url);
     }
 
+    /**
+     * Constructor
+     * @param url
+     */
     private AquariusService(String url) {
         this.url= url.replaceAll("/$", "");
         this.ddoEndpoint = this.url + DDO_URI;
@@ -37,6 +49,12 @@ public class AquariusService {
         return ddoEndpoint;
     }
 
+    /**
+     * Registers a new DDO in Aquarius
+     * @param ddo
+     * @return the created DDO
+     * @throws DDOException
+     */
     public DDO createDDO(DDO ddo) throws DDOException {
 
         log.debug("Creating DDO: " + ddo.id);
@@ -58,6 +76,12 @@ public class AquariusService {
 
     }
 
+    /**
+     * Gets a DDO from an URL
+     * @param url
+     * @return the DDO
+     * @throws DDOException
+     */
     public DDO getDDO(String url) throws DDOException {
 
         log.debug("Getting DDO: " + url);
@@ -79,12 +103,25 @@ public class AquariusService {
         }
     }
 
+    /**
+     * Gets a DDO from the DID
+     * @param id
+     * @return the DDO
+     * @throws Exception
+     */
     public DDO getDDOUsingId(String id) throws Exception {
         return getDDO(this.ddoEndpoint + "/" +  id);
 
     }
 
 
+    /**
+     * Updates the metadata of a DDO
+     * @param id
+     * @param ddo
+     * @return a flag that indicates if the update operation was executed correctly
+     * @throws Exception
+     */
     public boolean updateDDO(String id, DDO ddo) throws Exception {
         HttpResponse response= HttpHelper.httpClientPut(
                 this.ddoEndpoint + "/" + id, new ArrayList<>(), ddo.toJson());
@@ -95,6 +132,14 @@ public class AquariusService {
         throw new Exception("Unable to update DDO: " + response.toString());
     }
 
+    /**
+     * Search all the DDOs that match the text passed as a parameter
+     * @param param
+     * @param offset
+     * @param page
+     * @return a List of all the DDOs found
+     * @throws DDOException
+     */
     public ArrayList<DDO> searchDDO(String param, int offset, int page) throws DDOException  {
 
         String url= this.ddoEndpoint + "/query?text=" + param + "&page=" + page + "&offset=" + offset;
@@ -120,6 +165,12 @@ public class AquariusService {
 
     }
 
+    /**
+     * Search all the DDOs that match the query passed as a parameter
+     * @param searchQuery
+     * @return a List of all the DDOs found
+     * @throws DDOException
+     */
     public ArrayList<DDO> searchDDO(SearchQuery searchQuery) throws DDOException {
 
         HttpResponse response;

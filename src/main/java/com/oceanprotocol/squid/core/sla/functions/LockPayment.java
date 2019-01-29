@@ -10,11 +10,22 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 
+/**
+ * Represents a lock payment function
+ */
 public class LockPayment {
 
     static final Logger log= LogManager.getLogger(LockPayment.class);
 
 
+    /**
+     * Executes a lock payment function for a Service Agreement between publisher and consumer
+     * @param paymentConditions
+     * @param serviceAgreementId
+     * @param assetInfo
+     * @return a flag that indicates if the function was executed correctly
+     * @throws LockPaymentException
+     */
     public static Boolean  executeLockPayment(PaymentConditions paymentConditions,
                                               String serviceAgreementId,
                                               BasicAssetInfo assetInfo) throws LockPaymentException {
