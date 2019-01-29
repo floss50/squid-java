@@ -24,6 +24,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
 
+/**
+ * Class that represents the entry point to initialize and use the API
+ */
 public class OceanAPI {
 
     static final Logger log= LogManager.getLogger(OceanAPI.class);
@@ -56,16 +59,32 @@ public class OceanAPI {
     private static OceanAPI oceanAPI = null;
 
 
+    /**
+     * Private constructor
+     * @param oceanConfig
+     */
     private OceanAPI(OceanConfig oceanConfig){
         this.oceanConfig = oceanConfig;
     }
 
+    /**
+     * Transform a TypeSafe Config object into a Java's Properties
+     * @param config
+     * @return a Properties object with the configuration of the API
+     */
     private static Properties toProperties(Config config) {
         Properties properties = new Properties();
         config.entrySet().forEach(e -> properties.setProperty(e.getKey(), config.getString(e.getKey())));
         return properties;
     }
 
+    /**
+     * Build an Instance of Ocean API from a Properties object
+     * @param properties
+     * @return an Initialized OceanAPI object
+     * @throws InitializationException
+     * @throws InvalidConfiguration
+     */
     public static OceanAPI getInstance(Properties properties) throws InitializationException, InvalidConfiguration {
 
         if (oceanAPI != null)
@@ -125,22 +144,45 @@ public class OceanAPI {
         }
     }
 
+    /**
+     * Build an Instance of Ocean API from a TypeSafe Config object
+     * @param config
+     * @return an Initialized OceanAPI object
+     * @throws InitializationException
+     * @throws InvalidConfiguration
+     */
     public static OceanAPI getInstance(Config config) throws InitializationException, InvalidConfiguration{
        return OceanAPI.getInstance(OceanAPI.toProperties(config));
     }
 
+    /**
+     * Gets the account used to initialized the API
+     * @return the account used to initialized the API
+     */
     public Account getMainAccount() {
         return this.mainAccount;
     }
 
+    /**
+     * Gets the AccountsAPI
+     * @return an instance of an Implementation class of AccountsAPI
+     */
     public AccountsAPI getAccountsAPI() {
         return this.accountsAPI;
     }
 
+    /**
+     * Gets the AssetsAPI
+     * @return an instance of an Implementation class of AssetsAPI
+     */
     public AssetsAPI getAssetsAPI() {
         return this.assetsAPI;
     }
 
+    /**
+     * Gets the SecretStoreAPI
+     * @return an instance of an Implementation class of SecretStoreAPI
+     */
     public SecretStoreAPI getSecretStoreAPI() {
         return this.secretStoreAPI;
     }

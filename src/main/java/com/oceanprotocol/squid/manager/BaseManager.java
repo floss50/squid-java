@@ -8,6 +8,9 @@ import com.oceanprotocol.squid.external.KeeperService;
 import org.web3j.crypto.CipherException;
 import java.io.IOException;
 
+/**
+ * Abstract class for the Managers
+ */
 public abstract class BaseManager {
 
     private KeeperService keeperService;
