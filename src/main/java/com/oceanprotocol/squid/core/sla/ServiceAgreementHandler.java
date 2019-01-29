@@ -29,7 +29,7 @@ import java.util.UUID;
 
 
 /**
- *
+ * Handles functionality related with the execution of a Service Agreement
  */
 public class ServiceAgreementHandler {
 
