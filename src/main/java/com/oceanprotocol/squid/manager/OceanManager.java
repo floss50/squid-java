@@ -1,5 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.ServiceAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
@@ -32,6 +33,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.parity.methods.response.VMTrace;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,10 +178,8 @@ public class OceanManager extends BaseManager {
             // Initializing DDO
             DDO ddo = new DDO(address);
 
-            // Encrypting contentUrls and adding them to the Metadata
-            ArrayList<String> urls = new ArrayList<>();
-            urls.add(encryptContentUrls(ddo.getDid(), metadata.base.contentUrls, threshold));
-            metadata.base.contentUrls = urls;
+            String filesJson = metadata.toJson(metadata.base.files);
+            metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(ddo.getDid().getHash(), filesJson, threshold);
 
             // Definition of service endpoints
             String metadataEndpoint;
@@ -234,7 +234,7 @@ public class OceanManager extends BaseManager {
             return createdDDO;
         }catch (DDOException e) {
             throw e;
-        }catch (EncryptionException|InitializeConditionsException|DIDFormatException|DIDRegisterException e) {
+        }catch (EncryptionException|InitializeConditionsException|DIDFormatException|DIDRegisterException|IOException e) {
             throw new DDOException("Error registering Asset." , e);
         }
 
@@ -418,13 +418,24 @@ public class OceanManager extends BaseManager {
 
         String checkConsumerAddress = Keys.toChecksumAddress(consumerAddress);
         String serviceEndpoint;
-        String decryptedUrls;
+        String decryptedUrls="";
 
         try {
 
             ddo = resolveDID(did);
             serviceEndpoint = ddo.getAccessService(serviceDefinitionId).serviceEndpoint;
-            decryptedUrls = decryptContentUrls(did, ddo.metadata.base.contentUrls.get(0), threshold).replace("[", "").replace("]", "");
+
+            // TODO get files
+            String jsonFiles = getSecretStoreManager().decryptDocument(did.getHash(), ddo.metadata.base.encryptedFiles);
+            try {
+                DDO.fromJSON(new TypeReference<ArrayList<File>>() {
+                }, jsonFiles);
+            }catch(Exception e){
+
+            }
+
+
+          //  decryptedUrls = decryptContentUrls(did, ddo.metadata.base.files.get(0).toString(), threshold).replace("[", "").replace("]", "");
         }catch (EthereumException|DDOException|ServiceException|EncryptionException e) {
             String msg = "Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId;
             log.error(msg+ ": " + e.getMessage());
