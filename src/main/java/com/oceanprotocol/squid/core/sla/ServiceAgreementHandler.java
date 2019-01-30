@@ -9,6 +9,7 @@ import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.BaseManager;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
+import com.oceanprotocol.squid.models.service.template.AccessTemplate;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,12 +21,10 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -131,10 +130,10 @@ public class ServiceAgreementHandler {
         }
     }
 
-    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
-    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
-    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
-    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
+    public static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
 
 
     /**
@@ -142,11 +141,11 @@ public class ServiceAgreementHandler {
      * (serviceAgreementTemplateId, address, signature)
      * @return Map of (varible name => conditionKeys)
      */
-    public Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
+    public static Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
 
 
         String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());
-        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddres());
+        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddress());
 
         Map<String, Object> fingerprints= new HashMap<>();
         fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
@@ -198,6 +197,16 @@ public class ServiceAgreementHandler {
     }
 
 
+    public static List<BigInteger> getDependenciesBits(List<Condition> conditions)   {
+        List<BigInteger> dependenciesBits= new ArrayList<>();
+        BigInteger counter= BigInteger.ZERO;
+        for (com.oceanprotocol.squid.models.service.Condition condition: conditions)    {
+            if (condition.isTerminalCondition == 1)
+                dependenciesBits.add(counter);
+            counter= counter.add(BigInteger.ONE);
+        }
+        return dependenciesBits;
+    }
 
 
 
