@@ -1,6 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.OceanMarket;
+import com.oceanprotocol.keeper.contracts.Dispenser;
 import com.oceanprotocol.keeper.contracts.OceanToken;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
@@ -16,13 +16,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
 import org.web3j.protocol.admin.Admin;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AccountsManagerIT {
@@ -36,7 +34,7 @@ public class AccountsManagerIT {
     private static AquariusService aquarius;
 
     private static OceanToken oceanToken;
-    private static OceanMarket oceanMarket;
+    private static Dispenser dispenser;
 
     private static final Config config = ConfigFactory.load();
     private static String TEST_ADDRESS;
@@ -51,9 +49,9 @@ public class AccountsManagerIT {
 
         // Loading Smart Contracts required
         oceanToken= ManagerHelper.loadOceanTokenContract(keeper, config.getString("contract.token.address"));
-        oceanMarket= ManagerHelper.loadOceanMarketContract(keeper, config.getString("contract.oceanmarket.address"));
+        dispenser= ManagerHelper.loadDispenserContract(keeper, config.getString("contract.dispenser.address"));
         manager.setTokenContract(oceanToken);
-        manager.setOceanMarketContract(oceanMarket);
+        manager.setDispenserContract(dispenser);
 
         TEST_ADDRESS= config.getString("account.parity.address");
 
@@ -65,8 +63,8 @@ public class AccountsManagerIT {
         managerError.setTokenContract(
                 ManagerHelper.loadOceanTokenContract(keeperError, config.getString("contract.token.address"))
         );
-        managerError.setOceanMarketContract(
-                ManagerHelper.loadOceanMarketContract(keeperError, config.getString("contract.oceanmarket.address"))
+        managerError.setDispenserContract(
+                ManagerHelper.loadDispenserContract(keeperError, config.getString("contract.oceanmarket.address"))
         );
     }
 

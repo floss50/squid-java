@@ -144,20 +144,21 @@ public class OceanInitializationHelper {
 
 
     /**
-     * Loads the OceanMarket contract from Keeper
+     * Loads the Dispenser contract from Keeper
      * @param keeper
-     * @return an instance of OceanMarket contract deployed in keeper
+     * @return an instance of Dispenser contract deployed in keeper
      * @throws IOException
      * @throws CipherException
      */
-    public OceanMarket loadOceanMarketContract(KeeperService keeper) throws IOException, CipherException {
-        return OceanMarket.load(
-                oceanConfig.getOceanMarketAddress(),
+    public Dispenser loadDispenserContract(KeeperService keeper) throws IOException, CipherException {
+        return Dispenser.load(
+                oceanConfig.getDispenserAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()
         );
     }
+
 
     /**
      *  Loads the DIDRegistry contract from Keeper

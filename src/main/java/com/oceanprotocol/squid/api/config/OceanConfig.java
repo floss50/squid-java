@@ -23,7 +23,7 @@ public class OceanConfig {
     public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
     public static final String ACCESS_CONDITIONS_ADDRESS = "contract.accessConditions.address";
     public static final String TOKEN_ADDRESS = "contract.token.address";
-    public static final String OCEAN_MARKET_ADDRESS = "contract.oceanmarket.address";
+    public static final String DISPENSER_ADDRESS = "contract.dispenser.address";
     public static final String CONSUME_BASE_PATH = "consume.basePath";
 
 
@@ -40,7 +40,7 @@ public class OceanConfig {
     private String paymentConditionsAddress;
     private String accessConditionsAddress;
     private String tokenAddress;
-    private String oceanMarketAddress;
+    private String dispenserAddress;
     private String consumeBasePath;
 
     /**
@@ -240,11 +240,11 @@ public class OceanConfig {
         this.tokenAddress = tokenAddress;
     }
 
-    public String getOceanMarketAddress() {
-        return oceanMarketAddress;
+    public String getDispenserAddress() {
+        return dispenserAddress;
     }
 
-    public void setOceanMarketAddress(String oceanMarketAddress) {
-        this.oceanMarketAddress = oceanMarketAddress;
+    public void setDispenserAddress(String dispenserAddress) {
+        this.dispenserAddress = dispenserAddress;
     }
 }
