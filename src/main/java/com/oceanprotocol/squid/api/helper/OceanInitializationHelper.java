@@ -178,15 +178,15 @@ public class OceanInitializationHelper {
     }
 
     /**
-     * Loads the ServiceAgreement contract from Keeper
+     * Loads the ServiceExecutionAgreement contract from Keeper
      * @param keeper
-     * @return an instance of ServiceAgreement contract deployed in keeper
+     * @return an instance of ServiceExecutionAgreement contract deployed in keeper
      * @throws IOException
      * @throws CipherException
      */
-    public ServiceAgreement loadServiceAgreementContract(KeeperService keeper) throws IOException, CipherException {
-        return ServiceAgreement.load(
-                oceanConfig.getServiceAgreementAddress(),
+    public ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper) throws IOException, CipherException {
+        return ServiceExecutionAgreement.load(
+                oceanConfig.getServiceExecutionAgreementAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());

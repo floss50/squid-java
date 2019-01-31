@@ -19,7 +19,7 @@ public class OceanConfig {
     public static final String MAIN_ACCOUNT_PASSWORD = "account.main.password";
     public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
     public static final String DID_REGISTRY_ADDRESS = "contract.didRegistry.address";
-    public static final String SERVICE_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
+    public static final String SERVICE_EXECUTION_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
     public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
     public static final String ACCESS_CONDITIONS_ADDRESS = "contract.accessConditions.address";
     public static final String TOKEN_ADDRESS = "contract.token.address";
@@ -36,7 +36,7 @@ public class OceanConfig {
     private String mainAccountPassword;
     private String mainAccountCredentialsFile;
     private String didRegistryAddress;
-    private String serviceAgreementAddress;
+    private String serviceExecutionAgreementAddress;
     private String paymentConditionsAddress;
     private String accessConditionsAddress;
     private String tokenAddress;
@@ -83,10 +83,10 @@ public class OceanConfig {
 
         OceanConfigValidation validation = new OceanConfigValidation();
 
-        if (oceanConfig.getServiceAgreementAddress() == null || oceanConfig.getServiceAgreementAddress().isEmpty()) {
+        if (oceanConfig.getServiceExecutionAgreementAddress() == null || oceanConfig.getServiceExecutionAgreementAddress().isEmpty()) {
             validation.setValid(false);
-            validation.addErrorMessage("The Address of Service Agreement Contract must be set with the property "
-                    + OceanConfig.SERVICE_AGREEMENT_ADDRESS);
+            validation.addErrorMessage("The Address of Service Execution Agreement Contract must be set with the property "
+                    + OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS);
         }
 
         if (oceanConfig.getDidRegistryAddress() == null || oceanConfig.getDidRegistryAddress().isEmpty()) {
@@ -176,12 +176,12 @@ public class OceanConfig {
         this.didRegistryAddress = didRegistryAddress;
     }
 
-    public String getServiceAgreementAddress() {
-        return serviceAgreementAddress;
+    public String getServiceExecutionAgreementAddress() {
+        return serviceExecutionAgreementAddress;
     }
 
-    public void setServiceAgreementAddress(String serviceAgreementAddress) {
-        this.serviceAgreementAddress = serviceAgreementAddress;
+    public void setServiceExecutionAgreementAddress(String serviceExecutionAgreementAddress) {
+        this.serviceExecutionAgreementAddress = serviceExecutionAgreementAddress;
     }
 
     public String getPaymentConditionsAddress() {

@@ -1,6 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
 import com.oceanprotocol.squid.external.AquariusService;

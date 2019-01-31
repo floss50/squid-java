@@ -46,7 +46,7 @@ public class OceanAPI {
     private OceanToken tokenContract;
     private Dispenser dispenser;
     private DIDRegistry didRegistryContract;
-    private ServiceAgreement serviceAgreementContract;
+    private ServiceExecutionAgreement serviceExecutionAgreementContract;
     private PaymentConditions paymentConditionsContract;
     private AccessConditions accessConditionsContract;
 
@@ -114,7 +114,7 @@ public class OceanAPI {
             oceanAPI.secretStoreManager = oceanInitializationHelper.getSecretStoreManager(oceanAPI.secretStoreDto, oceanAPI.evmDto);
 
             oceanAPI.didRegistryContract = oceanInitializationHelper.loadDIDRegistryContract(oceanAPI.keeperService);
-            oceanAPI.serviceAgreementContract = oceanInitializationHelper.loadServiceAgreementContract(oceanAPI.keeperService);
+            oceanAPI.serviceExecutionAgreementContract = oceanInitializationHelper.loadServiceExecutionAgreementContract(oceanAPI.keeperService);
             oceanAPI.paymentConditionsContract = oceanInitializationHelper.loadPaymentConditionsContract(oceanAPI.keeperService);
             oceanAPI.accessConditionsContract = oceanInitializationHelper.loadAccessConditionsContract(oceanAPI.keeperService);
             oceanAPI.dispenser = oceanInitializationHelper.loadDispenserContract(oceanAPI.keeperService);
@@ -123,7 +123,7 @@ public class OceanAPI {
             oceanAPI.oceanManager = oceanInitializationHelper.getOceanManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.oceanManager.setSecretStoreManager(oceanAPI.secretStoreManager)
                     .setDidRegistryContract(oceanAPI.didRegistryContract)
-                    .setServiceAgreementContract(oceanAPI.serviceAgreementContract)
+                    .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract);
 

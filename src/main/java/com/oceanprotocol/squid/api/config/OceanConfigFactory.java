@@ -36,7 +36,7 @@ public class OceanConfigFactory {
         oceanConfig.setAquariusUrl((String)properties.getOrDefault(OceanConfig.AQUARIUS_URL, DEFAULT_AQUARIUS_URL));
         oceanConfig.setSecretStoreUrl((String)properties.getOrDefault(OceanConfig.SECRETSTORE_URL, DEFAULT_SECRET_STORE_URL));
         oceanConfig.setDidRegistryAddress((String)properties.getOrDefault(OceanConfig.DID_REGISTRY_ADDRESS, ""));
-        oceanConfig.setServiceAgreementAddress((String)properties.getOrDefault(OceanConfig.SERVICE_AGREEMENT_ADDRESS, ""));
+        oceanConfig.setServiceExecutionAgreementAddress((String)properties.getOrDefault(OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS, ""));
         oceanConfig.setPaymentConditionsAddress((String)properties.getOrDefault(OceanConfig.PAYMENT_CONDITIONS_ADDRESS, ""));
         oceanConfig.setAccessConditionsAddress((String)properties.getOrDefault(OceanConfig.ACCESS_CONDITIONS_ADDRESS, ""));
         oceanConfig.setTokenAddress((String)properties.getOrDefault(OceanConfig.TOKEN_ADDRESS, ""));

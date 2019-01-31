@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
-import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
@@ -50,7 +50,7 @@ public class OceanManagerIT {
     private static SecretStoreManager secretStore;
 
     private static DIDRegistry didRegistry;
-    private static ServiceAgreement saContract;
+    private static ServiceExecutionAgreement saContract;
     private static PaymentConditions paymentConditions;
     private static AccessConditions accessConditions;
 
@@ -75,7 +75,7 @@ public class OceanManagerIT {
 
     private static final String SERVICE_AGREEMENT_CONTRACT;
     static {
-        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.serviceAgreement.address");
+        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.serviceExecutionAgreement.address");
     }
 
     private static final String PAYMENT_CONDITIONS_CONTRACT;
@@ -104,7 +104,7 @@ public class OceanManagerIT {
         secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
 
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
-        saContract= ManagerHelper.loadServiceAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
+        saContract= ManagerHelper.loadServiceExecutionAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
 
@@ -112,7 +112,7 @@ public class OceanManagerIT {
         managerPublisher = OceanManager.getInstance(keeperPublisher, aquarius);
         managerPublisher.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-                .setServiceAgreementContract(saContract)
+                .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions);
 
@@ -120,7 +120,7 @@ public class OceanManagerIT {
         managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
         managerConsumer.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-                .setServiceAgreementContract(saContract)
+                .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions);
 

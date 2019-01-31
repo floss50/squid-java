@@ -104,8 +104,8 @@ public abstract class ManagerHelper {
     }
 
 
-    public static ServiceAgreement loadServiceAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
-        return ServiceAgreement.load(
+    public static ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return ServiceExecutionAgreement.load(
                 address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),
