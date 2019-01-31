@@ -1,6 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
 import com.oceanprotocol.squid.external.AquariusService;
@@ -266,12 +266,7 @@ public class OceanManager extends BaseManager {
         try {
 
             return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, consumerAccount, serviceAgreementId)
-                    .map(event -> {
-                        if (!event.state)
-                            throw new ServiceAgreementException(serviceAgreementId, "There was an error with the initialization of the serviceAgreement "
-                                    + EncodingHelper.toHexString(event.serviceAgreementId));
-                        return EncodingHelper.toHexString(event.serviceAgreementId);
-                    })
+                    .map(event -> EncodingHelper.toHexString(event.agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
                             return Flowable.empty();
@@ -299,18 +294,18 @@ public class OceanManager extends BaseManager {
     }
 
     /**
-     * Initialize a new Service Agreement between a publisher and a consumer
+     * Initialize a new ServiceExecutionAgreement between a publisher and a consumer
      * @param did
      * @param ddo
      * @param serviceDefinitionId
      * @param consumerAccount
      * @param serviceAgreementId
-     * @return a Flowable over an ExecuteAgreementResponse
+     * @return a Flowable over an AgreementInitializedEventResponse
      * @throws DDOException
      * @throws ServiceException
      * @throws ServiceAgreementException
      */
-    private Flowable<ServiceAgreement.ExecuteAgreementEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId,  Account consumerAccount, String serviceAgreementId)
+    private Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId,  Account consumerAccount, String serviceAgreementId)
             throws  DDOException, ServiceException, ServiceAgreementException {
 
         // We need to unlock the account before calling the purchase method
@@ -363,7 +358,7 @@ public class OceanManager extends BaseManager {
         }
 
         // 4. Listening of events
-       return  ServiceAgreementHandler.listenExecuteAgreement(serviceAgreement, serviceAgreementId);
+       return  ServiceAgreementHandler.listenExecuteAgreement(serviceExecutionAgreement, serviceAgreementId);
 
     }
 

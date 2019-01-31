@@ -19,9 +19,9 @@ public abstract class BaseManager {
     private EvmDto evmDto;
     private SecretStoreManager secretStoreManager;
     protected OceanToken tokenContract;
-    protected OceanMarket oceanMarket;
+    protected Dispenser dispenser;
     protected DIDRegistry didRegistry;
-    protected ServiceAgreement serviceAgreement;
+    protected ServiceExecutionAgreement serviceExecutionAgreement;
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
@@ -182,42 +182,14 @@ public abstract class BaseManager {
         return this;
     }
 
-    /**
-     * Initialize the Token Contract given a contract address
-     * @param address OceanToken contract address
-     * @return BaseManager instance
-     */
-    public BaseManager initializeTokenContract(String address) throws Exception {
-        this.tokenContract= OceanToken.load(address,
-                getKeeperService().getWeb3(),
-                getKeeperService().getCredentials(),
-                getKeeperService().getContractGasProvider()
-                );
-        return this;
-    }
 
     /**
-     * It sets the OceanMarket stub instance
-     * @param contract OceanMarket instance
+     * It sets the Dispenser stub instance
+     * @param contract Dispenser instance
      * @return BaseManager instance
      */
-    public BaseManager setOceanMarketContract(OceanMarket contract)    {
-        this.oceanMarket= contract;
-        return this;
-    }
-
-
-    /**
-     * Initialize the OceanMarket Contract given a contract address
-     * @param address OceanMarket contract address
-     * @return BaseManager instance
-     */
-    public BaseManager initializeOceanMarketContract(String address) throws Exception {
-        this.oceanMarket= OceanMarket.load(address,
-                getKeeperService().getWeb3(),
-                getKeeperService().getCredentials(),
-                getKeeperService().getContractGasProvider()
-        );
+    public BaseManager setDispenserContract(Dispenser contract)    {
+        this.dispenser= contract;
         return this;
     }
 
@@ -237,12 +209,12 @@ public abstract class BaseManager {
     }
 
     /**
-     * It sets the ServiceAgreement stub instance
-     * @param contract ServiceAgreement instance
+     * It sets the ServiceExecutionAgreement stub instance
+     * @param contract ServiceExecutionAgreement instance
      * @return BaseManager instance
      */
-    public BaseManager setServiceAgreementContract(ServiceAgreement contract)    {
-        this.serviceAgreement= contract;
+    public BaseManager setServiceExecutionAgreementContract(ServiceExecutionAgreement contract)    {
+        this.serviceExecutionAgreement= contract;
         return this;
     }
 
