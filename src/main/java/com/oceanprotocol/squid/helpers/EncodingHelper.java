@@ -94,7 +94,7 @@ public abstract class EncodingHelper {
     /**
      * Return true or false if a input string is in hex format
      * @param input
-     * @return
+     * @return bool
      */
     public static boolean isHexString(String input) {
         return input.matches("-?[0-9a-fA-F]+");

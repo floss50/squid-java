@@ -29,7 +29,7 @@ public class AquariusService {
     /**
      * Builds an instance of AquariusService
      * @param url
-     * @return
+     * @return AquariusService instance
      */
     public static AquariusService getInstance(String url)    {
         log.debug("Getting Aquarius instance: " + url);
