@@ -107,7 +107,7 @@ Typically in Maven you could add the dependency:
 <dependency>
   <groupId>com.oceanprotocol</groupId>
   <artifactId>squid</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
@@ -136,6 +136,14 @@ You can execute the integration tests using the following command:
 
 ```bash
 mvn clean verify -P integration-test
+```
+
+### Documentation
+
+You can generate the Javadoc using the following command:
+
+```bash
+mvn javadoc:javadoc
 ```
 
 ### All the tests

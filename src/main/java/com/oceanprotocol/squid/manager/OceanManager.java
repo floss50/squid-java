@@ -520,7 +520,7 @@ public class OceanManager extends BaseManager {
     /**
      * Gets some basic info of an Access Service
      * @param accessService
-     * @return
+     * @return BasicAssetInfo
      */
     private  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
 
