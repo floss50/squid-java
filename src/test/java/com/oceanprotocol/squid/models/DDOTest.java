@@ -117,9 +117,6 @@ public class DDOTest {
         AssetMetadata metadata = new AssetMetadata();
         AssetMetadata.Base base = new AssetMetadata.Base();
         base.name = "test name";
-        base.contentUrls = new ArrayList<String>() {{
-            add("http://service.net");
-        }};
 
         metadata.base = base;
 
