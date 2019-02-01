@@ -33,7 +33,6 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.parity.methods.response.VMTrace;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,6 +179,7 @@ public class OceanManager extends BaseManager {
 
             String filesJson = metadata.toJson(metadata.base.files);
             metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(ddo.getDid().getHash(), filesJson, threshold);
+            metadata.base.checksum = metadata.generateMetadataChecksum(ddo.getDid().getDid());
 
             // Definition of service endpoints
             String metadataEndpoint;

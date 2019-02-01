@@ -4,11 +4,13 @@ package com.oceanprotocol.squid.models.asset;
 import com.fasterxml.jackson.annotation.*;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
+import org.web3j.crypto.Hash;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.oceanprotocol.squid.models.AbstractModel.DATE_PATTERN;
 
@@ -97,6 +99,9 @@ public class AssetMetadata extends Metadata {
         @JsonProperty
         public String price;
 
+        @JsonProperty
+        public String checksum;
+
         public Base() {}
 
     }
@@ -149,6 +154,21 @@ public class AssetMetadata extends Metadata {
 
         public File() {}
     }
+
+    public String generateMetadataChecksum(String did) {
+
+        String concatFields = this.base.files.stream()
+                .map( file -> file.checksum!=null?file.checksum:"")
+                .collect(Collectors.joining(""))
+                .concat(this.base.name)
+                .concat(this.base.author)
+                .concat(this.base.license)
+                .concat(did);
+
+        return Hash.sha3(concatFields);
+
+    }
+
 
 
 }
