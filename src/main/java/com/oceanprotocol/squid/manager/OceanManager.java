@@ -193,7 +193,7 @@ public class OceanManager extends BaseManager {
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
-            serviceAgreementContract.contractName = "ServiceAgreement";
+            serviceAgreementContract.contractName = "ServiceExecutionAgreement";
             serviceAgreementContract.fulfillmentOperator = 1;
 
             // Execute Agreement Event

@@ -42,11 +42,7 @@
     "functionName": "grantAccess",
     "index": 1,
     "parameters": [
-      {
-        "name": "assetId",
-        "type": "bytes32",
-        "value": "{parameter.assetId}"
-      }, {
+    {
         "name": "documentKeyId",
         "type": "bytes32",
         "value": "{parameter.assetId}"
