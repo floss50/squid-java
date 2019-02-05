@@ -38,7 +38,7 @@ public class HttpHelperTest {
         when(httpEntity.getContent()).thenReturn(new ByteArrayInputStream( "test".getBytes() ));
         when(response.getEntity()).thenReturn(httpEntity);
 
-        assertTrue(downloadHandler.handleResponse(response));
+        assertTrue(downloadHandler.handleResponse(response).getResult());
 
     }
 

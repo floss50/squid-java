@@ -41,7 +41,7 @@ public abstract class AbstractModel {
         return getReaderInstance(clazz).readValue(json);
     }
 
-    public static <T> T fromJSON(final TypeReference<T> type, final String json) throws Exception {
+    public static <T> T fromJSON(final TypeReference<T> type, final String json) throws IOException {
         return getMapperInstance().readValue(json, type);
     }
 
