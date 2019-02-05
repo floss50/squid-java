@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.oceanprotocol.squid.helpers.HttpHelper.*;
+
 /**
  * Service for Brizo's Integration
  */
@@ -59,11 +61,11 @@ public class BrizoService {
      * @param serviceAgreementId
      * @param url
      * @param destinationPath
-     * @return a flag that indicates if the download was correct
+     * @return a DownloadResult object that indicates if the download was correct
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static Boolean consumeUrl(String serviceEndpoint, String consumerAddress, String serviceAgreementId, String url, String destinationPath) throws IOException, URISyntaxException {
+    public static DownloadResult consumeUrl(String serviceEndpoint, String consumerAddress, String serviceAgreementId, String url, String destinationPath) throws IOException, URISyntaxException {
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(Service.CONSUMER_ADDRESS_PARAM, consumerAddress);

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractModel {
 
@@ -39,11 +41,16 @@ public abstract class AbstractModel {
         return getReaderInstance(clazz).readValue(json);
     }
 
-    public static <T> T fromJSON(final TypeReference<T> type, final String json) throws Exception {
+    public static <T> T fromJSON(final TypeReference<T> type, final String json) throws IOException {
         return getMapperInstance().readValue(json, type);
     }
 
     public String toJson() throws JsonProcessingException {
         return getMapperInstance().writeValueAsString(this);
     }
+
+    public String toJson(Object object) throws JsonProcessingException {
+        return getMapperInstance().writeValueAsString(object);
+    }
+
 }

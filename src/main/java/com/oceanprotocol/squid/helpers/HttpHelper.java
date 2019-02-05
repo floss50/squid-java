@@ -1,5 +1,6 @@
 package com.oceanprotocol.squid.helpers;
 
+import com.oceanprotocol.squid.exceptions.OceanException;
 import com.oceanprotocol.squid.models.HttpResponse;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.httpclient.HttpClient;
@@ -8,6 +9,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
@@ -34,7 +36,39 @@ public abstract class HttpHelper {
     private HttpHelper() {
     }
 
-    static class DownloadResponseHandler implements ResponseHandler<Boolean> {
+
+    public static class DownloadResult {
+
+        private Boolean result;
+        private Integer code;
+        private String message;
+
+        public Boolean getResult() {
+            return result;
+        }
+
+        public void setResult(Boolean result) {
+            this.result = result;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
+    static class DownloadResponseHandler implements ResponseHandler<DownloadResult> {
 
         String destinationPath;
 
@@ -44,17 +78,22 @@ public abstract class HttpHelper {
         }
 
         @Override
-        public Boolean handleResponse(org.apache.http.HttpResponse response)  {
+        public DownloadResult handleResponse(org.apache.http.HttpResponse response) throws ClientProtocolException, IOException {
 
-            try {
 
-                FileUtils.copyInputStreamToFile( response.getEntity().getContent(), new File(destinationPath));
-                return true;
+            DownloadResult downloadResult = new DownloadResult();
+            downloadResult.setCode(response.getStatusLine().getStatusCode());
 
-            } catch (IOException e) {
-                log.error("Error downloading content " + e.getMessage());
-                return false;
+            downloadResult.result = downloadResult.code == 200;
+
+            if (!downloadResult.result){
+                downloadResult.setMessage(response.getStatusLine().toString());
+                return downloadResult;
             }
+
+            FileUtils.copyInputStreamToFile( response.getEntity().getContent(), new File(destinationPath));
+            return downloadResult;
+
         }
     }
 
@@ -224,7 +263,7 @@ public abstract class HttpHelper {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static Boolean downloadResource(String url, String destinationPath) throws IOException, URISyntaxException {
+    public static DownloadResult downloadResource(String url, String destinationPath) throws IOException, URISyntaxException {
 
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy()) // adds HTTP REDIRECT support to GET and POST methods

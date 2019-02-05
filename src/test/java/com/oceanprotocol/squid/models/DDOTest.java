@@ -117,9 +117,6 @@ public class DDOTest {
         AssetMetadata metadata = new AssetMetadata();
         AssetMetadata.Base base = new AssetMetadata.Base();
         base.name = "test name";
-        base.contentUrls = new ArrayList<String>() {{
-            add("http://service.net");
-        }};
 
         metadata.base = base;
 
@@ -143,7 +140,6 @@ public class DDOTest {
 
         assertEquals(2, (json.getJSONArray("service").length()));
         assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getString("name"));
-        assertEquals("http://service.net", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getJSONArray("contentUrls").get(0));
 
     }
 
