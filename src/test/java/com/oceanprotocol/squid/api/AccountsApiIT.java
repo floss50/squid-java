@@ -1,11 +1,7 @@
 package com.oceanprotocol.squid.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
-import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.ServiceEndpoints;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -13,11 +9,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.parity.methods.response.VMTrace;
 
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
