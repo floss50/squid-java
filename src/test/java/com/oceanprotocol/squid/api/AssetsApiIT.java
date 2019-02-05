@@ -3,7 +3,6 @@ package com.oceanprotocol.squid.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.ServiceEndpoints;
@@ -106,6 +105,7 @@ public class AssetsApiIT {
 
     }
 
+    // TODO DDO created date format
     @Test
     public void search() throws Exception {
 
@@ -121,6 +121,7 @@ public class AssetsApiIT {
 
     }
 
+    // TODO doesn't work
     @Test
     public void query() throws Exception {
 
