@@ -58,7 +58,11 @@ public class OceanApiIT {
         Config config = ConfigFactory.load();
 
         OceanAPI oceanAPIFromConfig = OceanAPI.getInstance(config);
+        assertNotNull(oceanAPI.getMainAccount());
         assertEquals(config.getString("account.main.address"), oceanAPIFromConfig.getMainAccount().address);
+        assertNotNull(oceanAPI.getAssetsAPI());
+        assertNotNull(oceanAPI.getAccountsAPI());
+        assertNotNull(oceanAPI.getSecretStoreAPI());
 
     }
 

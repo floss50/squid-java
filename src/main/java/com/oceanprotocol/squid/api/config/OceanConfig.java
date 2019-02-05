@@ -19,7 +19,7 @@ public class OceanConfig {
     public static final String MAIN_ACCOUNT_PASSWORD = "account.main.password";
     public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
     public static final String DID_REGISTRY_ADDRESS = "contract.didRegistry.address";
-    public static final String SERVICE_EXECUTION_AGREEMENT_ADDRESS = "contract.serviceAgreement.address";
+    public static final String SERVICE_EXECUTION_AGREEMENT_ADDRESS = "contract.serviceExecutionAgreement.address";
     public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
     public static final String ACCESS_CONDITIONS_ADDRESS = "contract.accessConditions.address";
     public static final String TOKEN_ADDRESS = "contract.token.address";
