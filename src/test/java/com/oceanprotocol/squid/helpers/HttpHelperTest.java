@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -33,9 +34,15 @@ public class HttpHelperTest {
 
         HttpHelper.DownloadResponseHandler downloadHandler= new HttpHelper.DownloadResponseHandler(destPath);
         org.apache.http.HttpResponse response= mock(org.apache.http.HttpResponse.class);
-        HttpEntity httpEntity= mock(HttpEntity.class);
 
+        HttpEntity httpEntity= mock(HttpEntity.class);
         when(httpEntity.getContent()).thenReturn(new ByteArrayInputStream( "test".getBytes() ));
+
+        StatusLine statusLine = mock(StatusLine.class);
+        when( statusLine.getStatusCode()).thenReturn(200);
+        when(response.getStatusLine()).thenReturn(statusLine);
+
+       // when(response.getStatusLine().getStatusCode()).thenReturn(200);
         when(response.getEntity()).thenReturn(httpEntity);
 
         assertTrue(downloadHandler.handleResponse(response).getResult());
