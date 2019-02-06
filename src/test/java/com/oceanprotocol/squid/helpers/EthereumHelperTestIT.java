@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Hash;
 import org.web3j.crypto.Sign;
 import java.io.IOException;
 import static org.junit.Assert.*;
@@ -36,10 +37,10 @@ public class EthereumHelperTestIT {
     @Test
     public void signMessage() throws IOException, CipherException {
         String message = "Hi there";
-        Sign.SignatureData signedMessage = EthereumHelper.signMessage(message, keeper.getCredentials());
+        Sign.SignatureData signatureData = EthereumHelper.signMessage(message, keeper.getCredentials());
 
-        assertTrue(signedMessage.getR().length == 32);
-        assertTrue(signedMessage.getS().length == 32);
+        assertTrue(signatureData.getR().length == 32);
+        assertTrue(signatureData.getS().length == 32);
 
     }
 
@@ -51,6 +52,8 @@ public class EthereumHelperTestIT {
 
         assertTrue( signedMaessage.length() == 132);
     }
+
+
 
 
 }
