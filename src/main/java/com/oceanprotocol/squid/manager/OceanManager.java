@@ -1,5 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
@@ -8,6 +9,7 @@ import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.helpers.HttpHelper;
 import com.oceanprotocol.squid.helpers.StringsHelper;
 import com.oceanprotocol.squid.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.Account;
@@ -176,10 +178,9 @@ public class OceanManager extends BaseManager {
             // Initializing DDO
             DDO ddo = new DDO(address);
 
-            // Encrypting contentUrls and adding them to the Metadata
-            ArrayList<String> urls = new ArrayList<>();
-            urls.add(encryptContentUrls(ddo.getDid(), metadata.base.contentUrls, threshold));
-            metadata.base.contentUrls = urls;
+            String filesJson = metadata.toJson(metadata.base.files);
+            metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(ddo.getDid().getHash(), filesJson, threshold);
+            metadata.base.checksum = metadata.generateMetadataChecksum(ddo.getDid().getDid());
 
             // Definition of service endpoints
             String metadataEndpoint;
@@ -193,7 +194,7 @@ public class OceanManager extends BaseManager {
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
-            serviceAgreementContract.contractName = "ServiceAgreement";
+            serviceAgreementContract.contractName = "ServiceExecutionAgreement";
             serviceAgreementContract.fulfillmentOperator = 1;
 
             // Execute Agreement Event
@@ -234,7 +235,7 @@ public class OceanManager extends BaseManager {
             return createdDDO;
         }catch (DDOException e) {
             throw e;
-        }catch (EncryptionException|InitializeConditionsException|DIDFormatException|DIDRegisterException e) {
+        }catch (EncryptionException|InitializeConditionsException|DIDFormatException|DIDRegisterException|IOException e) {
             throw new DDOException("Error registering Asset." , e);
         }
 
@@ -410,35 +411,38 @@ public class OceanManager extends BaseManager {
     public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String consumerAddress, String basePath, int threshold) throws ConsumeServiceException{
 
         DDO ddo;
-
         String checkConsumerAddress = Keys.toChecksumAddress(consumerAddress);
         String serviceEndpoint;
-        String decryptedUrls;
+        List<AssetMetadata.File> files;
 
         try {
 
             ddo = resolveDID(did);
             serviceEndpoint = ddo.getAccessService(serviceDefinitionId).serviceEndpoint;
-            decryptedUrls = decryptContentUrls(did, ddo.metadata.base.contentUrls.get(0), threshold).replace("[", "").replace("]", "");
-        }catch (EthereumException|DDOException|ServiceException|EncryptionException e) {
+
+            String jsonFiles = getSecretStoreManager().decryptDocument(did.getHash(), ddo.metadata.base.encryptedFiles);
+            files = DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>(){}, jsonFiles);
+
+        }catch (EthereumException|DDOException|ServiceException|EncryptionException|IOException e) {
             String msg = "Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId;
             log.error(msg+ ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
         }
 
-        List<String> contentUrls = StringsHelper.getStringsFromJoin(decryptedUrls);
-
-        for (String url: contentUrls) {
+        for (AssetMetadata.File file: files) {
 
             // For each url we call to consume Brizo endpoint that requires consumerAddress, serviceAgreementId and url as a parameters
             try {
 
+                String url = file.url;
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String destinationPath = basePath + File.separator + fileName;
 
-                Boolean flag = BrizoService.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
-                if (!flag){
-                    String msg = "Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId;
+                HttpHelper.DownloadResult downloadResult = BrizoService.consumeUrl(serviceEndpoint, checkConsumerAddress, serviceAgreementId, url, destinationPath);
+                if (!downloadResult.getResult()){
+                    String msg = "Error consuming asset with DID " + did.getDid() +" and Service Agreement " + serviceAgreementId
+                            + ". Http Code: " + downloadResult.getCode() + " . Message: " + downloadResult.getMessage();
+
                     log.error(msg);
                     throw new ConsumeServiceException(msg);
                 }

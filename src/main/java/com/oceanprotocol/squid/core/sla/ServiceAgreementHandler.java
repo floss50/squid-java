@@ -132,7 +132,7 @@ public class ServiceAgreementHandler {
     }
 
     private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
-    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
+    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32)";
     private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
     private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
 
@@ -152,14 +152,22 @@ public class ServiceAgreementHandler {
         fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_LOCKPAYMENT_DEF));
 
+        log.debug("lockPayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF));
+
         fingerprints.put("function.grantAccess.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_GRANTACCESS_DEF));
+
+        log.debug("grantAccess fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF));
 
         fingerprints.put("function.releasePayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_RELEASEPAYMENT_DEF));
 
+        log.debug("releasePayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF));
+
         fingerprints.put("function.refundPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_REFUNDPAYMENT_DEF));
+
+        log.debug("grantAccess refundPayment: " + EthereumHelper.getFunctionSelector( FUNCTION_REFUNDPAYMENT_DEF));
 
         fingerprints.put("function.lockPayment.conditionKey",
                 fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF)));

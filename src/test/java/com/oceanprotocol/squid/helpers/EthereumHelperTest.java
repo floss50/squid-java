@@ -1,5 +1,7 @@
 package com.oceanprotocol.squid.helpers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
@@ -13,6 +15,8 @@ import java.math.BigInteger;
 import static org.junit.Assert.*;
 
 public class EthereumHelperTest {
+
+    static final Logger log= LogManager.getLogger(EthereumHelper.class);
 
     public static final String PRIVATE_KEY_STRING = "a392604efc2fad9c0b3da43b5f698a2e3f270f170d859912be0d54742275c5f6";
     public static final String PUBLIC_KEY_STRING = "0x506bc1dc099358e5137292f4efdd57e400f29ba5132aa5d12b18dac1c1f6aab"
@@ -34,16 +38,15 @@ public class EthereumHelperTest {
 
     }
 
-    @Ignore
     @Test
     public void signAndValidateMessage() throws IOException, CipherException {
-        String message = "Hi there dude";
-        String hashMessage= EthereumHelper.hashMessage(message);
+        String message = "Hi dude";
+        byte[] hashMessage= EthereumHelper.getEthereumMessageHash(message);
+
+        log.debug("String message to sign and validate: " + message);
         Sign.SignatureData signatureData = EthereumHelper.signMessage(message, KEY_PAIR);
 
-        String address= EthereumHelper.recoverAddressFromSignature(signatureData, hashMessage);
-
-        assertEquals(ADDRESS, address);
+        assertTrue(EthereumHelper.wasSignedByAddress(ADDRESS, signatureData, hashMessage));
 
     }
 

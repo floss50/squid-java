@@ -6,23 +6,53 @@ import org.web3j.protocol.core.methods.response.EthSign;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class EthereumHelper {
 
-    public static String hashMessage(String message)   {
-        return Hash.sha3(message);
+    static final String MESSAGE_PREFIX = "\u0019Ethereum Signed Message:\n";
+
+    /**
+     * Given a String message, return the prefixed message hashed
+     * @param messageString message to hash
+     * @return byte[]
+     */
+    public static byte[] getEthereumMessageHash(String messageString) {
+        String prefix = MESSAGE_PREFIX + messageString.length();
+        return Hash.sha3((prefix + messageString).getBytes());
     }
 
+    /**
+     * Given a string and a ECKeyPair sign the ethereum prefixed message
+     * @param message message to sign
+     * @param keyPair keypair
+     * @return signature data
+     */
     public static Sign.SignatureData signMessage(String message, ECKeyPair keyPair)   {
         return Sign.signPrefixedMessage(message.getBytes(), keyPair);
     }
 
+    /**
+     * Given a string and a ECKeyPair sign the ethereum prefixed message
+     * @param message message to sign
+     * @param credentials user credentials
+     * @return signature data
+     */
     public static Sign.SignatureData signMessage(String message, Credentials credentials)   {
         return Sign.signPrefixedMessage(message.getBytes(), credentials.getEcKeyPair());
     }
 
-    public static String recoverAddressFromSignature(Sign.SignatureData signatureData, String hashMessage) {
-        String address= null;
+    /**
+     * Given a signature data and the hashed message, recover and return the public
+     * key that generated the signature
+     * @param signatureData signature data
+     * @param hashMessage hashed message
+     * @return address
+     */
+    public static List<String> recoverAddressFromSignature(Sign.SignatureData signatureData, byte[] hashMessage) {
+        List<String> address= new ArrayList<>();
         ECDSASignature ecdsaSignature = new ECDSASignature(
                 new BigInteger(1, signatureData.getR()),
                 new BigInteger(1, signatureData.getS()));
@@ -30,27 +60,67 @@ public abstract class EthereumHelper {
         // Iterate for each possible key to recover
         for (int i = 0; i < 4; i++) {
             BigInteger publicKey = Sign.recoverFromSignature(
-                    (byte) i, ecdsaSignature, hashMessage.getBytes());
+                    (byte) i, ecdsaSignature, hashMessage);
+            if (publicKey != null) {
+                address.add("0x" + Keys.getAddress(publicKey));
+            }
         }
-
-        Sign.recoverFromSignature(signatureData.getV() -27, ecdsaSignature, hashMessage.getBytes());
         return address;
     }
 
+    /**
+     * Given an address, signature data and the hashed message return true or false if the address
+     * is the one used to sign the message
+     * @param address
+     * @param signatureData
+     * @param hashMessage
+     * @return boolean
+     */
+    public static boolean wasSignedByAddress(String address, Sign.SignatureData signatureData, byte[] hashMessage)  {
+        List<String> addresses= recoverAddressFromSignature(signatureData, hashMessage);
+        return addresses.contains(address);
+    }
+
+    /**
+     * Execute a web3 eth-sign message in the keeper
+     * @param web3  web3j
+     * @param message message to sign
+     * @param address address to use for signing
+     * @return signed message
+     * @throws IOException
+     */
     public static String ethSignMessage(Web3j web3, String message, String address) throws IOException {
         EthSign ethSign= web3.ethSign(address, message).send();
         return ethSign.getResult();
     }
 
+    /**
+     * Hashing a message and signing using web3 eth-sign
+     * @param web3 web3j
+     * @param message message to hash and sign
+     * @param address address to use for signing
+     * @return signed message
+     * @throws IOException
+     */
     public static String ethEncodeAndSignMessage(Web3j web3, String message, String address) throws IOException {
         String hash= Hash.sha3(EncodingHelper.encodeToHex(message));
         return ethSignMessage(web3, hash, address);
     }
 
+    /**
+     * Removes all the "0x"
+     * @param input string
+     * @return string
+     */
     public static String remove0x(String input) {
         return input.replaceAll("0x", "");
     }
 
+    /**
+     * If a string doesn't start by 0x, prepend 0x to it
+     * @param input string
+     * @return string
+     */
     public static String add0x(String input) {
         if (!input.startsWith("0x"))
             return "0x" + input;
@@ -58,6 +128,11 @@ public abstract class EthereumHelper {
     }
 
 
+    /**
+     * Given a function defition return the ethereum function selector
+     * @param functionDefinition
+     * @return
+     */
     public static String getFunctionSelector(String functionDefinition)    {
         return Hash.sha3String(functionDefinition)
                 .substring(0, 10);
