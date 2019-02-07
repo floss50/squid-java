@@ -1,16 +1,15 @@
 package com.oceanprotocol.squid.helpers;
 
+import com.oceanprotocol.squid.exceptions.EncodingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.web3j.crypto.CipherException;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
 
-import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +28,7 @@ public class EthereumHelperTest {
     static final ECKeyPair KEY_PAIR = new ECKeyPair(PRIVATE_KEY, PUBLIC_KEY);
 
     @Test
-    public void signMessage() throws IOException, CipherException {
+    public void signMessage() {
         String message = "Hi there";
         Sign.SignatureData signatureData = EthereumHelper.signMessage(message, KEY_PAIR);
 
@@ -39,7 +38,7 @@ public class EthereumHelperTest {
     }
 
     @Test
-    public void signAndValidateMessage() throws IOException, CipherException {
+    public void signAndValidateMessage() {
         String message = "Hi dude";
         byte[] hashMessage= EthereumHelper.getEthereumMessageHash(message);
 
@@ -47,6 +46,31 @@ public class EthereumHelperTest {
         Sign.SignatureData signatureData = EthereumHelper.signMessage(message, KEY_PAIR);
 
         assertTrue(EthereumHelper.wasSignedByAddress(ADDRESS, signatureData, hashMessage));
+
+    }
+
+    @Test
+    public void checkingSignatureString() throws EncodingException {
+        String message = CryptoHelper.sha3("Hi there");
+
+        Sign.SignatureData signatureSource = EthereumHelper.signMessage(message, KEY_PAIR);
+
+        String signatureString= EncodingHelper.signatureToString(signatureSource);
+
+        log.debug("Signature String " + signatureString);
+
+        Sign.SignatureData signature= EncodingHelper.stringToSignature(signatureString);
+
+        assertTrue(signatureSource.getR().length == 32);
+        assertTrue(signatureSource.getS().length == 32);
+
+        assertTrue(signature.getR().length == 32);
+        assertTrue(signature.getS().length == 32);
+
+
+        assertTrue(Arrays.equals(signatureSource.getR(), signature.getR()));
+        assertTrue(Arrays.equals(signatureSource.getS(), signature.getS()));
+        assertEquals(signatureSource.getV(), signature.getV());
 
     }
 

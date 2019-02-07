@@ -40,6 +40,15 @@ public abstract class CryptoHelper {
 
 
     /**
+     * Given an input string return the result of sha3
+     * @param input string
+     * @return hashed message
+     */
+    public static String sha3(String input) {
+        return Hash.sha3(input);
+    }
+
+    /**
      * Given N objects, return the SHA3 of those objects
      * @param data objects
      * @return sha3
