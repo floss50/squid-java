@@ -46,7 +46,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) throws DDOException{
-        return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, 0);
+        return this.create(metadata, publisherAccount, serviceEndpoints, 0);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DDO> search(String text) throws DDOException{
-        return assetsManager.searchAssets(text, 0, 0);
+        return this.search(text, 0, 0);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DDO> query(Map<String, Object> params)  throws DDOException {
-        return assetsManager.searchAssets(params, 0, 0, 0);
+        return this.query(params, 0, 0, 1);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) throws ConsumeServiceException {
-        return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath);
+        return this.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount, basePath, 0);
     }
 
     @Override
