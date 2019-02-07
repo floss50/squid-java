@@ -33,7 +33,7 @@ public abstract class EncodingHelper {
      */
     public static byte[] byteArrayToByteArray32(byte[] byteValue) {
         byte[] byteValueLen32 = new byte[32];
-        System.arraycopy(byteValue, 0, byteValueLen32, 0, byteValue.length);
+        System.arraycopy(byteValue, 0, byteValueLen32, 0, byteValueLen32.length);
         return byteValueLen32;
     }
 

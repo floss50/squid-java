@@ -47,8 +47,6 @@ public class OceanManager extends BaseManager {
 
     static final Logger log= LogManager.getLogger(OceanManager.class);
 
-    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
-
     protected OceanManager(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
         super(keeperService, aquariusService);
@@ -139,15 +137,22 @@ public class OceanManager extends BaseManager {
      * @return boolean success
      * @throws DIDRegisterException
      */
-    public boolean registerDID(DID did, String url) throws DIDRegisterException{
+    public boolean registerDID(DID did, String url, String checksum) throws DIDRegisterException{
         log.debug("Registering DID " + did.getHash() + " into Registry " + didRegistry.getContractAddress());
 
         try {
 
+            /*
             TransactionReceipt receipt = didRegistry.registerAttribute(
                     EncodingHelper.hexStringToBytes(did.getHash()),
-                    DID_VALUE_TYPE,
                     EncodingHelper.byteArrayToByteArray32(EncodingHelper.stringToBytes(Service.serviceTypes.Metadata.toString())),
+                    url
+            ).send();
+            */
+
+            TransactionReceipt receipt = didRegistry.registerAttribute(
+                    EncodingHelper.hexStringToBytes(did.getHash()),
+                    EncodingHelper.hexStringToBytes(checksum.replace("0x", "")),
                     url
             ).send();
 
@@ -227,7 +232,7 @@ public class OceanManager extends BaseManager {
             DDO createdDDO = getAquariusService().createDDO(ddo);
 
             // Registering DID
-            registerDID(ddo.getDid(), metadataEndpoint);
+            registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum);
 
             return createdDDO;
         }catch (DDOException e) {

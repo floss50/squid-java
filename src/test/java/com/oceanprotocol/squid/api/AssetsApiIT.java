@@ -105,13 +105,10 @@ public class AssetsApiIT {
 
     }
 
-    // TODO DDO created date format
     @Test
     public void search() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
-        DID did= new DID(ddo.id);
-
+        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
         log.debug("DDO registered!");
 
         String searchText = "Weather";
@@ -121,13 +118,10 @@ public class AssetsApiIT {
 
     }
 
-    // TODO doesn't work
     @Test
     public void query() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
-        DID did= new DID(ddo.id);
-
+        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
         log.debug("DDO registered!");
 
         Map<String, Object> params = new HashMap<>();
