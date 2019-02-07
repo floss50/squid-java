@@ -71,7 +71,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DDO> query(Map<String, Object> params)  throws DDOException {
-        return this.query(params, 0, 0, 0);
+        return this.query(params, 0, 0, 1);
     }
 
     @Override
