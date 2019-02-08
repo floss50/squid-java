@@ -131,10 +131,10 @@ Squid-java uses web3j to interact with Solidity's Smart Contracts. It relies on 
 The order method in AssetsAPI returns a Flowable over an OrderResult object. It's your choice if you want to handle this in a synchronous or asynchronous fashion.
 If you prefer to deal with this method in a synchronous way, you will need to block the current thread until you get a response:
 
-```java`
+```java
  Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
  OrderResult orderResult = response.blockingFirst();
-``
+```
 On the contrary, if you want to handle the response asynchronously, you will need to subscribe to the Flowable:
 
 ```java
