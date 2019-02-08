@@ -64,7 +64,7 @@ public class AccountsManagerIT {
                 ManagerHelper.loadOceanTokenContract(keeperError, config.getString("contract.token.address"))
         );
         managerError.setDispenserContract(
-                ManagerHelper.loadDispenserContract(keeperError, config.getString("contract.oceanmarket.address"))
+                ManagerHelper.loadDispenserContract(keeperError, config.getString("contract.dispenser.address"))
         );
     }
 
@@ -85,10 +85,10 @@ public class AccountsManagerIT {
 
     @Test
     public void getAccountsBalance() throws EthereumException {
-        manager.requestTokens(BigInteger.TEN);
+        manager.requestTokens(BigInteger.ONE);
         log.debug("OceanToken Address: " + manager.tokenContract.getContractAddress());
 
-        log.debug("Requesting " + BigInteger.TEN + " ocean tokens for " + TEST_ADDRESS);
+        log.debug("Requesting " + BigInteger.ONE + " ocean tokens for " + TEST_ADDRESS);
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
 
