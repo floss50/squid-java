@@ -96,9 +96,7 @@ public class OceanManager extends BaseManager {
             didFilter.addSingleTopic(eventSignature);
 
             String didTopic= "0x" + did.getHash();
-            String metadataTopic= "0x" + EncodingHelper.padRightWithZero(
-                    EncodingHelper.encodeToHex(Service.serviceTypes.Metadata.toString()), 64);
-            didFilter.addOptionalTopics(didTopic, metadataTopic);
+            didFilter.addOptionalTopics(didTopic);
 
             EthLog ethLog;
 
@@ -134,6 +132,7 @@ public class OceanManager extends BaseManager {
      * It allows to resolve DDO's using DID's as input
      * @param did
      * @param url metadata url
+     * @param checksum calculated hash of the metadata
      * @return boolean success
      * @throws DIDRegisterException
      */
@@ -141,14 +140,6 @@ public class OceanManager extends BaseManager {
         log.debug("Registering DID " + did.getHash() + " into Registry " + didRegistry.getContractAddress());
 
         try {
-
-            /*
-            TransactionReceipt receipt = didRegistry.registerAttribute(
-                    EncodingHelper.hexStringToBytes(did.getHash()),
-                    EncodingHelper.byteArrayToByteArray32(EncodingHelper.stringToBytes(Service.serviceTypes.Metadata.toString())),
-                    url
-            ).send();
-            */
 
             TransactionReceipt receipt = didRegistry.registerAttribute(
                     EncodingHelper.hexStringToBytes(did.getHash()),
