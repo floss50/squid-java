@@ -15,7 +15,8 @@
    * [Squid-java](#squid-java)
       * [Table of Contents](#table-of-contents)
       * [Features](#features)
-      * [Next methods to integrate](#next-methods-to-integrate)
+      * [Using the API](#using-the-api)
+        * [Dealing with Flowables](#dealing-with-flowables)
         * [Installing the library](#installing-the-library)
       * [How to run the integration tests](#how-to-run-the-integration-tests)
       * [New Version](#new-version)
@@ -30,73 +31,125 @@ This library enables to integrate the Ocean Protocol capabilities from JVM clien
 
 The list of methods implemented are:
 
-**Ocean**
-
-* resolveDID
-* registerAsset
 
 **Asset**
 
-* searchAssets
-* getId
-* getDDO
-* getDID
-* publishMetadata
-* getMetadata
-* updateMetadata
+* create
+* resolve
+* search
+* query
+* order
+* consume
 
 **Accounts**
 
-* getId
-* getAccounts
-* getAccountBalance
-* getEthAccountBalance
-* getOceanAccountBalance
+* list
+* balance
 * requestTokens
 
 **Secret Store**
 
-* encryptDocument
-* decryptDocument
+* encrypt
+* decrypt
 
 
-## Next methods to integrate
+## Using the API
 
-**Ocean**
+You can configure the library using TypeSafe Config or a Java Properties Object
 
+In case you want to use TypeSafe Config you would need an application.conf file with this shape:
 
-* getOrder
-* getAsset
-* getServiceAgreement
-* getOrdersByAccount (Nice to Have)
-* searchOrders (Nice to Have)
+```
+keeper.url="http://localhost:8545"
+keeper.gasLimit=4712388
+keeper.gasPrice=100000000000
 
-**Asset**
+aquarius.url="http://localhost:5000"
 
-* purchase
-* retireMetadata (Nice to Have)
-* getServiceAgreements (Nice to Have)
+secretstore.url="http://localhost:12001"
 
-**ServiceAgreement**
+# Contracts addresses
+contract.token.address="0xe749e2f8482810b11b838ae8c5eb69e54d610411"
+contract.didRegistry.address="0x611f28ef25d778afc5a0034aea94297e2c215a42"
+contract.dispenser.address="0x83d35336e2cC9C69F6bD22c6D8412e4Ad59134ec"
+contract.serviceExecutionAgreement.address="0xdeAF2aa754287628d5d30Ca99d94a0CAd2AD4CAb"
+contract.paymentConditions.address="0xf9e633cbeeb2a474d3fe22261046c99e805beec4"
+contract.accessConditions.address="0xfe0145caf0ec55d23dc1b08431b071f6e1123a76"
 
-* getId
-* getPrice
-* getStatus
-* publish
-* retire
-* getAccess
+consume.basePath = "/tmp"
 
-**Order**
+## Main account
+account.main.address="0xaabbcc"
+account.main.password="pass"
+account.main.credentialsFile="/accounts/parity/aabbcc.json.testaccount"
+```
 
-* getId
-* getStatus
-* commit
-* pay
-* verifyPayment
-* consume
+And you can instantiate the API with the following lines:
 
+```java
+ Config config = ConfigFactory.load();
+ OceanAPI oceanAPI = OceanAPI.getInstance(config);
+```
 
-A complete description of the Squid API can be found on the [Squid documentation page](https://github.com/oceanprotocol/dev-ocean/blob/master/doc/development/squid.md)
+Remember that TypeSafe Config allows you to overwrite the values using Environment Variables or arguments passed to the JVM
+
+If you want to use Java's Properties, you just need to create a Properties Object with the same properties of the application.conf.
+You can read this Properties from a properties file, or define the values of this properties in your code
+
+```java
+    // Default values for KEEPER_URL, KEEPER_GAS_LIMIT, KEEPER_GAS_PRICE, AQUARIUS_URL, SECRETSTORE_URL, CONSUME_BASE_PATH
+    Properties properties = new Properties();
+    properties.put(OceanConfig.MAIN_ACCOUNT_ADDRESS, "0xaabbcc");
+    properties.put(OceanConfig.MAIN_ACCOUNT_PASSWORD,"pass");
+    properties.put(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE,"/accounts/parity/aabbcc.json.testaccount");
+    properties.put(OceanConfig.DID_REGISTRY_ADDRESS, "0x01daE123504DDf108E0C65a42190516E5c5dfc07");
+    properties.put(OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS, "0x21668cE2116Dbc48AC116F31678CfaaeF911F7aA");
+    properties.put(OceanConfig.PAYMENT_CONDITIONS_ADDRESS, "0x38A531cc85A58adCb01D6a249E33c27CE277a2D1");
+    properties.put(OceanConfig.ACCESS_CONDITIONS_ADDRESS, "0x605FAF898Fc7c2Aa847Ba0D558b5251c0F128Fd7");
+    properties.put(OceanConfig.TOKEN_ADDRESS, "0xe749e2f8482810b11b838ae8c5eb69e54d610411");
+    properties.put(OceanConfig.OCEAN_MARKET_ADDRESS, "0xf9e633cbeeb2a474d3fe22261046c99e805beec4");
+
+    OceanAPI oceanAPIFromProperties = OceanAPI.getInstance(properties);
+```
+
+Once you have initialized the API you can call the methods through their correspondent API class. For instance:
+
+```java
+ Balance balance = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
+
+ String filesJson = metadataBase.toJson(metadataBase.base.files);
+ String did = DID.builder().getHash();
+ String encryptedDocument = oceanAPI.getSecretStoreAPI().encrypt(did, filesJson, 0);
+
+ Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
+ boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount(), "/tmp");
+```
+
+### Dealing with Flowables
+
+Squid-java uses web3j to interact with Solidity's Smart Contracts. It relies on [RxJava](https://github.com/ReactiveX/RxJava) to deal with asynchronous calls.
+The order method in AssetsAPI returns a Flowable over an OrderResult object. It's your choice if you want to handle this in a synchronous or asynchronous fashion.
+If you prefer to deal with this method in a synchronous way, you will need to block the current thread until you get a response:
+
+```java
+ Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
+ OrderResult orderResult = response.blockingFirst();
+```
+On the contrary, if you want to handle the response asynchronously, you will need to subscribe to the Flowable:
+
+```java
+response.subscribe(
+     orderResultEvent -> {
+         if (orderResultEvent.isAccessGranted())
+             System.out.println("Access Granted for Service Agreement " + orderResultEvent.getServiceAgreementId());
+         else if (orderResultEvent.isPaymentRefund())
+             System.out.println("There was a problem with Service Agreement " + orderResultEvent.getServiceAgreementId() + " .Payment Refund");
+     }
+ );
+```
+
+The subscribe method will launch a new Thread to react to the events of the Flowable.
+More information: [RxJava](https://github.com/ReactiveX/RxJava/wiki) , [Flowable](http://reactivex.io/RxJava/2.x/javadoc/)
 
 
 ### Installing the library
