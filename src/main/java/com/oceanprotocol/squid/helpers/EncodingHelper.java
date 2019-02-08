@@ -1,11 +1,13 @@
 package com.oceanprotocol.squid.helpers;
 
+import com.oceanprotocol.squid.exceptions.EncodingException;
 import org.apache.commons.codec.binary.Hex;
 import org.web3j.abi.TypeEncoder;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Bool;
 import org.web3j.abi.datatypes.Uint;
 import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
 
 import java.io.UnsupportedEncodingException;
@@ -94,7 +96,7 @@ public abstract class EncodingHelper {
     /**
      * Return true or false if a input string is in hex format
      * @param input
-     * @return
+     * @return bool
      */
     public static boolean isHexString(String input) {
         return input.matches("-?[0-9a-fA-F]+");
@@ -132,4 +134,23 @@ public abstract class EncodingHelper {
 
     }
 
+    public static String signatureToString(Sign.SignatureData signatureData)    {
+        return EthereumHelper.remove0x(
+                Integer.toHexString(signatureData.getV())
+                + Numeric.toHexString(signatureData.getR())
+                + Numeric.toHexString(signatureData.getS())
+        );
+    }
+
+    public static Sign.SignatureData stringToSignature(String signatureString) throws EncodingException {
+        if (signatureString.length() != 130)
+            throw new EncodingException(
+                    "Error deserializing string to SignatureData, invalid length:" + signatureString.length());
+
+        byte[] v= Numeric.hexStringToByteArray(signatureString.substring(0, 2));
+        byte[] r= Numeric.hexStringToByteArray(signatureString.substring(2, 66));
+        byte[] s= Numeric.hexStringToByteArray(signatureString.substring(66, 130));
+
+        return new Sign.SignatureData(v[0], r, s);
+    }
 }

@@ -1,17 +1,16 @@
 package com.oceanprotocol.squid.models.asset;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
+import org.web3j.crypto.Hash;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.oceanprotocol.squid.models.AbstractModel.DATE_PATTERN;
 
@@ -82,8 +81,11 @@ public class AssetMetadata extends Metadata {
         @JsonProperty
         public String workExample;
 
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        public ArrayList<File> files;
+
         @JsonProperty
-        public ArrayList<String> contentUrls;
+        public String encryptedFiles=null;
 
         @JsonProperty
         public ArrayList<Link> links;
@@ -97,7 +99,11 @@ public class AssetMetadata extends Metadata {
         @JsonProperty
         public String price;
 
+        @JsonProperty
+        public String checksum;
+
         public Base() {}
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -131,6 +137,38 @@ public class AssetMetadata extends Metadata {
 
         public Curation() {}
     }
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class File {
+
+        @JsonProperty
+        public String url;
+
+        @JsonProperty
+        public String checksum;
+
+        @JsonProperty
+        public String contentLength;
+
+        public File() {}
+    }
+
+    public String generateMetadataChecksum(String did) {
+
+        String concatFields = this.base.files.stream()
+                .map( file -> file.checksum!=null?file.checksum:"")
+                .collect(Collectors.joining(""))
+                .concat(this.base.name)
+                .concat(this.base.author)
+                .concat(this.base.license)
+                .concat(did);
+
+        return Hash.sha3(concatFields);
+
+    }
+
 
 
 }

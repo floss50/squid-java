@@ -160,6 +160,12 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.services.add(service);
     }
 
+    @JsonSetter("id")
+    public void didSetter(String id) throws DIDFormatException{
+        this.id = id;
+        this.did = new DID(id);
+    }
+
     public DDO addService(Service service)  {
         service.serviceDefinitionId= String.valueOf(services.size());
         services.add(service);
@@ -236,6 +242,5 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
         throw new ServiceException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
     }
-
 
 }

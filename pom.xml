@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.oceanprotocol</groupId>
-	<artifactId>squid</artifactId>
-	<version>0.2.0</version>
-	<packaging>jar</packaging>
+    <groupId>com.oceanprotocol</groupId>
+    <artifactId>squid</artifactId>
+    <version>0.3.1</version>
+    <packaging>jar</packaging>
 
-	<name>Java client library for Ocean Protocol</name>
-	<description>Squid facilitate the interaction of java clients with the Ocean Protocol network</description>
+    <name>Java client library for Ocean Protocol</name>
+    <description>Squid facilitate the interaction of java clients with the Ocean Protocol network</description>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
         <final-name>squid</final-name>
 
-		<web3j.version>4.0.1</web3j.version>
-        <ocean.keeper.version>0.5.3</ocean.keeper.version>
+        <web3j.version>4.0.1</web3j.version>
+        <ocean.keeper.version>0.6.12</ocean.keeper.version>
         <ocean.secretstore.version>0.0.7</ocean.secretstore.version>
 
         <eddsa.version>0.3.0</eddsa.version>
         <jackson.version>2.9.7</jackson.version>
-		<log4j.version>2.11.1</log4j.version>
-		<junit.version>4.12</junit.version>
-		<typesafe-config.version>1.3.3</typesafe-config.version>
+        <log4j.version>2.11.1</log4j.version>
+        <junit.version>4.12</junit.version>
+        <typesafe-config.version>1.3.3</typesafe-config.version>
 
 
         <build.profile.id>dev</build.profile.id>
@@ -35,7 +35,7 @@
         <!-- Only unit tests are run by default. -->
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
-	</properties>
+    </properties>
 
     <profiles>
         <profile>
@@ -62,7 +62,7 @@
         </profile>
     </profiles>
 
-	<build>
+    <build>
         <finalName>${final-name}-${project.version}</finalName>
 
         <filters>
@@ -275,9 +275,20 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
+
         </plugins>
 
-	</build>
+
+    </build>
 
 
     <dependencies>
@@ -411,5 +422,19 @@
         </dependency>
 
     </dependencies>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+                    <show>public</show>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

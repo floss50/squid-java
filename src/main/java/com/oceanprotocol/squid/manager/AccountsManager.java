@@ -127,7 +127,7 @@ public class AccountsManager extends BaseManager {
 
 
     /**
-     * Requests Ocean Tokens from the OceanMarket Smart Contract
+     * Requests Ocean Tokens from the Dispenser Smart Contract
      * Contract: OceanMarket
      * Method: requestTokens
      * @param amount amount of tokens requestsd
@@ -135,7 +135,7 @@ public class AccountsManager extends BaseManager {
      */
     public TransactionReceipt requestTokens(BigInteger amount) throws EthereumException {
         try{
-            return oceanMarket.requestTokens(amount).send();
+            return dispenser.requestTokens(amount).send();
         } catch (Exception ex)  {
             String msg = "Unable request tokens " + amount.intValue();
             log.error(msg + ": " + ex.getMessage());

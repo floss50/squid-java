@@ -88,7 +88,7 @@ public class AssetsManager extends BaseManager {
      * @param text
      * @param offset
      * @param page
-     * @return
+     * @return List of DDOs
      * @throws DDOException
      */
     public List<DDO> searchAssets(String text, int offset, int page) throws DDOException {

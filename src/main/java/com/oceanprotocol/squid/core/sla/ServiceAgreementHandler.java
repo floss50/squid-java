@@ -2,7 +2,7 @@ package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
-import com.oceanprotocol.keeper.contracts.ServiceAgreement;
+import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
@@ -48,25 +48,25 @@ public class ServiceAgreementHandler {
     }
 
     /**
-     * Define and execute a Filter over the Service Agreement Contract to listen for an ExecuteAgreement event
+     * Define and execute a Filter over the Service Agreement Contract to listen for an AgreementInitialized event
      * @param slaContract
      * @param serviceAgreementId
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
-    public static Flowable<ServiceAgreement.ExecuteAgreementEventResponse> listenExecuteAgreement(ServiceAgreement slaContract, String serviceAgreementId)   {
+    public static Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> listenExecuteAgreement(ServiceExecutionAgreement slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
                 DefaultBlockParameterName.LATEST,
                 slaContract.getContractAddress()
         );
 
-        final Event event= slaContract.EXECUTEAGREEMENT_EVENT;
+        final Event event= slaContract.AGREEMENTINITIALIZED_EVENT;
         final String eventSignature= EventEncoder.encode(event);
         String slaTopic= "0x" + serviceAgreementId;
         slaFilter.addSingleTopic(eventSignature);
         slaFilter.addOptionalTopics(slaTopic);
 
-        return slaContract.executeAgreementEventFlowable(slaFilter);
+        return slaContract.agreementInitializedEventFlowable(slaFilter);
     }
 
 
@@ -130,10 +130,10 @@ public class ServiceAgreementHandler {
         }
     }
 
-    public static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
-    public static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32,bytes32)";
-    public static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
-    public static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32)";
+    private static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
+    private static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
 
 
     /**
@@ -151,14 +151,22 @@ public class ServiceAgreementHandler {
         fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_LOCKPAYMENT_DEF));
 
+        log.debug("lockPayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF));
+
         fingerprints.put("function.grantAccess.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_GRANTACCESS_DEF));
+
+        log.debug("grantAccess fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF));
 
         fingerprints.put("function.releasePayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_RELEASEPAYMENT_DEF));
 
+        log.debug("releasePayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF));
+
         fingerprints.put("function.refundPayment.fingerprint", EthereumHelper.getFunctionSelector(
                 FUNCTION_REFUNDPAYMENT_DEF));
+
+        log.debug("grantAccess refundPayment: " + EthereumHelper.getFunctionSelector( FUNCTION_REFUNDPAYMENT_DEF));
 
         fingerprints.put("function.lockPayment.conditionKey",
                 fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF)));

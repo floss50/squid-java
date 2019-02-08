@@ -44,9 +44,9 @@ public class OceanAPI {
     private AccountsManager accountsManager;
 
     private OceanToken tokenContract;
-    private OceanMarket oceanMarketContract;
+    private Dispenser dispenser;
     private DIDRegistry didRegistryContract;
-    private ServiceAgreement serviceAgreementContract;
+    private ServiceExecutionAgreement serviceExecutionAgreementContract;
     private PaymentConditions paymentConditionsContract;
     private AccessConditions accessConditionsContract;
 
@@ -114,22 +114,22 @@ public class OceanAPI {
             oceanAPI.secretStoreManager = oceanInitializationHelper.getSecretStoreManager(oceanAPI.secretStoreDto, oceanAPI.evmDto);
 
             oceanAPI.didRegistryContract = oceanInitializationHelper.loadDIDRegistryContract(oceanAPI.keeperService);
-            oceanAPI.serviceAgreementContract = oceanInitializationHelper.loadServiceAgreementContract(oceanAPI.keeperService);
+            oceanAPI.serviceExecutionAgreementContract = oceanInitializationHelper.loadServiceExecutionAgreementContract(oceanAPI.keeperService);
             oceanAPI.paymentConditionsContract = oceanInitializationHelper.loadPaymentConditionsContract(oceanAPI.keeperService);
             oceanAPI.accessConditionsContract = oceanInitializationHelper.loadAccessConditionsContract(oceanAPI.keeperService);
-            oceanAPI.oceanMarketContract = oceanInitializationHelper.loadOceanMarketContract(oceanAPI.keeperService);
+            oceanAPI.dispenser = oceanInitializationHelper.loadDispenserContract(oceanAPI.keeperService);
             oceanAPI.tokenContract = oceanInitializationHelper.loadOceanTokenContract(oceanAPI.keeperService);
 
             oceanAPI.oceanManager = oceanInitializationHelper.getOceanManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.oceanManager.setSecretStoreManager(oceanAPI.secretStoreManager)
                     .setDidRegistryContract(oceanAPI.didRegistryContract)
-                    .setServiceAgreementContract(oceanAPI.serviceAgreementContract)
+                    .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract);
 
             oceanAPI.accountsManager = oceanInitializationHelper.getAccountsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.accountsManager.setTokenContract(oceanAPI.tokenContract);
-            oceanAPI.accountsManager.setOceanMarketContract(oceanAPI.oceanMarketContract);
+            oceanAPI.accountsManager.setDispenserContract(oceanAPI.dispenser);
             oceanAPI.assetsManager = oceanInitializationHelper.getAssetsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
 
             oceanAPI.accountsAPI = new AccountsImpl(oceanAPI.accountsManager);

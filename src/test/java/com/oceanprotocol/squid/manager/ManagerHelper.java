@@ -72,13 +72,6 @@ public abstract class ManagerHelper {
     }
 
 
-    public static OceanToken deployOceanTokenContract(KeeperService keeper) throws Exception, IOException, CipherException {
-        return OceanToken.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider()).send();
-    }
-
     public static OceanToken loadOceanTokenContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return OceanToken.load(
                 address,
@@ -87,19 +80,10 @@ public abstract class ManagerHelper {
                 keeper.getContractGasProvider());
     }
 
-    public static OceanMarket deployOceanMarketContract(KeeperService keeper, String tokenAddress)
-            throws Exception {
-        return OceanMarket.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider(),
-                tokenAddress
-                ).send();
-    }
 
-    public static OceanMarket loadOceanMarketContract(KeeperService keeper, String address)
+    public static Dispenser loadDispenserContract(KeeperService keeper, String address)
             throws Exception {
-        return OceanMarket.load(
+        return Dispenser.load(
                 address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),
@@ -107,15 +91,6 @@ public abstract class ManagerHelper {
         );
     }
 
-    public static DIDRegistry deployDIDRegistryContract(KeeperService keeper)
-            throws Exception {
-
-        return DIDRegistry.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider()
-        ).send();
-    }
 
     public static DIDRegistry loadDIDRegistryContract(KeeperService keeper, String address)
             throws Exception {
@@ -128,15 +103,9 @@ public abstract class ManagerHelper {
         );
     }
 
-    public static ServiceAgreement deployServiceAgreementContract(KeeperService keeper) throws Exception, IOException, CipherException {
-        return ServiceAgreement.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider()).send();
-    }
 
-    public static ServiceAgreement loadServiceAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
-        return ServiceAgreement.load(
+    public static ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return ServiceExecutionAgreement.load(
                 address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),
@@ -144,15 +113,6 @@ public abstract class ManagerHelper {
     }
 
 
-    public static PaymentConditions deployPaymentConditionsContract(KeeperService keeper, String saAddress, String tokenAddress) throws Exception, IOException, CipherException {
-        return PaymentConditions.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider(),
-                saAddress,
-                tokenAddress
-        ).send();
-    }
 
     public static PaymentConditions loadPaymentConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return PaymentConditions.load(
@@ -164,14 +124,6 @@ public abstract class ManagerHelper {
     }
 
 
-    public static AccessConditions deployAccessConditionsContract(KeeperService keeper, String saAddress) throws Exception, IOException, CipherException {
-        return AccessConditions.deploy(
-                keeper.getWeb3(),
-                keeper.getCredentials(),
-                keeper.getContractGasProvider(),
-                saAddress
-        ).send();
-    }
 
     public static AccessConditions loadAccessConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return AccessConditions.load(address,

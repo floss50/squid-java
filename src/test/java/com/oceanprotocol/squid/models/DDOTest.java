@@ -76,15 +76,15 @@ public class DDOTest {
         }, DDO_JSON_CONTENT);
 
         assertEquals("https://w3id.org/future-method/v1", ddo.context);
-        assertEquals("did:op:3809174ce71dd460faf4941140323ebafdc062f062d3932fe0195c78719a8716", ddo.id.toString());
+        assertEquals("did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf", ddo.id.toString());
         assertEquals(3, ddo.publicKeys.size());
         assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:b6e2eb5eff1a093ced9826315d5a4ef6c5b5c8bd3c49890ee284231d7e1d0aaa"));
 
         assertEquals(2, ddo.authentication.size());
         assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
 
-        assertEquals(3, ddo.services.size());
-        assertTrue(ddo.services.get(2).serviceEndpoint.startsWith("http"));
+        assertEquals(2, ddo.services.size());
+        assertTrue(ddo.services.get(1).serviceEndpoint.startsWith("http"));
 
         AssetMetadata metadata = (AssetMetadata) ddo.metadata;
 
@@ -117,9 +117,6 @@ public class DDOTest {
         AssetMetadata metadata = new AssetMetadata();
         AssetMetadata.Base base = new AssetMetadata.Base();
         base.name = "test name";
-        base.contentUrls = new ArrayList<String>() {{
-            add("http://service.net");
-        }};
 
         metadata.base = base;
 
@@ -143,7 +140,6 @@ public class DDOTest {
 
         assertEquals(2, (json.getJSONArray("service").length()));
         assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getString("name"));
-        assertEquals("http://service.net", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getJSONArray("contentUrls").get(0));
 
     }
 
