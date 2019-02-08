@@ -43,8 +43,7 @@ public class AssetsApiIT {
         METADATA_JSON_CONTENT =  new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
 
-        //String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
-        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
+        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
@@ -105,13 +104,10 @@ public class AssetsApiIT {
 
     }
 
-    // TODO DDO created date format
     @Test
     public void search() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
-        DID did= new DID(ddo.id);
-
+        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
         log.debug("DDO registered!");
 
         String searchText = "Weather";
@@ -121,13 +117,10 @@ public class AssetsApiIT {
 
     }
 
-    // TODO doesn't work
     @Test
     public void query() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
-        DID did= new DID(ddo.id);
-
+        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
         log.debug("DDO registered!");
 
         Map<String, Object> params = new HashMap<>();

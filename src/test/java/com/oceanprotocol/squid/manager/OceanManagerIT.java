@@ -8,15 +8,12 @@ import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.ServiceEndpoints;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
@@ -25,7 +22,6 @@ import org.web3j.protocol.admin.Admin;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class OceanManagerIT {
@@ -54,19 +50,8 @@ public class OceanManagerIT {
     private static PaymentConditions paymentConditions;
     private static AccessConditions accessConditions;
 
-    private static final String SERVICE_DEFINITION_ID = "1";
 
     private static final Config config = ConfigFactory.load();
-
-    private static final String PURCHASE_ADDRESS;
-    static {
-        PURCHASE_ADDRESS = config.getString("account.parity.address");
-    }
-
-    private static final String PURCHASE_PASSWORD;
-    static {
-        PURCHASE_PASSWORD = config.getString("account.parity.password");
-    }
 
     private static final String DID_REGISTRY_CONTRACT;
     static {
@@ -88,10 +73,6 @@ public class OceanManagerIT {
         ACCESS_CONDITIONS_CONTRACT = config.getString("contract.accessConditions.address");
     }
 
-    private static final String CONSUME_BASE_PATH;
-    static {
-        CONSUME_BASE_PATH = config.getString("consume.basePath");
-    }
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -200,16 +181,18 @@ public class OceanManagerIT {
         String oldUrl= "http://mymetadata.io/api";
         String newUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
 
+        String checksum = "0xd190bc85ee50643baffe7afe84ec6a9dd5212b67223523cd8e4d88f9069255fb";
+
         ddoBase.id = did.toString();
 
         ddoBase.services.get(0).serviceEndpoint = newUrl;
         aquarius.createDDO(ddoBase);
 
-        boolean didRegistered= managerPublisher.registerDID(did, oldUrl);
+        boolean didRegistered= managerPublisher.registerDID(did, oldUrl, checksum);
         assertTrue(didRegistered);
 
         log.debug("Registering " + did.toString());
-        managerPublisher.registerDID(did, newUrl);
+        managerPublisher.registerDID(did, newUrl, checksum);
 
         DDO ddo= managerPublisher.resolveDID(did);
         assertEquals(did.getDid(), ddo.id);
@@ -220,53 +203,17 @@ public class OceanManagerIT {
     public void resolveDIDException() throws Exception {
         DID did= DID.builder();
         String url= "http://badhostname.inet:5000/api/v1/aquarius/assets/ddo/{did}";
+        String checksum = "0xd190bc85ee50643baffe7afe84ec6a9dd5212b67223523cd8e4d88f9069255fb";
 
         ddoBase.id = did.toString();
 
         ddoBase.services.get(0).serviceEndpoint = url;
         aquarius.createDDO(ddoBase);
 
-        boolean didRegistered= managerPublisher.registerDID(did, url);
+        boolean didRegistered= managerPublisher.registerDID(did, url, checksum);
         assertTrue(didRegistered);
 
         DDO ddo= managerPublisher.resolveDID(did);
-
-    }
-
-    @Test
-    public void purchaseAsset() throws Exception {
-
-        DDO ddo= newRegisteredAsset();
-        DID did= new DID(ddo.id);
-
-        Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD));
-
-        // blocking for testing purpose
-        OrderResult result = response.blockingFirst();
-        assertNotNull(result.getServiceAgreementId());
-        assertEquals(true, result.isAccessGranted());
-    }
-
-    @Test
-    public void consumerAsset() throws Exception {
-
-        DDO ddo= newRegisteredAsset();
-        DID did= new DID(ddo.id);
-
-        log.debug("DDO registered!");
-
-        Flowable<OrderResult> response =
-                managerConsumer.purchaseAsset(did, SERVICE_DEFINITION_ID, new Account(PURCHASE_ADDRESS, PURCHASE_PASSWORD));
-
-        // blocking for testing purpose
-        log.debug("Waiting for granted Access............");
-        OrderResult orderResult = response.blockingFirst();
-        assertEquals(true, orderResult.isAccessGranted());
-
-        log.debug("Granted Access Received for the service Agreement " + orderResult.getServiceAgreementId());
-        boolean result = managerConsumer.consume("0x" + orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, PURCHASE_ADDRESS,  CONSUME_BASE_PATH);
-        assertEquals(true, result);
 
     }
 

@@ -47,8 +47,6 @@ public class OceanManager extends BaseManager {
 
     static final Logger log= LogManager.getLogger(OceanManager.class);
 
-    static final BigInteger DID_VALUE_TYPE= BigInteger.valueOf(2);
-
     protected OceanManager(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
         super(keeperService, aquariusService);
@@ -98,9 +96,7 @@ public class OceanManager extends BaseManager {
             didFilter.addSingleTopic(eventSignature);
 
             String didTopic= "0x" + did.getHash();
-            String metadataTopic= "0x" + EncodingHelper.padRightWithZero(
-                    EncodingHelper.encodeToHex(Service.serviceTypes.Metadata.toString()), 64);
-            didFilter.addOptionalTopics(didTopic, metadataTopic);
+            didFilter.addOptionalTopics(didTopic);
 
             EthLog ethLog;
 
@@ -136,18 +132,18 @@ public class OceanManager extends BaseManager {
      * It allows to resolve DDO's using DID's as input
      * @param did
      * @param url metadata url
+     * @param checksum calculated hash of the metadata
      * @return boolean success
      * @throws DIDRegisterException
      */
-    public boolean registerDID(DID did, String url) throws DIDRegisterException{
+    public boolean registerDID(DID did, String url, String checksum) throws DIDRegisterException{
         log.debug("Registering DID " + did.getHash() + " into Registry " + didRegistry.getContractAddress());
 
         try {
 
             TransactionReceipt receipt = didRegistry.registerAttribute(
                     EncodingHelper.hexStringToBytes(did.getHash()),
-                    DID_VALUE_TYPE,
-                    EncodingHelper.byteArrayToByteArray32(EncodingHelper.stringToBytes(Service.serviceTypes.Metadata.toString())),
+                    EncodingHelper.hexStringToBytes(checksum.replace("0x", "")),
                     url
             ).send();
 
@@ -227,7 +223,7 @@ public class OceanManager extends BaseManager {
             DDO createdDDO = getAquariusService().createDDO(ddo);
 
             // Registering DID
-            registerDID(ddo.getDid(), metadataEndpoint);
+            registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum);
 
             return createdDDO;
         }catch (DDOException e) {
