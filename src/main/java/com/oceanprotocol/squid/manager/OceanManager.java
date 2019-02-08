@@ -170,6 +170,7 @@ public class OceanManager extends BaseManager {
 
             // Initializing DDO
             DDO ddo = new DDO(address);
+            ddo.created = new Date();
 
             String filesJson = metadata.toJson(metadata.base.files);
             metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(ddo.getDid().getHash(), filesJson, threshold);
