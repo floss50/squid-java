@@ -55,7 +55,7 @@ public class AccountsApiIT {
     @Test
     public void requestTokens() throws Exception {
 
-        BigInteger tokens = BigInteger.valueOf(100);
+        BigInteger tokens = BigInteger.valueOf(1);
 
         Balance balanceBefore = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
         TransactionReceipt receipt = oceanAPI.getAccountsAPI().requestTokens(tokens);
@@ -63,7 +63,7 @@ public class AccountsApiIT {
         assertTrue(receipt.isStatusOK());
 
         Balance balanceAfter = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
-        assertEquals(balanceBefore.getOcn().add(BigInteger.valueOf(100)), balanceAfter.getOcn());
+        assertEquals(balanceBefore.getOcn().add(BigInteger.valueOf(1)), balanceAfter.getOcn());
     }
 
 }
