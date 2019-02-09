@@ -122,13 +122,28 @@ public class ServiceAgreementHandlerTest {
     }
 
     @Test
+    public void getFullfillmentIndices() throws Exception {
+        String templateFilePath = "src/main/resources/sla/access-sla-template.json";
+        String jsonContent = new String(Files.readAllBytes(Paths.get(templateFilePath)));
+        AccessTemplate accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, jsonContent);
+
+        List<BigInteger> indices = ServiceAgreementHandler.getFullfillmentIndices(accessTemplate.conditions);
+        assertEquals(BigInteger.valueOf(2), indices.get(0));
+        assertEquals(BigInteger.valueOf(3), indices.get(1));
+    }
+
+    @Test
     public void getDependenciesBits() throws Exception {
         String templateFilePath = "src/main/resources/sla/access-sla-template.json";
         String jsonContent = new String(Files.readAllBytes(Paths.get(templateFilePath)));
         AccessTemplate accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, jsonContent);
 
-        List<BigInteger> depBits = ServiceAgreementHandler.getDependenciesBits(accessTemplate.conditions);
-        assertEquals(BigInteger.valueOf(2), depBits.get(0));
-        assertEquals(BigInteger.valueOf(3), depBits.get(1));
+//        List<BigInteger> depBits = ServiceAgreementHandler.getDependenciesBits(accessTemplate.conditions);
+        List<BigInteger> depBits = ServiceAgreementHandler.getDependenciesBits();
+        assertEquals(BigInteger.valueOf(0), depBits.get(0));
+        assertEquals(BigInteger.valueOf(1), depBits.get(1));
+        assertEquals(BigInteger.valueOf(4), depBits.get(2));
+        assertEquals(BigInteger.valueOf(13), depBits.get(3));
     }
+
 }
