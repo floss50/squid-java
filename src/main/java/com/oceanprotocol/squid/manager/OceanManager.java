@@ -304,7 +304,12 @@ public class OceanManager extends BaseManager {
 
                     })
                     // We add a filter to ignore the result of processing the initial events
-                    .filter( result -> result.isPaymentRefund() || result.isAccessGranted());
+                    .filter( result -> result.isPaymentRefund() || result.isAccessGranted())
+                    .timeout(60, TimeUnit.SECONDS
+                    )
+                    .doOnError(throwable -> {
+                        throw new ServiceAgreementException(serviceAgreementId, "Timeout waiting for AccessGranted for service agreement " + serviceAgreementId);
+                    });
 
         }catch (DDOException|ServiceException|ServiceAgreementException e){
             String msg = "Error processing Order with DID " + did.getDid() + "and ServiceAgreementID " + serviceAgreementId;
