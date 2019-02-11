@@ -103,32 +103,11 @@ public class SetupServiceAgreement {
 
     private boolean createServiceAgeementTemplate(AccessTemplate accessTemplate) throws UnsupportedEncodingException {
 
-        List<byte[]> fingerprints= getFingerprints();
-
-        /**
-         * setupTemplate(
-         *    byte[] templateId,
-         *    List<String> contracts,
-         *    List<byte[]> fingerprints,
-         *    List<BigInteger> dependenciesBits,
-         *    List<BigInteger> fulfillmentIndices,
-         *    BigInteger fulfillmentOperator) {}
-         *
-         *  function setupTemplate(
-         *     bytes32 templateId,
-         *     address[] contracts,
-         *     bytes4[] fingerprints,
-         *     uint256[] dependenciesBits,
-         *     uint8[] fulfillmentIndices,
-         *     uint8 fulfillmentOperator
-         *     )
-        */
-
         try {
             TransactionReceipt receipt = sea.setupTemplate(
                     EncodingHelper.hexStringToBytes(ACCESS_SERVICE_TEMPLATE_ID),
                     getContractAddresses(accessTemplate),
-                    fingerprints,
+                    getFingerprints(),
                     ServiceAgreementHandler.getDependenciesBits(),
                     ServiceAgreementHandler.getFullfillmentIndices(accessTemplate.conditions),
                     BigInteger.ONE
