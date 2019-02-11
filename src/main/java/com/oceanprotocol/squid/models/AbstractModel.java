@@ -9,7 +9,11 @@ import com.fasterxml.jackson.databind.ObjectReader;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +22,7 @@ public abstract class AbstractModel {
     private static ObjectMapper objectMapper= null;
 
     public static final String DATE_PATTERN= "yyyy-MM-dd'T'HH:mm:ss";
-    protected static final DateFormat DATE_FORMAT= new SimpleDateFormat(DATE_PATTERN);
+    public static final DateFormat DATE_FORMAT= new SimpleDateFormat(DATE_PATTERN);
 
     public static ObjectMapper getMapperInstance()  {
         if (objectMapper == null) {
@@ -26,7 +30,7 @@ public abstract class AbstractModel {
             objectMapper = new ObjectMapper();
             objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
+            objectMapper.setDateFormat(DATE_FORMAT);
         }
 
         return objectMapper;
@@ -51,6 +55,18 @@ public abstract class AbstractModel {
 
     public String toJson(Object object) throws JsonProcessingException {
         return getMapperInstance().writeValueAsString(object);
+    }
+
+    public static String getNowFormatted()    {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
+    }
+
+    public static Date getDateNowFormatted() {
+        try {
+            return DATE_FORMAT.parse(getNowFormatted());
+        } catch (ParseException ex) {
+            return new Date();
+        }
     }
 
 }

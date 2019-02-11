@@ -7,7 +7,7 @@
     "type": "ieee2410Authentication2018",
     "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea#keys-2"
   }],
-  "created": "2019-02-08T08:13:41",
+  "created": "2019-02-08T08:13:49:00",
   "id": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
   "proof": {
     "created": "2019-02-08T08:13:41",
