@@ -1,6 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
@@ -19,6 +21,7 @@ import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -260,7 +263,8 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, consumerAccount, serviceAgreementId)
+            // Returns a flowable over an AccessGranted event after calling the lockPayment function
+            Flowable<AccessConditions.AccessGrantedEventResponse> accessGrantedFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, consumerAccount, serviceAgreementId)
                     .map(event -> EncodingHelper.toHexString(event.agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
@@ -268,18 +272,40 @@ public class OceanManager extends BaseManager {
                         else {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
                             this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
-                            return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId)
-                                    .map(event -> {
-                                        OrderResult result = new OrderResult(serviceAgreementId, true, false);
-                                        return result;
-                                    })
-                                    .timeout(60, TimeUnit.SECONDS
-                                    )
-                                    .doOnError(throwable -> {
-                                        throw new ServiceAgreementException(serviceAgreementId, "Timeout waiting for AccessGranted for service agreement " + eventServiceAgreementId);
-                                    });
+                            return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId);
                         }
                     });
+
+            // We add an initial (empty) event to the flowable
+            accessGrantedFlowable = accessGrantedFlowable.startWith(new AccessConditions.AccessGrantedEventResponse());
+
+            // We initialize a Flowable over an PaymentRefund Event
+            Flowable<PaymentConditions.PaymentRefundEventResponse> paymentRefundFlowable = ServiceAgreementHandler.listenForPaymentRefund(paymentConditions, serviceAgreementId)
+                    // We also add an initial (empty) event to the flowable
+                    .startWith(new PaymentConditions.PaymentRefundEventResponse());
+
+            // We compose both events with a withLatestFrom function
+            // this function triggers only if both events has at least one event
+            // That's the reason we add an initial event to the flowables
+            return accessGrantedFlowable
+                    .withLatestFrom(paymentRefundFlowable, (access, refund) -> {
+
+                        byte[] accessAgreement = access.agreementId;
+                        byte[] refundAgreement = refund.agreementId;
+
+                        // The AccessGranted event and the PaymentRefund event are mutually exclusive
+                        if (accessAgreement!= null)
+                            return new OrderResult(EncodingHelper.toHexString(accessAgreement), true, false);
+                        else if (refundAgreement!= null)
+                            return new OrderResult(EncodingHelper.toHexString(refundAgreement), false, true);
+
+                        // If both agreements are null, it means we are processing the initial events
+                        return new OrderResult("", false, false);
+
+                    })
+                    // We add a filter to ignore the result of processing the initial events
+                    .filter( result -> result.isPaymentRefund() || result.isAccessGranted());
+
         }catch (DDOException|ServiceException|ServiceAgreementException e){
             String msg = "Error processing Order with DID " + did.getDid() + "and ServiceAgreementID " + serviceAgreementId;
             log.error(msg  + ": " + e.getMessage());

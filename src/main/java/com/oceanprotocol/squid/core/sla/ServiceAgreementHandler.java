@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
@@ -95,6 +96,32 @@ public class ServiceAgreementHandler {
 
 
         return accessConditions.accessGrantedEventFlowable(grantedFilter);
+    }
+
+
+    /**
+     * Define and execute a Filter over the Payment Condition Contract to listen for an PaymentRefund event
+     * @param paymentConditions
+     * @param serviceAgreementId
+     * @return a Flowable over the Event to handle it in an asynchronous fashion
+     */
+    public static Flowable<PaymentConditions.PaymentRefundEventResponse> listenForPaymentRefund(PaymentConditions paymentConditions,
+                                                                                                           String serviceAgreementId)   {
+        EthFilter refundFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                paymentConditions.getContractAddress()
+        );
+
+        final Event event= PaymentConditions.PAYMENTREFUND_EVENT;
+        final String eventSignature= EventEncoder.encode(event);
+        String slaTopic= "0x" + serviceAgreementId;
+
+        refundFilter.addSingleTopic(eventSignature);
+        refundFilter.addOptionalTopics(slaTopic);
+
+        return paymentConditions.paymentRefundEventFlowable(refundFilter);
+
     }
 
     /**
