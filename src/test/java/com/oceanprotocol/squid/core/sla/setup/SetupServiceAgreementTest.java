@@ -1,6 +1,8 @@
 package com.oceanprotocol.squid.core.sla.setup;
 
 import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -14,19 +16,21 @@ import static org.junit.Assert.*;
 public class SetupServiceAgreementTest {
 
     private static SetupServiceAgreement setup;
+    private static Config config;
 
     @BeforeClass
     public static void setupServiceAgreementTest() throws Exception {
         setup= new SetupServiceAgreement();
+        config= ConfigFactory.load();
     }
 
     @Test
     public void getContractAddresses() throws Exception {
         List<String> expected= new ArrayList();
-        expected.add("0xed0a0123eaeb4e32335d64cab75ed0022938cd59");
-        expected.add("0x9e6d17b661a535f0d7126673e0f5d62a561bddf4");
-        expected.add("0xed0a0123eaeb4e32335d64cab75ed0022938cd59");
-        expected.add("0xed0a0123eaeb4e32335d64cab75ed0022938cd59");
+        expected.add(config.getString("contract.paymentConditions.address"));
+        expected.add(config.getString("contract.accessConditions.address"));
+        expected.add(config.getString("contract.paymentConditions.address"));
+        expected.add(config.getString("contract.paymentConditions.address"));
 
         List<String> addresses= setup.getContractAddresses(setup.getAccessTemplate());
 
