@@ -7,10 +7,10 @@
     "type": "ieee2410Authentication2018",
     "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea#keys-2"
   }],
-  "created": "2019-02-08T08:13:49:00",
+  "created": "2019-02-08T08:13:49Z",
   "id": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
   "proof": {
-    "created": "2019-02-08T08:13:41",
+    "created": "2019-02-08T08:13:41Z",
     "creator": "0x37BB53e3d293494DE59fBe1FF78500423dcFd43B",
     "signatureValue": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
     "type": "UUIDSignature"
@@ -53,7 +53,7 @@
           "compression": "zip",
           "contentType": "text/csv",
           "copyrightHolder": "Met Office",
-          "dateCreated": "2019-02-08T08:13:49+00:00",
+          "dateCreated": "2019-02-08T08:13:49Z",
           "description": "Weather information of UK including temperature and humidity",
           "encoding": "UTF-8",
           "encryptedFiles": "0x2e48ceefcca7abb024f90c87c676fce8f7913f889605a349c08c0c4a822c69ad651e122cc81db4fbb52938ac627786491514f37a2ebfd04fd98ec726f1d9061ed52f13fde132222af34d9af8ec358429cf45fc669f81a607185cb9a8150df3cbb2b4e3e382fb16429be228ddd920f061b78dd54701025fac8aab976239fb31a5b60a57393e96a338324c5ac8a5600a1247339c4835533cecdb5b53caf6b6f9d6478b579b7426f650a4154a20d18a9d49f509770af62647a57fc174741b47af3c8beeaaa76bee276cce8fba1f3fec0e1c",

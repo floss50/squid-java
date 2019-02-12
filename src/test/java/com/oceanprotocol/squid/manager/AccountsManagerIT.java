@@ -95,7 +95,7 @@ public class AccountsManagerIT {
         log.debug("Balance is " + balance.toString());
         log.debug("Eth balance is " + balance.getEth().toString());
 
-        assertTrue(balance.getEth().intValue() > 0);
+        assertTrue(balance.getEth().compareTo(BigInteger.ZERO)>0);
         assertTrue(balance.getOcn().intValue() > 0);
 
     }
