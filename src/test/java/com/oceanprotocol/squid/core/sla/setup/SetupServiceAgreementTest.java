@@ -1,13 +1,9 @@
 package com.oceanprotocol.squid.core.sla.setup;
 
-import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

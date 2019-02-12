@@ -21,7 +21,7 @@ public abstract class AbstractModel {
 
     private static ObjectMapper objectMapper= null;
 
-    public static final String DATE_PATTERN= "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String DATE_PATTERN= "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final DateFormat DATE_FORMAT= new SimpleDateFormat(DATE_PATTERN);
 
     public static ObjectMapper getMapperInstance()  {
