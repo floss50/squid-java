@@ -30,10 +30,10 @@ public class SetupServiceAgreementTest {
 
         List<String> addresses= setup.getContractAddresses(setup.getAccessTemplate());
 
-        assertEquals(expected.get(0), addresses.get(0).toLowerCase());
-        assertEquals(expected.get(1), addresses.get(1).toLowerCase());
-        assertEquals(expected.get(2), addresses.get(2).toLowerCase());
-        assertEquals(expected.get(3), addresses.get(3).toLowerCase());
+        assertEquals(expected.get(0).toLowerCase(), addresses.get(0).toLowerCase());
+        assertEquals(expected.get(1).toLowerCase(), addresses.get(1).toLowerCase());
+        assertEquals(expected.get(2).toLowerCase(), addresses.get(2).toLowerCase());
+        assertEquals(expected.get(3).toLowerCase(), addresses.get(3).toLowerCase());
     }
 
 
