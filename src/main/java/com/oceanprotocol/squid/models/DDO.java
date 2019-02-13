@@ -140,24 +140,18 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.id= this.did.toString();
     }
 
-    public DDO(String publicKey) throws DIDFormatException {
-        this(generateDID(), publicKey);
-    }
 
-    public DDO(DID did, String publicKey) {
+    public DDO(DID did, MetadataService metadataService, String publicKey, String signature) throws DIDFormatException {
+
         this.did= did;
         this.id= did.toString();
         this.created= new Date();
-        this.proof= new Proof(UUID_PROOF_TYPE, publicKey, this.id);
+
+        this.metadata= metadataService.metadata;
+        this.services.add(metadataService);
+
+        this.proof= new Proof(UUID_PROOF_TYPE, publicKey, signature);
         this.publicKeys.add( new DDO.PublicKey(this.id, ETHEREUM_KEY_TYPE, this.id));
-    }
-
-    public DDO(AssetMetadata metadata, String publicKey, String serviceUrl) throws DIDFormatException {
-        this(publicKey);
-        MetadataService service= new MetadataService(metadata, serviceUrl);
-        this.metadata= metadata;
-
-        this.services.add(service);
     }
 
     @JsonSetter("id")

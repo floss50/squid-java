@@ -21,7 +21,6 @@ import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.*;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
@@ -38,7 +37,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -171,14 +169,6 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            // Initializing DDO
-            DDO ddo = new DDO(address);
-            ddo.created = new Date();
-
-            String filesJson = metadata.toJson(metadata.base.files);
-            metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(ddo.getDid().getHash(), filesJson, threshold);
-            metadata.base.checksum = metadata.generateMetadataChecksum(ddo.getDid().getDid());
-
             // Definition of service endpoints
             String metadataEndpoint;
             if (serviceEndpoints.getMetadataEndpoint() == null)
@@ -188,6 +178,9 @@ public class OceanManager extends BaseManager {
 
             // Initialization of services supported for this asset
             MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, "0");
+
+            // Initializing DDO
+            DDO ddo = this.buildDDO(metadataService, address, threshold);
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
@@ -220,8 +213,7 @@ public class OceanManager extends BaseManager {
                     getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
 
             // Adding services to DDO
-            ddo.addService(metadataService)
-                    .addService(accessService);
+            ddo.addService(accessService);
 
             // Storing DDO
             DDO createdDDO = getAquariusService().createDDO(ddo);
@@ -232,7 +224,7 @@ public class OceanManager extends BaseManager {
             return createdDDO;
         }catch (DDOException e) {
             throw e;
-        }catch (EncryptionException|InitializeConditionsException|DIDFormatException|DIDRegisterException|IOException e) {
+        }catch (InitializeConditionsException|DIDRegisterException e) {
             throw new DDOException("Error registering Asset." , e);
         }
 
