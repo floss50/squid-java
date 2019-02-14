@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.oceanprotocol.squid.models.AbstractModel.DATE_FORMAT;
 import static org.junit.Assert.*;
 
 public class DDOTest {
@@ -62,6 +63,20 @@ public class DDOTest {
         assertTrue(ddo.id.startsWith(DID.PREFIX));
         assertEquals(64, ddo.getDid().getHash().length());
     }
+
+    @Test
+    public void checkDateFormat() throws Exception {
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+
+        log.debug("Date found: " + DATE_FORMAT.format(ddo.created));
+        log.debug("Date String: " + ddo.created.toString());
+        assertTrue(DATE_FORMAT.format(ddo.created).startsWith("20"));
+
+        DDO newDDO= new DDO();
+        log.debug("Date found: " + DATE_FORMAT.format(newDDO.created));
+        assertTrue(DATE_FORMAT.format(newDDO.created).startsWith("20"));
+    }
+
 
     @Test
     public void generateRandomDID() throws Exception {

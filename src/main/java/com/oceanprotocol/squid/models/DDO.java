@@ -1,6 +1,7 @@
 package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
@@ -11,6 +12,10 @@ import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
@@ -48,8 +53,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public Proof proof;
 
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-    @JsonProperty
+    @JsonDeserialize(using = CustomDateDeserializer.class)
     public Date created;
 
     @JsonIgnore
@@ -112,7 +118,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         public String type;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonProperty
+        @JsonDeserialize(using = CustomDateDeserializer.class)
         public Date created;
 
         @JsonProperty
@@ -127,7 +133,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
             this.type= type;
             this.creator= creator;
             this.signatureValue= signature;
-            this.created= new Date();
+            this.created= getDateNowFormatted();
         }
 
         public Proof(String type, String creator, byte[] signature) {
@@ -137,6 +143,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     public DDO() throws DIDFormatException {
         this.did= generateDID();
+        if (null == this.created)
+            this.created= getDateNowFormatted();
+
         this.id= this.did.toString();
     }
 
@@ -145,8 +154,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         this.did= did;
         this.id= did.toString();
-        this.created= new Date();
 
+        if (null == this.created)
+              this.created= getDateNowFormatted();
         this.metadata= metadataService.metadata;
         this.services.add(metadataService);
 
@@ -165,6 +175,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         services.add(service);
         return this;
     }
+
+
 
     @JsonSetter("service")
     public void servicesSetter(ArrayList<LinkedHashMap> services) {

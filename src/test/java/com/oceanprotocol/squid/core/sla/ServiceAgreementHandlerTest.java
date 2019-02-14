@@ -6,6 +6,7 @@ import com.oceanprotocol.squid.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.template.AccessTemplate;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -16,8 +17,11 @@ import org.junit.Test;
 import org.web3j.crypto.Hash;
 import org.web3j.crypto.Keys;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class ServiceAgreementHandlerTest {
@@ -115,6 +119,31 @@ public class ServiceAgreementHandlerTest {
         String lockPaymentConditionKey = ServiceAgreementHandler.fetchConditionKey(templateId, address, lockPaymentFingerprint);
         assertEquals(lockPaymentConditionKey, targetLockPaymentConditionKey);
 
+    }
+
+    @Test
+    public void getFullfillmentIndices() throws Exception {
+        String templateFilePath = "src/main/resources/sla/access-sla-template.json";
+        String jsonContent = new String(Files.readAllBytes(Paths.get(templateFilePath)));
+        AccessTemplate accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, jsonContent);
+
+        List<BigInteger> indices = ServiceAgreementHandler.getFullfillmentIndices(accessTemplate.conditions);
+        assertEquals(BigInteger.valueOf(2), indices.get(0));
+        assertEquals(BigInteger.valueOf(3), indices.get(1));
+    }
+
+    @Test
+    public void getDependenciesBits() throws Exception {
+        String templateFilePath = "src/main/resources/sla/access-sla-template.json";
+        String jsonContent = new String(Files.readAllBytes(Paths.get(templateFilePath)));
+        AccessTemplate accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, jsonContent);
+
+//        List<BigInteger> depBits = ServiceAgreementHandler.getDependenciesBits(accessTemplate.conditions);
+        List<BigInteger> depBits = ServiceAgreementHandler.getDependenciesBits();
+        assertEquals(BigInteger.valueOf(0), depBits.get(0));
+        assertEquals(BigInteger.valueOf(1), depBits.get(1));
+        assertEquals(BigInteger.valueOf(4), depBits.get(2));
+        assertEquals(BigInteger.valueOf(13), depBits.get(3));
     }
 
 }

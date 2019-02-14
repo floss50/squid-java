@@ -40,7 +40,7 @@ public abstract class BaseManager {
     public static class ContractAddresses {
 
         private String paymentConditionsAddress;
-        private String accessConditionsAddres;
+        private String accessConditionsAddress;
 
         public ContractAddresses(){}
 
@@ -52,12 +52,12 @@ public abstract class BaseManager {
             this.paymentConditionsAddress = paymentConditionsAddress;
         }
 
-        public String getAccessConditionsAddres() {
-            return accessConditionsAddres;
+        public String getAccessConditionsAddress() {
+            return accessConditionsAddress;
         }
 
-        public void setAccessConditionsAddres(String accessConditionsAddres) {
-            this.accessConditionsAddres = accessConditionsAddres;
+        public void setAccessConditionsAddress(String accessConditionsAddress) {
+            this.accessConditionsAddress = accessConditionsAddress;
         }
     }
 
@@ -273,7 +273,7 @@ public abstract class BaseManager {
      */
     public BaseManager setAccessConditionsContract(AccessConditions contract)    {
         this.accessConditions= contract;
-        this.contractAddresses.setAccessConditionsAddres(this.accessConditions.getContractAddress());
+        this.contractAddresses.setAccessConditionsAddress(this.accessConditions.getContractAddress());
         return this;
     }
 

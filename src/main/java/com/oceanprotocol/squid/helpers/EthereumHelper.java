@@ -128,6 +128,18 @@ public abstract class EthereumHelper {
         return input;
     }
 
+    /**
+     * Given an input string validates if it's a valid ethereum address
+     * @param input
+     * @return boolean
+     */
+    public static boolean isValidAddress(String input) {
+        String hash= remove0x(input).toLowerCase();
+        if (hash.length() == 40 && EncodingHelper.isHexString(hash))
+            return true;
+        return false;
+    }
+
 
     /**
      * Given a function defition return the ethereum function selector
