@@ -7,6 +7,13 @@
     }
   ],
   "id": "did:op:cb36cf78d87f4ce4a784f17c2a4a694f19f3fbf05b814ac6b0b7197163888865",
+  "created": "2019-02-08T08:13:49Z",
+  "proof": {
+    "created": "2019-02-08T08:13:41Z",
+    "creator": "0x37BB53e3d293494DE59fBe1FF78500423dcFd43B",
+    "signatureValue": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
+    "type": "UUIDSignature"
+  },
   "publicKey": [
     {
       "id": "did:op:cb36cf78d87f4ce4a784f17c2a4a694f19f3fbf05b814ac6b0b7197163888865#keys-1"
@@ -225,7 +232,7 @@
           "type": "dataset",
           "description": "Weather information of UK including temperature and humidity",
           "size": "3.1gb",
-          "dateCreated": "2018-11-23T10:26:55+00:00",
+          "dateCreated": "2018-11-23T10:26:55Z",
           "author": "Met Office",
           "license": "CC-BY",
           "copyrightHolder": "Met Office",
@@ -233,7 +240,7 @@
           "compression": "zip",
           "contentType": "text/csv",
           "workExample": "stationId,latitude,longitude,datetime,temperature,humidity423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68",
-          "contentUrls": ["0x10b6840ca0afd2f34c0c61c7fbc377f1674fa3c36cdcf2225fa83665b29553d35133417f052383986bffa80f180e96bd97dc13972d9c255a445fa8c99cc5c3738c37281f12e8ecc9c533431d3eee32bc4162f7cecacbf322e526043c86befd3aabee3ad28fb4495ed34f9e29b06bcb82e3bf73bb73b8b348e6386fabd2959d93c545c222055c4d3766a4ed24a6f4f082f752b401f26845"],
+          "encryptedFiles": "0x2e48ceefcca7abb024f90c87c676fce8f7913f889605a349c08c0c4a822c69ad651e122cc81db4fbb52938ac627786491514f37a2ebfd04fd98ec726f1d9061ed52f13fde132222af34d9af8ec358429cf45fc669f81a607185cb9a8150df3cbb2b4e3e382fb16429be228ddd920f061b78dd54701025fac8aab976239fb31a5b60a57393e96a338324c5ac8a5600a1247339c4835533cecdb5b53caf6b6f9d6478b579b7426f650a4154a20d18a9d49f509770af62647a57fc174741b47af3c8beeaaa76bee276cce8fba1f3fec0e1c",
           "links": [
             {
               "sample1": "http://data.ceda.ac.uk/badc/ukcp09/data/gridded-land-obs/gridded-land-obs-daily/"
