@@ -6,9 +6,11 @@ import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.MetadataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +59,10 @@ public class AssetsManager extends BaseManager {
      */
     public DDO publishMetadata(AssetMetadata metadata, String serviceEndpoint) throws Exception {
 
+        MetadataService service= new MetadataService(metadata, serviceEndpoint);
+
         return publishMetadata(
-                new DDO(metadata, getKeeperService().getAddress(), serviceEndpoint));
+                this.buildDDO(service, getKeeperService().getAddress()));
 
     }
 
