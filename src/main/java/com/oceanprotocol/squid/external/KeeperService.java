@@ -1,14 +1,18 @@
 package com.oceanprotocol.squid.external;
 
+import com.oceanprotocol.keeper.contracts.OceanToken;
+import com.oceanprotocol.squid.exceptions.TokenApproveException;
 import com.oceanprotocol.squid.models.Account;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
@@ -165,5 +169,34 @@ public class KeeperService {
                         .sendAsync().get();
 
         return personalUnlockAccount.accountUnlocked();
+    }
+
+    public boolean tokenApprove(OceanToken tokenContract, String spenderAddress, int price) throws TokenApproveException {
+
+        String checksumAddress =  Keys.toChecksumAddress(spenderAddress);
+
+        try {
+
+            TransactionReceipt receipt=  tokenContract.approve(
+                    checksumAddress,
+                    BigInteger.valueOf(price)
+            ).send();
+
+            if (!receipt.getStatus().equals("0x1")) {
+                String msg = "The Status received is not valid executing Token Approve: " + receipt.getStatus();
+                log.error(msg);
+                throw new TokenApproveException(msg);
+            }
+
+            log.debug("Token Approve transactionReceipt OK ");
+            return true;
+
+        } catch (Exception e) {
+
+            String msg = "Error executing Token Approve ";
+            log.error(msg+ ": " + e.getMessage());
+            throw new TokenApproveException(msg, e);
+        }
+
     }
 }
