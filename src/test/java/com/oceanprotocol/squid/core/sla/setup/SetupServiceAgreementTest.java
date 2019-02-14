@@ -28,7 +28,10 @@ public class SetupServiceAgreementTest {
         expected.add(config.getString("contract.paymentConditions.address"));
         expected.add(config.getString("contract.paymentConditions.address"));
 
-        List<String> addresses= setup.getContractAddresses(setup.getAccessTemplate());
+        List<String> addresses= setup.getContractAddresses(
+                setup.getAccessTemplate(),
+                config.getString("contract.paymentConditions.address"),
+                config.getString("contract.accessConditions.address"));
 
         assertEquals(expected.get(0).toLowerCase(), addresses.get(0).toLowerCase());
         assertEquals(expected.get(1).toLowerCase(), addresses.get(1).toLowerCase());

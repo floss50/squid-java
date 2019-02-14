@@ -29,7 +29,7 @@ import static com.oceanprotocol.squid.core.sla.ServiceAgreementHandler.*;
 public class SetupServiceAgreement {
 
     private static final Logger log = LogManager.getLogger(SetupServiceAgreement.class);
-    private Config config;
+    private static Config config;
 
     private static final String ACCESS_SERVICE_TEMPLATE_ID= "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
     private static final String ACCESS_TEMPLATE_JSON = "src/main/resources/sla/access-sla-template.json";
@@ -80,13 +80,13 @@ public class SetupServiceAgreement {
         return true;
     }
 
-    public List<String> getContractAddresses(AccessTemplate accessTemplate) {
+    public static List<String> getContractAddresses(AccessTemplate accessTemplate, String paymentConditionsAddress, String accessConditionsAddress) {
         List<String> contractAddresses= new ArrayList();
         for (Condition condition: accessTemplate.conditions)    {
             if (condition.contractName.equals("PaymentConditions"))
-                contractAddresses.add(config.getString("contract.paymentConditions.address"));
+                contractAddresses.add(paymentConditionsAddress);
             else if (condition.contractName.equals("AccessConditions"))
-                contractAddresses.add(config.getString("contract.accessConditions.address"));
+                contractAddresses.add(accessConditionsAddress);
         }
 
         return contractAddresses;
@@ -106,7 +106,10 @@ public class SetupServiceAgreement {
         try {
             TransactionReceipt receipt = sea.setupTemplate(
                     EncodingHelper.hexStringToBytes(ACCESS_SERVICE_TEMPLATE_ID),
-                    getContractAddresses(accessTemplate),
+                    getContractAddresses(
+                            accessTemplate,
+                            config.getString("contract.paymentConditions.address"),
+                            config.getString("contract.accessConditions.address")),
                     getFingerprints(),
                     ServiceAgreementHandler.getDependenciesBits(),
                     ServiceAgreementHandler.getFullfillmentIndices(accessTemplate.conditions),
