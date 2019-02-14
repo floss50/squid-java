@@ -1,9 +1,14 @@
 package com.oceanprotocol.squid.core.sla.setup;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.squid.models.service.template.AccessTemplate;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +16,16 @@ import static org.junit.Assert.*;
 
 public class SetupServiceAgreementTest {
 
-    private static SetupServiceAgreement setup;
     private static Config config;
+    private static final String ACCESS_TEMPLATE_JSON = "src/main/resources/sla/access-sla-template.json";
+    private static String ACCESS_TEMPLATE_JSON_CONTENT;
+    private static AccessTemplate accessTemplate;
 
     @BeforeClass
     public static void setupServiceAgreementTest() throws Exception {
-        setup= new SetupServiceAgreement();
         config= ConfigFactory.load();
+        ACCESS_TEMPLATE_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(ACCESS_TEMPLATE_JSON)));
+        accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, ACCESS_TEMPLATE_JSON_CONTENT);
     }
 
     @Test
@@ -28,8 +36,8 @@ public class SetupServiceAgreementTest {
         expected.add(config.getString("contract.paymentConditions.address"));
         expected.add(config.getString("contract.paymentConditions.address"));
 
-        List<String> addresses= setup.getContractAddresses(
-                setup.getAccessTemplate(),
+        List<String> addresses= SetupServiceAgreement.getContractAddresses(
+                accessTemplate,
                 config.getString("contract.paymentConditions.address"),
                 config.getString("contract.accessConditions.address"));
 

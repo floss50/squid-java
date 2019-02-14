@@ -34,7 +34,7 @@ public class SetupServiceAgreement {
     private static final String ACCESS_SERVICE_TEMPLATE_ID= "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
     private static final String ACCESS_TEMPLATE_JSON = "src/main/resources/sla/access-sla-template.json";
     private static String ACCESS_TEMPLATE_JSON_CONTENT;
-    private AccessTemplate accessTemplate;
+    private static AccessTemplate accessTemplate;
     private static String address;
     private KeeperService keeper;
     private ServiceExecutionAgreement sea;
@@ -148,10 +148,6 @@ public class SetupServiceAgreement {
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());
-    }
-
-    public AccessTemplate getAccessTemplate() {
-        return accessTemplate;
     }
 
     public static void main(String[] args) throws Exception {
