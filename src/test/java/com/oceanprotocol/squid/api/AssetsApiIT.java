@@ -6,6 +6,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.ServiceEndpoints;
+import com.oceanprotocol.squid.core.sla.setup.SetupServiceAgreement;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.reactivex.Flowable;
@@ -33,6 +34,7 @@ public class AssetsApiIT {
     private static AssetMetadata metadataBase;
     private static ServiceEndpoints serviceEndpoints;
     private static final String SERVICE_DEFINITION_ID = "1";
+    private static SetupServiceAgreement setupServiceAgreement;
 
 
     private static OceanAPI oceanAPI;
@@ -54,6 +56,8 @@ public class AssetsApiIT {
 
         assertNotNull(oceanAPI.getAssetsAPI());
         assertNotNull(oceanAPI.getMainAccount());
+        setupServiceAgreement = new SetupServiceAgreement();
+        setupServiceAgreement.registerTemplate();
 
     }
 
