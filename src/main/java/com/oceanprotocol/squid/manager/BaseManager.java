@@ -3,9 +3,20 @@ package com.oceanprotocol.squid.manager;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
+import com.oceanprotocol.squid.exceptions.DDOException;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.models.DDO;
+import com.oceanprotocol.squid.models.DID;
+import com.oceanprotocol.squid.models.service.MetadataService;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Sign;
+
 import java.io.IOException;
 
 /**
@@ -60,6 +71,32 @@ public abstract class BaseManager {
     public BaseManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
         this.keeperService = keeperService;
         this.aquariusService = aquariusService;
+    }
+
+    protected DDO buildDDO(MetadataService metadataService, String address, int threshold) throws DDOException {
+
+        try {
+
+            DID did = DDO.generateDID();
+            Credentials credentials = getKeeperService().getCredentials();
+
+            String filesJson = metadataService.metadata.toJson(metadataService.metadata.base.files);
+            metadataService.metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(did.getHash(), filesJson, threshold);
+            metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
+
+            Sign.SignatureData signatureSource = EthereumHelper.signMessage(metadataService.metadata.base.checksum, credentials);
+            String signature = EncodingHelper.signatureToString(signatureSource);
+
+            return new DDO(did, metadataService, address, signature);
+        }
+        catch (DIDFormatException|EncryptionException|CipherException|IOException e) {
+            throw new DDOException("Error building DDO", e);
+        }
+
+    }
+
+    protected DDO buildDDO(MetadataService metadataService, String address) throws DDOException {
+        return this.buildDDO(metadataService, address, 0);
     }
 
 
