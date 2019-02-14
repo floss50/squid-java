@@ -1,10 +1,6 @@
 package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.keeper.contracts.AccessConditions;
-import com.oceanprotocol.keeper.contracts.DIDRegistry;
-import com.oceanprotocol.keeper.contracts.PaymentConditions;
-import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
@@ -13,7 +9,6 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import jnr.ffi.annotations.Meta;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
@@ -37,9 +32,6 @@ public class BaseManagerTest {
             super(keeperService, aquariusService);
         }
 
-        public  DDO buildDDOTest(MetadataService metadataService, String address, int threshold) throws DDOException {
-            return this.buildDDO(metadataService, address, threshold);
-        }
     }
 
     private static final Config config = ConfigFactory.load();

@@ -277,7 +277,7 @@ public class OceanManager extends BaseManager {
                     .startWith(new PaymentConditions.PaymentRefundEventResponse());
 
             // We compose both events with a withLatestFrom function
-            // this function triggers only if both events has at least one event
+            // this function triggers only if both flowables has at least one event
             // That's the reason we add an initial event to the flowables
             return accessGrantedFlowable
                     .withLatestFrom(paymentRefundFlowable, (access, refund) -> {
@@ -300,7 +300,7 @@ public class OceanManager extends BaseManager {
                     .timeout(60, TimeUnit.SECONDS
                     )
                     .doOnError(throwable -> {
-                        throw new ServiceAgreementException(serviceAgreementId, "Timeout waiting for AccessGranted for service agreement " + serviceAgreementId);
+                        throw new ServiceAgreementException(serviceAgreementId, "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId);
                     });
 
         }catch (DDOException|ServiceException|ServiceAgreementException e){
