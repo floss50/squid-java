@@ -87,8 +87,9 @@ public class OceanAPI {
      */
     public static OceanAPI getInstance(Properties properties) throws InitializationException, InvalidConfiguration {
 
-        if (oceanAPI != null)
-            return oceanAPI;
+        // NO SINGLETON
+        //if (oceanAPI != null)
+        //    return oceanAPI;
 
         OceanConfig oceanConfig = OceanConfigFactory.getOceanConfig(properties);
         OceanConfig.OceanConfigValidation validation = OceanConfig.validate(oceanConfig);
