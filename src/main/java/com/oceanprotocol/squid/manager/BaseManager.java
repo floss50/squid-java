@@ -10,6 +10,7 @@ import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.service.MetadataService;
@@ -36,6 +37,8 @@ public abstract class BaseManager {
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
+
+    protected Account mainAccount;
 
     public static class ContractAddresses {
 
@@ -285,6 +288,14 @@ public abstract class BaseManager {
     public BaseManager setDidRegistryContract(DIDRegistry contract)    {
         this.didRegistry= contract;
         return this;
+    }
+
+    public Account getMainAccount() {
+        return mainAccount;
+    }
+
+    public void setMainAccount(Account mainAccount) {
+        this.mainAccount = mainAccount;
     }
 
     @Override

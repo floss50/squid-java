@@ -125,7 +125,8 @@ public class OceanAPI {
                     .setDidRegistryContract(oceanAPI.didRegistryContract)
                     .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
-                    .setAccessConditionsContract(oceanAPI.accessConditionsContract);
+                    .setAccessConditionsContract(oceanAPI.accessConditionsContract)
+                    .setMainAccount(oceanAPI.mainAccount);
 
             oceanAPI.accountsManager = oceanInitializationHelper.getAccountsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.accountsManager.setTokenContract(oceanAPI.tokenContract);

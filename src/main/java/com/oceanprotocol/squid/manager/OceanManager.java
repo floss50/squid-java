@@ -159,13 +159,12 @@ public class OceanManager extends BaseManager {
     /**
      * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
      * @param metadata
-     * @param address
      * @param serviceEndpoints
      * @param threshold
      * @return an instance of the DDO created
      * @throws DDOException
      */
-    public DDO registerAsset(AssetMetadata metadata, String address, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException {
+    public DDO registerAsset(AssetMetadata metadata, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException {
 
         try {
 
@@ -180,7 +179,7 @@ public class OceanManager extends BaseManager {
             MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, "0");
 
             // Initializing DDO
-            DDO ddo = this.buildDDO(metadataService, address, threshold);
+            DDO ddo = this.buildDDO(metadataService, getMainAccount().address, threshold);
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
@@ -235,11 +234,10 @@ public class OceanManager extends BaseManager {
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAccount
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException
      */
-    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId, Account consumerAccount)
+    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId)
             throws OrderException {
 
         String serviceAgreementId = ServiceAgreementHandler.generateSlaId();
@@ -256,7 +254,7 @@ public class OceanManager extends BaseManager {
         try {
 
             // Returns a flowable over an AccessGranted event after calling the lockPayment function
-            Flowable<AccessConditions.AccessGrantedEventResponse> accessGrantedFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, consumerAccount, serviceAgreementId)
+            Flowable<AccessConditions.AccessGrantedEventResponse> accessGrantedFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
                     .map(event -> EncodingHelper.toHexString(event.agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
@@ -316,31 +314,30 @@ public class OceanManager extends BaseManager {
      * @param did
      * @param ddo
      * @param serviceDefinitionId
-     * @param consumerAccount
      * @param serviceAgreementId
      * @return a Flowable over an AgreementInitializedEventResponse
      * @throws DDOException
      * @throws ServiceException
      * @throws ServiceAgreementException
      */
-    private Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId,  Account consumerAccount, String serviceAgreementId)
+    private Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
             throws  DDOException, ServiceException, ServiceAgreementException {
 
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
         try {
-            boolean accountUnlocked = this.getKeeperService().unlockAccount(consumerAccount);
+            boolean accountUnlocked = this.getKeeperService().unlockAccount(getMainAccount());
             if (!accountUnlocked) {
-                String msg = "Account " + consumerAccount.address + " has not been unlocked";
+                String msg = "Account " + getMainAccount().address + " has not been unlocked";
                 log.error(msg);
-                throw new ServiceAgreementException(serviceAgreementId, "Account " + consumerAccount.address + " has not been unlocked");
+                throw new ServiceAgreementException(serviceAgreementId, "Account " + getMainAccount().address + " has not been unlocked");
             }
 
         }
         catch (Exception e){
-            String msg = "Account " + consumerAccount.address + " has not been unlocked";
+            String msg = "Account " + getMainAccount().address + " has not been unlocked";
             log.error(msg+ ": " + e.getMessage());
-            throw new ServiceAgreementException(serviceAgreementId, "Account " + consumerAccount.address + " has not been unlocked");
+            throw new ServiceAgreementException(serviceAgreementId, "Account " + getMainAccount().address + " has not been unlocked");
         }
 
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
@@ -351,7 +348,7 @@ public class OceanManager extends BaseManager {
         try {
             agreementSignature = accessService.generateServiceAgreementSignature(
                     getKeeperService().getWeb3(),
-                    consumerAccount.getAddress(),
+                    getMainAccount().getAddress(),
                     serviceAgreementId
             );
         }catch(IOException e){
@@ -365,7 +362,7 @@ public class OceanManager extends BaseManager {
                 "0x".concat(serviceAgreementId),
                 serviceDefinitionId,
                 agreementSignature,
-                Keys.toChecksumAddress(consumerAccount.getAddress())
+                Keys.toChecksumAddress(getMainAccount().getAddress())
         );
 
         // 3. Send agreement details to Publisher (Brizo endpoint)
@@ -403,14 +400,13 @@ public class OceanManager extends BaseManager {
      * @param serviceAgreementId
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAddress
      * @param basePath
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String consumerAddress, String basePath) throws ConsumeServiceException {
+    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
 
-        return consume(serviceAgreementId, did, serviceDefinitionId, consumerAddress, basePath,0);
+        return consume(serviceAgreementId, did, serviceDefinitionId, basePath,0);
     }
 
 
@@ -419,16 +415,15 @@ public class OceanManager extends BaseManager {
      * @param serviceAgreementId
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAddress
      * @param basePath
      * @param threshold
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String consumerAddress, String basePath, int threshold) throws ConsumeServiceException{
+    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException{
 
         DDO ddo;
-        String checkConsumerAddress = Keys.toChecksumAddress(consumerAddress);
+        String checkConsumerAddress = Keys.toChecksumAddress(getMainAccount().address);
         String serviceEndpoint;
         List<AssetMetadata.File> files;
 

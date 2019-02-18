@@ -60,7 +60,7 @@ public class AssetsApiIT {
     @Test
     public void create() throws Exception {
 
-        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
+        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
 
         DID did= new DID(ddo.id);
         DDO resolvedDDO= oceanAPI.getAssetsAPI().resolve(did);
@@ -73,10 +73,10 @@ public class AssetsApiIT {
     @Test
     public void order() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
+        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         DID did= new DID(ddo.id);
 
-        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
+        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
 
         OrderResult result = response.blockingFirst();
         assertNotNull(result.getServiceAgreementId());
@@ -87,19 +87,19 @@ public class AssetsApiIT {
     @Test
     public void consume() throws Exception {
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
+        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         DID did= new DID(ddo.id);
 
         log.debug("DDO registered!");
 
-        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
+        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
 
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());
         assertEquals(true, orderResult.isAccessGranted());
         log.debug("Granted Access Received for the service Agreement " + orderResult.getServiceAgreementId());
 
-        boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount(), "/tmp");
+        boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, "/tmp");
         assertEquals(true, result);
 
     }
@@ -107,7 +107,7 @@ public class AssetsApiIT {
     @Test
     public void search() throws Exception {
 
-        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
+        oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         log.debug("DDO registered!");
 
         String searchText = "Weather";
@@ -120,7 +120,7 @@ public class AssetsApiIT {
     @Test
     public void query() throws Exception {
 
-        oceanAPI.getAssetsAPI().create(metadataBase, oceanAPI.getMainAccount(), serviceEndpoints);
+        oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         log.debug("DDO registered!");
 
         Map<String, Object> params = new HashMap<>();
