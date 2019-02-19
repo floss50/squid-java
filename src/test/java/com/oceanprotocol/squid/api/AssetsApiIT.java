@@ -124,7 +124,7 @@ public class AssetsApiIT {
         log.debug("DDO registered!");
 
         Map<String, Object> params = new HashMap<>();
-        params.put("service.metadata.base.license", "CC-BY");
+        params.put("license", "CC-BY");
 
         List<DDO> results = oceanAPI.getAssetsAPI().query(params);
         assertNotNull(results);
