@@ -8,6 +8,7 @@ import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -78,6 +79,9 @@ public class OceanManagerIT {
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
+        Account publisherAccount = new Account(config.getString("account.parity.address"), config.getString("account.parity.password"));
+        Account consumerAccount = new Account(config.getString("account.parity.address2"), config.getString("account.parity.password2"));
+
         keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
         keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
 
@@ -95,7 +99,8 @@ public class OceanManagerIT {
                 .setDidRegistryContract(didRegistry)
                 .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions);
+                .setAccessConditionsContract(accessConditions)
+                .setMainAccount(publisherAccount);
 
         // Initializing the OceanManager for the Consumer
         managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
@@ -103,7 +108,8 @@ public class OceanManagerIT {
                 .setDidRegistryContract(didRegistry)
                 .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions);
+                .setAccessConditionsContract(accessConditions)
+                .setMainAccount(consumerAccount);
 
         // Pre-parsing of json's and models
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
@@ -142,7 +148,6 @@ public class OceanManagerIT {
         ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         return managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
                 serviceEndpoints,
                 0);
 
@@ -161,7 +166,6 @@ public class OceanManagerIT {
         ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         DDO ddo= managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
                 serviceEndpoints,
                 0);
 

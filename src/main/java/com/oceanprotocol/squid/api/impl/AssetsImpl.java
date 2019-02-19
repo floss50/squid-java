@@ -40,13 +40,13 @@ public class AssetsImpl implements AssetsAPI {
 
 
     @Override
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException{
-        return oceanManager.registerAsset(metadata, publisherAccount.address, serviceEndpoints, threshold);
+    public DDO create(AssetMetadata metadata, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException{
+        return oceanManager.registerAsset(metadata, serviceEndpoints, threshold);
     }
 
     @Override
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) throws DDOException{
-        return this.create(metadata, publisherAccount, serviceEndpoints, 0);
+    public DDO create(AssetMetadata metadata, ServiceEndpoints serviceEndpoints) throws DDOException{
+        return this.create(metadata, serviceEndpoints, 0);
     }
 
     @Override
@@ -75,17 +75,17 @@ public class AssetsImpl implements AssetsAPI {
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold) throws ConsumeServiceException {
-        return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount.address, basePath, threshold);
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException {
+        return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId,  basePath, threshold);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) throws ConsumeServiceException {
-        return this.consume(serviceAgreementId, did, serviceDefinitionId, consumerAccount, basePath, 0);
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId,  String basePath) throws ConsumeServiceException {
+        return this.consume(serviceAgreementId, did, serviceDefinitionId,  basePath, 0);
     }
 
     @Override
-    public Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) throws OrderException{
-        return oceanManager.purchaseAsset(did, serviceDefinitionId, consumerAccount);
+    public Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException{
+        return oceanManager.purchaseAsset(did, serviceDefinitionId);
     }
 }

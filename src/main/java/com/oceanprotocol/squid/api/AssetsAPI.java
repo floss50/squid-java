@@ -23,23 +23,21 @@ public interface AssetsAPI {
     /**
      * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
      * @param metadata
-     * @param publisherAccount
      * @param serviceEndpoints
      * @param threshold
      * @return an instance of the DDO created
      * @throws DDOException
      */
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException;
+    public DDO create(AssetMetadata metadata,  ServiceEndpoints serviceEndpoints, int threshold) throws DDOException;
 
     /**
      *  Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
      * @param metadata
-     * @param publisherAccount
      * @param serviceEndpoints
      * @return an instance of the DDO created
      * @throws DDOException
      */
-    public DDO create(AssetMetadata metadata, Account publisherAccount, ServiceEndpoints serviceEndpoints) throws DDOException;
+    public DDO create(AssetMetadata metadata, ServiceEndpoints serviceEndpoints) throws DDOException;
 
     /**
      * Gets a DDO from a DID
@@ -92,35 +90,32 @@ public interface AssetsAPI {
      * @param serviceAgreementId
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAccount
      * @param basePath
      * @param threshold
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException;
 
     /**
      *  Downloads an Asset previously ordered through a Service Agreement
      * @param serviceAgreementId
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAccount
      * @param basePath
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Account consumerAccount, String basePath) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException;
 
     /**
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
      * @param did
      * @param serviceDefinitionId
-     * @param consumerAccount
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException
      */
-    Flowable<OrderResult> order(DID did, String serviceDefinitionId, Account consumerAccount) throws OrderException;
+    Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException;
 
 
 
