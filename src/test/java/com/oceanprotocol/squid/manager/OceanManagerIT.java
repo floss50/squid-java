@@ -134,7 +134,7 @@ public class OceanManagerIT {
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
 
         String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
@@ -153,7 +153,7 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
 
         String publicKey= config.getString("account.parity.address");
-        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        String metadataUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
@@ -180,7 +180,7 @@ public class OceanManagerIT {
 
         DID did= DID.builder();
         String oldUrl= "http://mymetadata.io/api";
-        String newUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        String newUrl= "http://aquarius:5000/api/v1/aquarius/assets/ddo/{did}";
 
         String checksum = "0xd190bc85ee50643baffe7afe84ec6a9dd5212b67223523cd8e4d88f9069255fb";
 
