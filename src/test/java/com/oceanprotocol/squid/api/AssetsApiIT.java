@@ -36,6 +36,7 @@ public class AssetsApiIT {
 
 
     private static OceanAPI oceanAPI;
+    private static  Config config;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -49,7 +50,7 @@ public class AssetsApiIT {
 
         serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
-        Config config = ConfigFactory.load();
+        config = ConfigFactory.load();
         oceanAPI = OceanAPI.getInstance(config);
 
         assertNotNull(oceanAPI.getAssetsAPI());
@@ -86,6 +87,8 @@ public class AssetsApiIT {
 
     @Test
     public void consume() throws Exception {
+
+        serviceEndpoints.setSecretStoreEndpoint(config.getString("secretstore.url"));
 
         DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         DID did= new DID(ddo.id);

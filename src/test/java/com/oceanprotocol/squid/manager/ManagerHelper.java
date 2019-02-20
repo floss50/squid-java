@@ -71,6 +71,10 @@ public abstract class ManagerHelper {
         return SecretStoreManager.getInstance(getSecretStoreDto(config),getEvmDto(config, client));
     }
 
+    public static SecretStoreManager getSecretStoreController(Config config, EvmDto evmDto) {
+        return SecretStoreManager.getInstance(getSecretStoreDto(config), evmDto);
+    }
+
 
     public static OceanToken loadOceanTokenContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
         return OceanToken.load(

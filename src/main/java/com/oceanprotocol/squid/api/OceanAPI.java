@@ -126,7 +126,8 @@ public class OceanAPI {
                     .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract)
-                    .setMainAccount(oceanAPI.mainAccount);
+                    .setMainAccount(oceanAPI.mainAccount)
+                    .setEvmDto(oceanAPI.evmDto);
 
             oceanAPI.accountsManager = oceanInitializationHelper.getAccountsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.accountsManager.setTokenContract(oceanAPI.tokenContract);
