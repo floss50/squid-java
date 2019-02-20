@@ -176,7 +176,7 @@ public class OceanManager extends BaseManager {
                 metadataEndpoint = serviceEndpoints.getMetadataEndpoint();
 
             // Initialization of services supported for this asset
-            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, "0");
+            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
 
             // Initializing DDO
             DDO ddo = this.buildDDO(metadataService, getMainAccount().address, threshold);
@@ -200,7 +200,7 @@ public class OceanManager extends BaseManager {
             serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
 
             AccessService accessService = new AccessService(serviceEndpoints.getAccessEndpoint(),
-                    "1",
+                    Service.DEFAULT_ACCESS_SERVICE_ID,
                     serviceAgreementContract);
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
 
@@ -213,6 +213,12 @@ public class OceanManager extends BaseManager {
 
             // Adding services to DDO
             ddo.addService(accessService);
+
+            //Adding the authorization service if the endpoint is defined
+            if (serviceEndpoints.getSecretStoreEndpoint()!=null && !serviceEndpoints.getSecretStoreEndpoint().equals("")){
+                AuthorizationService authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, serviceEndpoints.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+                ddo.addService(authorizationService);
+            }
 
             // Storing DDO
             DDO createdDDO = getAquariusService().createDDO(ddo);

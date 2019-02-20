@@ -5,6 +5,7 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.ServiceEndpoints;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -32,7 +33,6 @@ public class AssetsApiIT {
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
     private static ServiceEndpoints serviceEndpoints;
-    private static final String SERVICE_DEFINITION_ID = "1";
 
 
     private static OceanAPI oceanAPI;
@@ -76,7 +76,7 @@ public class AssetsApiIT {
         DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         DID did= new DID(ddo.id);
 
-        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
+        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
 
         OrderResult result = response.blockingFirst();
         assertNotNull(result.getServiceAgreementId());
@@ -92,14 +92,14 @@ public class AssetsApiIT {
 
         log.debug("DDO registered!");
 
-        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
+        Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did,  Service.DEFAULT_ACCESS_SERVICE_ID);
 
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());
         assertEquals(true, orderResult.isAccessGranted());
         log.debug("Granted Access Received for the service Agreement " + orderResult.getServiceAgreementId());
 
-        boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, "/tmp");
+        boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, Service.DEFAULT_ACCESS_SERVICE_ID, "/tmp");
         assertEquals(true, result);
 
     }
