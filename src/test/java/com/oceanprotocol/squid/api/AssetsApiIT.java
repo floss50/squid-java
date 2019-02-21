@@ -60,8 +60,10 @@ public class AssetsApiIT {
 
         assertNotNull(oceanAPI.getAssetsAPI());
         assertNotNull(oceanAPI.getMainAccount());
-        setupServiceAgreement = new SetupServiceAgreement();
-        setupServiceAgreement.registerTemplate();
+
+        // TODO Enable the access's template registration in future versions
+        //setupServiceAgreement = new SetupServiceAgreement();
+        //setupServiceAgreement.registerTemplate();
 
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
