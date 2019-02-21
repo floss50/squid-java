@@ -125,6 +125,8 @@ Once you have initialized the API you can call the methods through their corresp
  boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount(), "/tmp");
 ```
 
+Note: Due to [this issue](https://github.com/oceanprotocol/squid-java/issues/67), is necessary to register the Access Service's template using squid-py
+
 ### Dealing with Flowables
 
 Squid-java uses web3j to interact with Solidity's Smart Contracts. It relies on [RxJava](https://github.com/ReactiveX/RxJava) to deal with asynchronous calls.
