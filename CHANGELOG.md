@@ -1,6 +1,13 @@
 History
 =======
 
+0.3.3 (February 21th, 2019)
+-------------------------
+
+* Added Token Approve function
+* Using different Ocean's instances in the Integration Tests
+
+
 0.3.2 (February 14th, 2019)
 -------------------------
 
