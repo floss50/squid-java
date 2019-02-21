@@ -5,9 +5,11 @@ import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
+import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -78,11 +80,15 @@ public class OceanManagerIT {
     public static void setUp() throws Exception {
         log.debug("Setting Up DTO's");
 
+        Account publisherAccount = new Account(config.getString("account.parity.address"), config.getString("account.parity.password"));
+        Account consumerAccount = new Account(config.getString("account.parity.address2"), config.getString("account.parity.password2"));
+
         keeperPublisher = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
         keeperConsumer = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
 
         aquarius= ManagerHelper.getAquarius(config);
-        secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
+        EvmDto evmDto = ManagerHelper.getEvmDto(config, ManagerHelper.VmClient.parity);
+        secretStore= ManagerHelper.getSecretStoreController(config, evmDto);
 
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
         saContract= ManagerHelper.loadServiceExecutionAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
@@ -96,7 +102,9 @@ public class OceanManagerIT {
                 .setDidRegistryContract(didRegistry)
                 .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions);
+                .setAccessConditionsContract(accessConditions)
+                .setMainAccount(publisherAccount)
+                .setEvmDto(evmDto);
 
         // Initializing the OceanManager for the Consumer
         managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
@@ -104,7 +112,9 @@ public class OceanManagerIT {
                 .setDidRegistryContract(didRegistry)
                 .setServiceExecutionAgreementContract(saContract)
                 .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions);
+                .setAccessConditionsContract(accessConditions)
+                .setMainAccount(consumerAccount)
+                .setEvmDto(evmDto);
 
         // Pre-parsing of json's and models
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
@@ -143,7 +153,6 @@ public class OceanManagerIT {
         ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
         return managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
                 serviceEndpoints,
                 0);
 
@@ -156,13 +165,13 @@ public class OceanManagerIT {
         String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
+        String secretStoreEndpoint= config.getString("secretstore.url");
 
         String serviceAgreementAddress = saContract.getContractAddress();
 
-        ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
+        ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint);
 
         DDO ddo= managerPublisher.registerAsset(metadataBase,
-                serviceAgreementAddress,
                 serviceEndpoints,
                 0);
 

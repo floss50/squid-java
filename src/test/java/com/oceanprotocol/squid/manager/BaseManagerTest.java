@@ -6,7 +6,9 @@ import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -14,11 +16,14 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.crypto.CipherException;
+import com.oceanprotocol.secretstore.core.EvmDto;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class BaseManagerTest {
@@ -61,10 +66,13 @@ public class BaseManagerTest {
 
         keeperService = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
         aquarius= ManagerHelper.getAquarius(config);
-        secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
+
+        EvmDto evmDto = ManagerHelper.getEvmDto(config, ManagerHelper.VmClient.parity);
+        secretStore= ManagerHelper.getSecretStoreController(config, evmDto);
 
         baseManager = new BaseManagerImplementation(keeperService, aquarius);
-        baseManager.setSecretStoreManager(secretStore);
+        baseManager.setSecretStoreManager(secretStore)
+        .setEvmDto(evmDto);
 
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
@@ -77,7 +85,23 @@ public class BaseManagerTest {
         String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
         MetadataService metadataService = new MetadataService(metadataBase, metadataUrl);
 
-        DDO ddo = baseManager.buildDDO(metadataService, SERVICE_AGREEMENT_ADDRESS);
+        DDO ddo = baseManager.buildDDO(metadataService, null, SERVICE_AGREEMENT_ADDRESS);
+        assertNotNull(ddo.proof);
+        assertNotNull(ddo.metadata.base.checksum);
+
+    }
+
+    @Test
+    public void buildDDOWithAuthorizationService() throws Exception {
+
+        String metadataUrl= "http://172.15.0.15:5000/api/v1/aquarius/assets/ddo/{did}";
+        MetadataService metadataService = new MetadataService(metadataBase, metadataUrl);
+
+        String serviceEndpoint = "http://localhost:12001";
+
+        AuthorizationService authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, serviceEndpoint, Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+
+        DDO ddo = baseManager.buildDDO(metadataService, authorizationService, SERVICE_AGREEMENT_ADDRESS);
         assertNotNull(ddo.proof);
         assertNotNull(ddo.metadata.base.checksum);
 

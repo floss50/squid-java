@@ -5,6 +5,7 @@ public class ServiceEndpoints {
     private String accessEndpoint;
     private String purchaseEndpoint;
     private String metadataEndpoint;
+    private String secretStoreEndpoint;
 
     public ServiceEndpoints() {
     }
@@ -13,6 +14,11 @@ public class ServiceEndpoints {
         this.accessEndpoint = accessEndpoint;
         this.purchaseEndpoint = purchaseEndpoint;
         this.metadataEndpoint = metadataEndpoint;
+    }
+
+    public ServiceEndpoints(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String secretStoreEndpoint) {
+        this(accessEndpoint, purchaseEndpoint, metadataEndpoint);
+        this.secretStoreEndpoint = secretStoreEndpoint;
     }
 
     public String getAccessEndpoint() {
@@ -40,5 +46,13 @@ public class ServiceEndpoints {
     public ServiceEndpoints setMetadataEndpoint(String metadataEndpoint) {
         this.metadataEndpoint = metadataEndpoint;
         return this;
+    }
+
+    public String getSecretStoreEndpoint() {
+        return secretStoreEndpoint;
+    }
+
+    public void setSecretStoreEndpoint(String secretStoreEndpoint) {
+        this.secretStoreEndpoint = secretStoreEndpoint;
     }
 }

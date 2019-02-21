@@ -62,7 +62,7 @@ public class AssetsManager extends BaseManager {
         MetadataService service= new MetadataService(metadata, serviceEndpoint);
 
         return publishMetadata(
-                this.buildDDO(service, getKeeperService().getAddress()));
+                this.buildDDO(service, null, getKeeperService().getAddress()));
 
     }
 

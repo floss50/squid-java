@@ -33,6 +33,12 @@
   }],
   "service": [
     {
+      "type": "Authorization",
+      "service": "SecretStore",
+      "serviceDefinitionId": "2",
+      "serviceEndpoint": "http://localhost:12001"
+    },
+    {
       "metadata": {
         "additionalInformation": {
           "updateFrecuency": "yearly",

@@ -48,6 +48,9 @@ public class AssetsManagerIT {
         aquarius = ManagerHelper.getAquarius(config);
         manager = AssetsManager.getInstance(keeper, aquarius);
 
+        SecretStoreManager secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
+        manager.setSecretStoreManager(secretStore);
+
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         ddoBase = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
 

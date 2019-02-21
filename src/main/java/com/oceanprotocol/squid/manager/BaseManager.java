@@ -1,23 +1,30 @@
 package com.oceanprotocol.squid.manager;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.EncryptionException;
+import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.KeeperService;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
+import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Sign;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract class for the Managers
@@ -36,6 +43,8 @@ public abstract class BaseManager {
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
+
+    protected Account mainAccount;
 
     public static class ContractAddresses {
 
@@ -61,6 +70,8 @@ public abstract class BaseManager {
         }
     }
 
+
+
     /**
      * Constructor
      * @param keeperService KeeperService
@@ -73,7 +84,15 @@ public abstract class BaseManager {
         this.aquariusService = aquariusService;
     }
 
-    protected DDO buildDDO(MetadataService metadataService, String address, int threshold) throws DDOException {
+    private SecretStoreManager getSecretStoreInstance(AuthorizationService authorizationService) {
+
+        if (authorizationService==null)
+            return getSecretStoreManager();
+
+        return SecretStoreManager.getInstance( SecretStoreDto.builder(authorizationService.serviceEndpoint), evmDto);
+    }
+
+    protected DDO buildDDO(MetadataService metadataService,  AuthorizationService authorizationService, String address, int threshold) throws DDOException {
 
         try {
 
@@ -81,7 +100,10 @@ public abstract class BaseManager {
             Credentials credentials = getKeeperService().getCredentials();
 
             String filesJson = metadataService.metadata.toJson(metadataService.metadata.base.files);
-            metadataService.metadata.base.encryptedFiles = getSecretStoreManager().encryptDocument(did.getHash(), filesJson, threshold);
+
+            SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
+
+            metadataService.metadata.base.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
             metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
 
             Sign.SignatureData signatureSource = EthereumHelper.signMessage(metadataService.metadata.base.checksum, credentials);
@@ -95,9 +117,19 @@ public abstract class BaseManager {
 
     }
 
-    protected DDO buildDDO(MetadataService metadataService, String address) throws DDOException {
-        return this.buildDDO(metadataService, address, 0);
+    protected DDO buildDDO(MetadataService metadataService, AuthorizationService authorizationService, String address) throws DDOException {
+        return this.buildDDO(metadataService, authorizationService, address, 0);
     }
+
+    protected List<AssetMetadata.File> getMetadataFiles(DDO ddo) throws IOException, EncryptionException {
+
+        AuthorizationService authorizationService = ddo.getAuthorizationService();
+        SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
+
+        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.metadata.base.encryptedFiles);
+        return  DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>(){}, jsonFiles);
+    }
+
 
 
     public ContractAddresses getContractAddresses() {
@@ -284,6 +316,15 @@ public abstract class BaseManager {
      */
     public BaseManager setDidRegistryContract(DIDRegistry contract)    {
         this.didRegistry= contract;
+        return this;
+    }
+
+    public Account getMainAccount() {
+        return mainAccount;
+    }
+
+    public BaseManager setMainAccount(Account mainAccount) {
+        this.mainAccount = mainAccount;
         return this;
     }
 

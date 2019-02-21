@@ -94,7 +94,7 @@ And you can instantiate the API with the following lines:
 Remember that TypeSafe Config allows you to overwrite the values using Environment Variables or arguments passed to the JVM
 
 If you want to use Java's Properties, you just need to create a Properties Object with the same properties of the application.conf.
-You can read this Properties from a properties file, or define the values of this properties in your code
+You can read this Properties from a properties file, or define the values of these properties in your code
 
 ```java
     // Default values for KEEPER_URL, KEEPER_GAS_LIMIT, KEEPER_GAS_PRICE, AQUARIUS_URL, SECRETSTORE_URL, CONSUME_BASE_PATH
@@ -121,8 +121,8 @@ Once you have initialized the API you can call the methods through their corresp
  String did = DID.builder().getHash();
  String encryptedDocument = oceanAPI.getSecretStoreAPI().encrypt(did, filesJson, 0);
 
- Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
- boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount(), "/tmp");
+ Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
+ boolean result = oceanAPI.getAssetsAPI().consume(orderResult.getServiceAgreementId(), did, SERVICE_DEFINITION_ID, "/tmp");
 ```
 
 Note: Due to [this issue](https://github.com/oceanprotocol/squid-java/issues/67), is necessary to register the Access Service's template using squid-py
@@ -134,7 +134,7 @@ The order method in AssetsAPI returns a Flowable over an OrderResult object. It'
 If you prefer to deal with this method in a synchronous way, you will need to block the current thread until you get a response:
 
 ```java
- Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID, oceanAPI.getMainAccount());
+ Flowable<OrderResult> response = oceanAPI.getAssetsAPI().order(did, SERVICE_DEFINITION_ID);
  OrderResult orderResult = response.blockingFirst();
 ```
 On the contrary, if you want to handle the response asynchronously, you will need to subscribe to the Flowable:
