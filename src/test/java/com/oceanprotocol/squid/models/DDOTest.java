@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +33,9 @@ public class DDOTest {
     private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-example.json";
     private static String DDO_JSON_CONTENT;
 
+    private static final String DDO_JSON_AUTH_SAMPLE = "src/test/resources/examples/ddo-example-authorization.json";
+    private static String DDO_JSON_AUTH_CONTENT;
+
     private static ObjectMapper objectMapper;
 
     private static final Config config = ConfigFactory.load();
@@ -39,6 +44,7 @@ public class DDOTest {
     @BeforeClass
     public static void setUp() throws Exception {
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
+        DDO_JSON_AUTH_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_AUTH_SAMPLE)));
         objectMapper = new ObjectMapper();
     }
 
@@ -106,6 +112,27 @@ public class DDOTest {
         assertEquals("UK Weather information 2011", metadata.base.name);
         assertEquals(2, metadata.base.links.size());
         assertEquals(123, metadata.curation.numVotes);
+    }
+
+    @Test
+    public void jsonToModelWithAuth() throws Exception {
+
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {
+        }, DDO_JSON_AUTH_CONTENT);
+
+        assertEquals("https://w3id.org/future-method/v1", ddo.context);
+        assertEquals("did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf", ddo.id.toString());
+        assertEquals(3, ddo.publicKeys.size());
+        assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:b6e2eb5eff1a093ced9826315d5a4ef6c5b5c8bd3c49890ee284231d7e1d0aaa"));
+
+        assertEquals(2, ddo.authentication.size());
+        assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
+
+        assertEquals(3, ddo.services.size());
+
+        AuthorizationService authorizationService = ddo.getAuthorizationService();
+        assertEquals("http://localhost:12001", authorizationService.serviceEndpoint);
+        assertEquals(Service.serviceTypes.Authorization.name(), authorizationService.type);
     }
 
     @Test

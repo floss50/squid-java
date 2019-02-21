@@ -7,6 +7,7 @@ import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
@@ -190,7 +191,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
                     } else if (service.get("type").equals(Service.serviceTypes.Access.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AccessService.class));
-
+                    } else if (service.get("type").equals(Service.serviceTypes.Authorization.toString())) {
+                        this.services.add(getMapperInstance().convertValue(service, AuthorizationService.class));
                     } else {
                         this.services.add(getMapperInstance().convertValue(service, Service.class));
                     }
@@ -247,6 +249,25 @@ public class DDO extends AbstractModel implements FromJsonToModel {
             }
         }
         throw new ServiceException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
+    }
+
+    public AuthorizationService getAuthorizationService(String serviceDefinitionId) {
+        for (Service service: services) {
+            if (service.serviceDefinitionId.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.Authorization.toString())) {
+                return (AuthorizationService) service;
+            }
+        }
+        return null;
+    }
+
+    public AuthorizationService getAuthorizationService() {
+        for (Service service: services) {
+            if (service.type.equals(Service.serviceTypes.Authorization.toString())) {
+                return (AuthorizationService) service;
+            }
+        }
+
+       return null;
     }
 
 }
