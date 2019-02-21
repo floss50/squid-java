@@ -5,9 +5,8 @@
 
     <groupId>com.oceanprotocol</groupId>
     <artifactId>squid</artifactId>
-    <version>0.3.2</version>
+    <version>0.3.3</version>
     <packaging>jar</packaging>
-
     <name>Java client library for Ocean Protocol</name>
     <description>Squid facilitate the interaction of java clients with the Ocean Protocol network</description>
 

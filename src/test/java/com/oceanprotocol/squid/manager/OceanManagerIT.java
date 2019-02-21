@@ -95,6 +95,7 @@ public class OceanManagerIT {
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
 
+
         // Initializing the OceanManager for the Publisher
         managerPublisher = OceanManager.getInstance(keeperPublisher, aquarius);
         managerPublisher.setSecretStoreManager(secretStore)

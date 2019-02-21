@@ -87,9 +87,6 @@ public class OceanAPI {
      */
     public static OceanAPI getInstance(Properties properties) throws InitializationException, InvalidConfiguration {
 
-        if (oceanAPI != null)
-            return oceanAPI;
-
         OceanConfig oceanConfig = OceanConfigFactory.getOceanConfig(properties);
         OceanConfig.OceanConfigValidation validation = OceanConfig.validate(oceanConfig);
 
@@ -126,8 +123,10 @@ public class OceanAPI {
                     .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract)
+                    .setTokenContract(oceanAPI.tokenContract)
                     .setMainAccount(oceanAPI.mainAccount)
                     .setEvmDto(oceanAPI.evmDto);
+
 
             oceanAPI.accountsManager = oceanInitializationHelper.getAccountsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.accountsManager.setTokenContract(oceanAPI.tokenContract);

@@ -40,6 +40,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Handles several operations related with Ocean's flow
@@ -270,6 +271,8 @@ public class OceanManager extends BaseManager {
                             return Flowable.empty();
                         else {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
+                            getKeeperService().unlockAccount(getMainAccount());
+                            getKeeperService().tokenApprove(this.tokenContract, paymentConditions.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
                             this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
                             return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId);
                         }
@@ -307,7 +310,13 @@ public class OceanManager extends BaseManager {
                     .timeout(60, TimeUnit.SECONDS
                     )
                     .doOnError(throwable -> {
-                        throw new ServiceAgreementException(serviceAgreementId, "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId);
+
+                        String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
+                        if (throwable instanceof TimeoutException){
+                            msg = "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId;
+                        }
+
+                        throw new ServiceAgreementException(serviceAgreementId, msg);
                     });
 
         }catch (DDOException|ServiceException|ServiceAgreementException e){
