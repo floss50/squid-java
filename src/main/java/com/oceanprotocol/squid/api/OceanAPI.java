@@ -123,7 +123,7 @@ public class OceanAPI {
                     .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract)
-                    .setTokenContract(oceanAPI.tokenContract);
+                    .setTokenContract(oceanAPI.tokenContract)
                     .setMainAccount(oceanAPI.mainAccount)
                     .setEvmDto(oceanAPI.evmDto);
 

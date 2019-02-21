@@ -271,7 +271,7 @@ public class OceanManager extends BaseManager {
                             return Flowable.empty();
                         else {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
-                            getKeeperService().unlockAccount(consumerAccount);
+                            getKeeperService().unlockAccount(getMainAccount());
                             getKeeperService().tokenApprove(this.tokenContract, paymentConditions.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
                             this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
                             return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId);
