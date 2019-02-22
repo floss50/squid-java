@@ -79,7 +79,7 @@ public class HttpResponse {
 
     /**
      * Set content length
-     * @param contentLength
+     * @param contentLength content length
      */
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
