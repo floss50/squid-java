@@ -37,6 +37,8 @@ public class AccountsManager extends BaseManager {
      * @param keeperService Keeper Dto
      * @param aquariusService Provider Dto
      * @return AccountsManager
+     * @throws IOException
+     * @throws CipherException
      */
     public static AccountsManager getInstance(KeeperService keeperService, AquariusService aquariusService)
             throws IOException, CipherException {
@@ -48,7 +50,8 @@ public class AccountsManager extends BaseManager {
     /**
      * Returns the list of ethereum accounts registered in the Keeper node
      * If getBalance is true, get the ethereum and ocean balance of each account
-     * @return List<Account> List of accounts
+     * @return  List of accounts
+     * @throws EthereumException
      */
     public List<Account> getAccounts(boolean getBalance) throws EthereumException {
 
@@ -72,7 +75,8 @@ public class AccountsManager extends BaseManager {
 
     /**
      * Returns the list of ethereum accounts registered in the Keeper node
-     * @return List<Account> List of accounts without Balance information
+     * @return List of accounts without Balance information
+     * @throws EthereumException
      */
     public List<Account> getAccounts() throws EthereumException {
         return getAccounts(false);
@@ -82,6 +86,7 @@ public class AccountsManager extends BaseManager {
      * Given an account returns a Balance object with the Ethereum and Ocean balance
      * @param accountAddress account
      * @return Balance
+     * @throws EthereumException
      */
     public Balance getAccountBalance(String accountAddress) throws EthereumException {
         return new Balance(
@@ -94,6 +99,7 @@ public class AccountsManager extends BaseManager {
      * Given an account returns the Ethereum balance
      * @param accountAddress account
      * @return ethereum balance
+     * @throws EthereumException
      */
     public BigInteger getEthAccountBalance(String accountAddress) throws EthereumException {
         try {
@@ -114,6 +120,7 @@ public class AccountsManager extends BaseManager {
      * Method: balanceOf
      * @param accountAddress account
      * @return ocean balance
+     * @throws EthereumException
      */
     public BigInteger getOceanAccountBalance(String accountAddress) throws EthereumException {
         try{
@@ -132,6 +139,7 @@ public class AccountsManager extends BaseManager {
      * Method: requestTokens
      * @param amount amount of tokens requestsd
      * @return TransactionReceipt
+     * @throws EthereumException
      */
     public TransactionReceipt requestTokens(BigInteger amount) throws EthereumException {
         try{
