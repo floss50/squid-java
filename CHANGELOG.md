@@ -1,6 +1,12 @@
 History
 =======
 
+0.3.4 (February 22th, 2019)
+-------------------------
+
+* Added Maven Central release profile
+
+
 0.3.3 (February 21th, 2019)
 -------------------------
 
