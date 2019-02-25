@@ -61,7 +61,7 @@ public class OceanAPI {
 
     /**
      * Private constructor
-     * @param oceanConfig
+     * @param oceanConfig the object to configure the API
      */
     private OceanAPI(OceanConfig oceanConfig){
         this.oceanConfig = oceanConfig;

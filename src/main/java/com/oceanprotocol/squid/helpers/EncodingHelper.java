@@ -95,7 +95,7 @@ public abstract class EncodingHelper {
 
     /**
      * Return true or false if a input string is in hex format
-     * @param input
+     * @param input the input string
      * @return bool
      */
     public static boolean isHexString(String input) {
