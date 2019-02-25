@@ -71,15 +71,12 @@ public abstract class BaseManager {
     }
 
 
-
     /**
      * Constructor
      * @param keeperService KeeperService
      * @param aquariusService AquariusService
-     * @throws IOException
-     * @throws CipherException
      */
-    public BaseManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
+    public BaseManager(KeeperService keeperService, AquariusService aquariusService) {
         this.keeperService = keeperService;
         this.aquariusService = aquariusService;
     }
