@@ -26,7 +26,7 @@ public class OceanInitializationHelper {
 
     /**
      * Constructor
-     * @param oceanConfig
+     * @param oceanConfig object with the configuration
      */
     public OceanInitializationHelper(OceanConfig oceanConfig) {
         this.oceanConfig = oceanConfig;
@@ -35,8 +35,8 @@ public class OceanInitializationHelper {
     /**
      * Initialize an instance of KeeperService
      * @return an initialized KeeperService object
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public KeeperService getKeeper() throws IOException, CipherException {
 
@@ -83,8 +83,8 @@ public class OceanInitializationHelper {
 
     /**
      *  Initialize an instance of SecretStoreManager
-     * @param secretStoreDto
-     * @param evmDto
+     * @param secretStoreDto the DTO to connect with secret store
+     * @param evmDto DTO with the EVM
      * @return  an initialized SecretStoreManager object
      */
     public SecretStoreManager getSecretStoreManager(SecretStoreDto secretStoreDto, EvmDto evmDto) {
@@ -93,11 +93,11 @@ public class OceanInitializationHelper {
 
     /**
      * Initialize an instance of OceanManager
-     * @param keeperService
-     * @param aquariusService
+     * @param keeperService the keeperService
+     * @param aquariusService the aquariusService
      * @return an initialized OceanManager object
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public OceanManager getOceanManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
         return OceanManager.getInstance(keeperService, aquariusService);
@@ -105,11 +105,11 @@ public class OceanInitializationHelper {
 
     /**
      * Initialize an instance of AccountsManager
-     * @param keeperService
-     * @param aquariusService
+     * @param keeperService the keeperService
+     * @param aquariusService the AquariusService
      * @return an initialized AccountsManager object
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public AccountsManager getAccountsManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
         return AccountsManager.getInstance(keeperService, aquariusService);
@@ -117,11 +117,11 @@ public class OceanInitializationHelper {
 
     /**
      * Initialize an instance of AssetsManager
-     * @param keeperService
-     * @param aquariusService
+     * @param keeperService the KeeperService
+     * @param aquariusService the AquariusService
      * @return an initialized AssetsManager object
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public AssetsManager getAssetsManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
         return AssetsManager.getInstance(keeperService, aquariusService);
@@ -129,10 +129,10 @@ public class OceanInitializationHelper {
 
     /**
      * Loads the OceanToken contract from Keeper
-     * @param keeper
+     * @param keeper the keeper Service
      * @return an instance of OceanToken contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public OceanToken loadOceanTokenContract(KeeperService keeper) throws IOException, CipherException {
         return OceanToken.load(
@@ -145,10 +145,10 @@ public class OceanInitializationHelper {
 
     /**
      * Loads the Dispenser contract from Keeper
-     * @param keeper
+     * @param keeper the keeper Service
      * @return an instance of Dispenser contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public Dispenser loadDispenserContract(KeeperService keeper) throws IOException, CipherException {
         return Dispenser.load(
@@ -162,10 +162,10 @@ public class OceanInitializationHelper {
 
     /**
      *  Loads the DIDRegistry contract from Keeper
-     * @param keeper
+     * @param keeper the keeper service
      * @return an instance of DIDRegistry contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public DIDRegistry loadDIDRegistryContract(KeeperService keeper) throws IOException, CipherException {
 
@@ -179,10 +179,10 @@ public class OceanInitializationHelper {
 
     /**
      * Loads the ServiceExecutionAgreement contract from Keeper
-     * @param keeper
+     * @param keeper the keeper Service
      * @return an instance of ServiceExecutionAgreement contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper) throws IOException, CipherException {
         return ServiceExecutionAgreement.load(
@@ -194,10 +194,10 @@ public class OceanInitializationHelper {
 
     /**
      * Loads the PaymentConditions contract from Keeper
-     * @param keeper
+     * @param keeper the keeper Service
      * @return an instance of PaymentConditions contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public PaymentConditions loadPaymentConditionsContract(KeeperService keeper) throws  IOException, CipherException {
         return PaymentConditions.load(
@@ -210,10 +210,10 @@ public class OceanInitializationHelper {
 
     /**
      *  Loads the AccessConditions contract from Keeper
-     * @param keeper
+     * @param keeper the keeper Service
      * @return an instance of AccessConditions contract deployed in keeper
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public AccessConditions loadAccessConditionsContract(KeeperService keeper) throws IOException, CipherException {
         return AccessConditions.load(

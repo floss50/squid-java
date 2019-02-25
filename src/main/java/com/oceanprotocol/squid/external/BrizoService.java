@@ -26,8 +26,8 @@ public class BrizoService {
 
     /**
      * Calls a Brizo's endpoint to request the initialization of a new Service Agreement
-     * @param url
-     * @param payload
+     * @param url the url
+     * @param payload the payload
      * @return a flag that indicates if Brizo initialized the Service Agreement correctly
      */
     public static boolean initializeAccessServiceAgreement(String url, InitializeAccessSLA payload)  {
@@ -56,14 +56,14 @@ public class BrizoService {
 
     /**
      * Calls a Brizo´s endpoint to download an asset
-     * @param serviceEndpoint
-     * @param consumerAddress
-     * @param serviceAgreementId
-     * @param url
-     * @param destinationPath
+     * @param serviceEndpoint the service endpoint
+     * @param consumerAddress the address of the consumer
+     * @param serviceAgreementId the serviceAgreement Id
+     * @param url the url
+     * @param destinationPath the path to download the resource
      * @return a DownloadResult object that indicates if the download was correct
-     * @throws IOException
-     * @throws URISyntaxException
+     * @throws IOException IOException
+     * @throws URISyntaxException URISyntaxException
      */
     public static DownloadResult consumeUrl(String serviceEndpoint, String consumerAddress, String serviceAgreementId, String url, String destinationPath) throws IOException, URISyntaxException {
 

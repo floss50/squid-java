@@ -20,7 +20,7 @@ public class AccountsImpl implements AccountsAPI{
 
     /**
      * Constructor
-     * @param accountsManager
+     * @param accountsManager  the accountsManager
      */
     public AccountsImpl(AccountsManager accountsManager) {
 

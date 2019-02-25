@@ -21,7 +21,7 @@ public class OceanConfigFactory {
 
     /**
      * Creates an OceanConfig object from a set of properties
-     * @param properties
+     * @param properties configuration values
      * @return an OceanConfig value with all the values set
      */
     public static OceanConfig getOceanConfig(Properties properties){

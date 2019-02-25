@@ -14,7 +14,7 @@ public class SecretStoreImpl implements SecretStoreAPI{
 
     /**
      * Constructor
-     * @param secretStoreManager
+     * @param secretStoreManager the secretStore Manager
      */
     public SecretStoreImpl(SecretStoreManager secretStoreManager){
 

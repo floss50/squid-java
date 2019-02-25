@@ -50,6 +50,8 @@ public class KeeperService {
      * @param password User password
      * @param credentialsFile Path to the file with the local credentials
      * @return KeeperService
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public static KeeperService getInstance(String url, String address, String password, String credentialsFile)
             throws IOException, CipherException {
