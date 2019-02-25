@@ -37,7 +37,7 @@ public class StringsHelper {
     /**
      * Given a String and a map of key values, search in the string the variables using the ${xxx} format
      * and replace by the correspondant value of the map
-     * Example: given: xxx${key1}yyy and "key1" -> "000" the output will be xxx000yyy
+     * Example: given: xxx${key1}yyy and "key1","000" the output will be xxx000yyy
      * @param format input string with ${xxx} variables
      * @param values map with key values to replace in the string
      * @return output string with the variables replaced

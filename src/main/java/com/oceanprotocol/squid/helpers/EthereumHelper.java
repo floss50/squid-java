@@ -130,7 +130,7 @@ public abstract class EthereumHelper {
 
     /**
      * Given an input string validates if it's a valid ethereum address
-     * @param input
+     * @param input the input string
      * @return boolean
      */
     public static boolean isValidAddress(String input) {
@@ -143,8 +143,8 @@ public abstract class EthereumHelper {
 
     /**
      * Given a function defition return the ethereum function selector
-     * @param functionDefinition
-     * @return
+     * @param functionDefinition the definition of a function
+     * @return a String with the ethereum function selector
      */
     public static String getFunctionSelector(String functionDefinition)    {
         return Hash.sha3String(functionDefinition)

@@ -164,7 +164,9 @@ public class ServiceAgreementHandler {
     /**
      * Compose the different conditionKey hashes using:
      * (serviceAgreementTemplateId, address, signature)
-     * @return Map of (varible name => conditionKeys)
+     * @param templateId id of the template
+     * @param  addresses addresses of the contracts
+     * @return Map of (varible name, conditionKeys)
      * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
     public static Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
