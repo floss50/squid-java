@@ -29,8 +29,8 @@ public class AssetsImpl implements AssetsAPI {
 
     /**
      * Constructor
-     * @param oceanManager
-     * @param assetsManager
+     * @param oceanManager the oceanManager
+     * @param assetsManager the assetsManager
      */
     public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager) {
 

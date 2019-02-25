@@ -69,7 +69,7 @@ public class OceanAPI {
 
     /**
      * Transform a TypeSafe Config object into a Java's Properties
-     * @param config
+     * @param config the config object
      * @return a Properties object with the configuration of the API
      */
     private static Properties toProperties(Config config) {
@@ -80,10 +80,10 @@ public class OceanAPI {
 
     /**
      * Build an Instance of Ocean API from a Properties object
-     * @param properties
+     * @param properties values of the configuration
      * @return an Initialized OceanAPI object
-     * @throws InitializationException
-     * @throws InvalidConfiguration
+     * @throws InitializationException InitializationException
+     * @throws InvalidConfiguration InvalidConfiguration
      */
     public static OceanAPI getInstance(Properties properties) throws InitializationException, InvalidConfiguration {
 
@@ -149,10 +149,10 @@ public class OceanAPI {
 
     /**
      * Build an Instance of Ocean API from a TypeSafe Config object
-     * @param config
+     * @param config the config object
      * @return an Initialized OceanAPI object
-     * @throws InitializationException
-     * @throws InvalidConfiguration
+     * @throws InitializationException InitializationException
+     * @throws InvalidConfiguration  InvalidConfiguration
      */
     public static OceanAPI getInstance(Config config) throws InitializationException, InvalidConfiguration{
        return OceanAPI.getInstance(OceanAPI.toProperties(config));

@@ -33,8 +33,8 @@ public class SecretStoreManager {
 
     /**
      * Gets an instance of the SecretStoreManager
-     * @param ssDto
-     * @param evmDto
+     * @param ssDto the secret store dto
+     * @param evmDto the EVM dto
      * @return an initialized instance of SecretStoreManager
      */
     public static SecretStoreManager getInstance(SecretStoreDto ssDto, EvmDto evmDto) {
@@ -43,11 +43,11 @@ public class SecretStoreManager {
 
     /**
      * Encrypts a document using Secret Store
-     * @param resourceId
-     * @param content
-     * @param threshold
+     * @param resourceId the resource id
+     * @param content content to encrypt
+     * @param threshold secret store threshold
      * @return a String with the encrypted content
-     * @throws EncryptionException
+     * @throws EncryptionException EncryptionException
      */
     public String encryptDocument(String resourceId, String content, int threshold) throws EncryptionException {
 
@@ -62,10 +62,10 @@ public class SecretStoreManager {
 
     /**
      * Decrypts a document using Secret Store
-     * @param resourceId
-     * @param encryptedContent
+     * @param resourceId the resource id
+     * @param encryptedContent the content to decrypt
      * @return a String with the decrypted content
-     * @throws EncryptionException
+     * @throws EncryptionException EncryptionException
      */
     public String decryptDocument(String resourceId, String encryptedContent) throws EncryptionException {
 

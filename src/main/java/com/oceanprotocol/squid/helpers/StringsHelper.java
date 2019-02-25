@@ -13,7 +13,7 @@ public class StringsHelper {
 
     /**
      * Given a list of strings join all of them using quotes wrapping each item with quotes
-     * @param listOfStrings
+     * @param listOfStrings list of the strings
      * @return output string
      */
     public static String wrapWithQuotesAndJoin(List<String> listOfStrings)   {
@@ -22,7 +22,7 @@ public class StringsHelper {
 
     /**
      * Given a string with joined items by comma, return a list of items. Each item will have replaced the double quoutes
-     * @param joinedString
+     * @param joinedString the joined string
      * @return list of items
      */
     public static List<String> getStringsFromJoin(String joinedString) {

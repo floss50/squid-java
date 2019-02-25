@@ -72,9 +72,9 @@ public abstract class EthereumHelper {
     /**
      * Given an address, signature data and the hashed message return true or false if the address
      * is the one used to sign the message
-     * @param address
-     * @param signatureData
-     * @param hashMessage
+     * @param address address
+     * @param signatureData the signature
+     * @param hashMessage the hashed message
      * @return boolean
      */
     public static boolean wasSignedByAddress(String address, Sign.SignatureData signatureData, byte[] hashMessage)  {
@@ -88,7 +88,7 @@ public abstract class EthereumHelper {
      * @param message message to sign
      * @param address address to use for signing
      * @return signed message
-     * @throws IOException
+     * @throws IOException IOException
      */
     public static String ethSignMessage(Web3j web3, String message, String address) throws IOException {
         EthSign ethSign= web3.ethSign(address, message).send();
@@ -101,7 +101,7 @@ public abstract class EthereumHelper {
      * @param message message to hash and sign
      * @param address address to use for signing
      * @return signed message
-     * @throws IOException
+     * @throws IOException IOException
      */
     public static String ethEncodeAndSignMessage(Web3j web3, String message, String address) throws IOException {
         String hash= Hash.sha3(EncodingHelper.encodeToHex(message));

@@ -61,9 +61,9 @@ public abstract class EncodingHelper {
 
     /**
      * Convert a string to hex and after to a byte array
-     * @param input
+     * @param input string to encode
      * @return byte[]
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException Error encoding to byte array
      */
     public static byte[] stringToBytes(String input) throws UnsupportedEncodingException {
         return hexStringToBytes(encodeToHex(input));
@@ -104,10 +104,10 @@ public abstract class EncodingHelper {
 
     /**
      * Given a type and an object, convert to the proper web3j abi type
-     * @param type
-     * @param value
+     * @param type thw type
+     * @param value the object
      * @return String in hex format
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
     public static String hexEncodeAbiType(String type, Object value) throws UnsupportedEncodingException {
 

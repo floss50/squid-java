@@ -28,7 +28,7 @@ public class AquariusService {
 
     /**
      * Builds an instance of AquariusService
-     * @param url
+     * @param url url of aquarius
      * @return AquariusService instance
      */
     public static AquariusService getInstance(String url)    {
@@ -38,7 +38,7 @@ public class AquariusService {
 
     /**
      * Constructor
-     * @param url
+     * @param url the url of aquarius
      */
     private AquariusService(String url) {
         this.url= url.replaceAll("/$", "");
@@ -51,9 +51,9 @@ public class AquariusService {
 
     /**
      * Registers a new DDO in Aquarius
-     * @param ddo
+     * @param ddo the ddo
      * @return the created DDO
-     * @throws DDOException
+     * @throws DDOException DDOException
      */
     public DDO createDDO(DDO ddo) throws DDOException {
 
@@ -78,9 +78,9 @@ public class AquariusService {
 
     /**
      * Gets a DDO from an URL
-     * @param url
+     * @param url the url
      * @return the DDO
-     * @throws DDOException
+     * @throws DDOException DDOException
      */
     public DDO getDDO(String url) throws DDOException {
 
@@ -105,9 +105,9 @@ public class AquariusService {
 
     /**
      * Gets a DDO from the DID
-     * @param id
+     * @param id the DID
      * @return the DDO
-     * @throws Exception
+     * @throws Exception Exception
      */
     public DDO getDDOUsingId(String id) throws Exception {
         return getDDO(this.ddoEndpoint + "/" +  id);
@@ -117,10 +117,10 @@ public class AquariusService {
 
     /**
      * Updates the metadata of a DDO
-     * @param id
-     * @param ddo
+     * @param id the did
+     * @param ddo the DDO
      * @return a flag that indicates if the update operation was executed correctly
-     * @throws Exception
+     * @throws Exception Exception
      */
     public boolean updateDDO(String id, DDO ddo) throws Exception {
         HttpResponse response= HttpHelper.httpClientPut(
@@ -134,11 +134,11 @@ public class AquariusService {
 
     /**
      * Search all the DDOs that match the text passed as a parameter
-     * @param param
-     * @param offset
-     * @param page
+     * @param param the criteria
+     * @param offset parameter to paginate
+     * @param page parameter to paginate
      * @return a List of all the DDOs found
-     * @throws DDOException
+     * @throws DDOException DDOException
      */
     public ArrayList<DDO> searchDDO(String param, int offset, int page) throws DDOException  {
 
@@ -167,9 +167,9 @@ public class AquariusService {
 
     /**
      * Search all the DDOs that match the query passed as a parameter
-     * @param searchQuery
+     * @param searchQuery the query
      * @return a List of all the DDOs found
-     * @throws DDOException
+     * @throws DDOException DDOException
      */
     public ArrayList<DDO> searchDDO(SearchQuery searchQuery) throws DDOException {
 

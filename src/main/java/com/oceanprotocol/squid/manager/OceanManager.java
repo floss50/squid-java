@@ -70,7 +70,7 @@ public class OceanManager extends BaseManager {
      * Given a DDO, returns a DID created using the ddo
      * @param ddo
      * @return DID
-     * @throws DIDFormatException
+     * @throws DIDFormatException DIDFormatException
      */
     public DID generateDID(DDO ddo) throws DIDFormatException {
         return DID.builder();
@@ -79,9 +79,9 @@ public class OceanManager extends BaseManager {
     /**
      * Given a DID, scans the DIDRegistry events on-chain to resolve the
      * Metadata API url and return the DDO found
-     * @param did
+     * @param did the did
      * @return DDO
-     * @throws IOException
+     * @throws IOException IOException
      */
     public DDO resolveDID(DID did) throws EthereumException, DDOException {
 
@@ -132,11 +132,11 @@ public class OceanManager extends BaseManager {
     /**
      * Given a DID and a Metadata API url, register on-chain the DID.
      * It allows to resolve DDO's using DID's as input
-     * @param did
+     * @param did the did
      * @param url metadata url
      * @param checksum calculated hash of the metadata
      * @return boolean success
-     * @throws DIDRegisterException
+     * @throws DIDRegisterException DIDRegisterException
      */
     public boolean registerDID(DID did, String url, String checksum) throws DIDRegisterException{
         log.debug("Registering DID " + did.getHash() + " into Registry " + didRegistry.getContractAddress());
@@ -159,11 +159,11 @@ public class OceanManager extends BaseManager {
 
     /**
      * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
-     * @param metadata
-     * @param serviceEndpoints
-     * @param threshold
+     * @param metadata the metadata
+     * @param serviceEndpoints the service Endpoints
+     * @param threshold secret store threshold
      * @return an instance of the DDO created
-     * @throws DDOException
+     * @throws DDOException DDOException
      */
     public DDO registerAsset(AssetMetadata metadata, ServiceEndpoints serviceEndpoints, int threshold) throws DDOException {
 
@@ -242,10 +242,10 @@ public class OceanManager extends BaseManager {
 
     /**
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
-     * @param did
-     * @param serviceDefinitionId
+     * @param did the did
+     * @param serviceDefinitionId the service definition id
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
-     * @throws OrderException
+     * @throws OrderException OrderException
      */
     public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId)
             throws OrderException {
@@ -329,14 +329,14 @@ public class OceanManager extends BaseManager {
 
     /**
      * Initialize a new ServiceExecutionAgreement between a publisher and a consumer
-     * @param did
-     * @param ddo
-     * @param serviceDefinitionId
-     * @param serviceAgreementId
+     * @param did the did
+     * @param ddo the ddi
+     * @param serviceDefinitionId the service definition id
+     * @param serviceAgreementId the service agreement id
      * @return a Flowable over an AgreementInitializedEventResponse
-     * @throws DDOException
-     * @throws ServiceException
-     * @throws ServiceAgreementException
+     * @throws DDOException DDOException
+     * @throws ServiceException ServiceException
+     * @throws ServiceAgreementException ServiceAgreementException
      */
     private Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
             throws  DDOException, ServiceException, ServiceAgreementException {
@@ -397,12 +397,12 @@ public class OceanManager extends BaseManager {
 
     /**
      * Executes the lock payment
-     * @param ddo
-     * @param serviceDefinitionId
-     * @param serviceAgreementId
+     * @param ddo the ddo
+     * @param serviceDefinitionId the serviceDefinition id
+     * @param serviceAgreementId service agreement id
      * @return a flag that indicates if the function was executed correctly
-     * @throws ServiceException
-     * @throws LockPaymentException
+     * @throws ServiceException ServiceException
+     * @throws LockPaymentException LockPaymentException
      */
     private boolean lockPayment(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockPaymentException {
 
@@ -415,12 +415,12 @@ public class OceanManager extends BaseManager {
 
     /**
      *  Downloads an Asset previously ordered through a Service Agreement
-     * @param serviceAgreementId
-     * @param did
-     * @param serviceDefinitionId
-     * @param basePath
+     * @param serviceAgreementId the service agreement id
+     * @param did the did
+     * @param serviceDefinitionId the service definition id
+     * @param basePath the path where the asset will be downloaded
      * @return a flag that indicates if the consume operation was executed correctly
-     * @throws ConsumeServiceException
+     * @throws ConsumeServiceException ConsumeServiceException
      */
     public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
 
@@ -430,13 +430,13 @@ public class OceanManager extends BaseManager {
 
     /**
      * Downloads an Asset previously ordered through a Service Agreement
-     * @param serviceAgreementId
-     * @param did
-     * @param serviceDefinitionId
-     * @param basePath
-     * @param threshold
+     * @param serviceAgreementId the service agreement id
+     * @param did the did
+     * @param serviceDefinitionId the service definition id
+     * @param basePath the path where the asset will be downloaded
+     * @param threshold secret store threshold
      * @return a flag that indicates if the consume operation was executed correctly
-     * @throws ConsumeServiceException
+     * @throws ConsumeServiceException ConsumeServiceException
      */
     public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException{
 
@@ -499,39 +499,11 @@ public class OceanManager extends BaseManager {
         return new ArrayList<>();
     }
 
-    /**
-     * Encrypts the URLs of an Asset
-     * @param did
-     * @param contentUrls
-     * @param threshold
-     * @return a String with the encrypted URLs
-     * @throws EncryptionException
-     */
-    private String encryptContentUrls(DID did, ArrayList<String> contentUrls, int threshold) throws EncryptionException {
-        String urls= "[" + StringsHelper.wrapWithQuotesAndJoin(contentUrls) + "]";
-        log.debug("Encrypting did: "+ did.getHash());
-        return getSecretStoreManager().encryptDocument(did.getHash(), urls, threshold);
-
-    }
-
-    /**
-     * Decrypts the URLS of an Asset
-     * @param did
-     * @param encryptedUrls
-     * @param threshold
-     * @return a String with the decrypted URLs
-     * @throws EncryptionException
-     */
-    private String decryptContentUrls(DID did, String encryptedUrls, int threshold) throws EncryptionException {
-        log.debug("Decrypting did: "+ did.getHash());
-        return getSecretStoreManager().decryptDocument(did.getHash(), encryptedUrls);
-
-    }
 
     /**
      * Gets the Access Conditions Params of a DDO
-     * @param did
-     * @param price
+     * @param did the did
+     * @param price the price
      * @return a Map with the params of the Access Conditions
      */
     private Map<String, Object> getAccessConditionParams(String did, int price)  {
@@ -549,7 +521,7 @@ public class OceanManager extends BaseManager {
 
     /**
      * Gets some basic info of an Access Service
-     * @param accessService
+     * @param accessService the access service
      * @return BasicAssetInfo
      */
     private  BasicAssetInfo getBasicAssetInfo( AccessService accessService) {
