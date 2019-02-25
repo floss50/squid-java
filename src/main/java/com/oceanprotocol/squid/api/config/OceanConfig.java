@@ -76,7 +76,7 @@ public class OceanConfig {
 
     /**
      * Validates that all the needed properties are set in the configuration
-     * @param oceanConfig
+     * @param oceanConfig the configuration
      * @return an OceanConfigValidation object that indicates if the configuration is valid
      */
     public static OceanConfigValidation validate(OceanConfig oceanConfig) {

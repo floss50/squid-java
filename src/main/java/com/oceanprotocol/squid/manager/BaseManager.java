@@ -76,8 +76,8 @@ public abstract class BaseManager {
      * Constructor
      * @param keeperService KeeperService
      * @param aquariusService AquariusService
-     * @throws IOException
-     * @throws CipherException
+     * @throws IOException IOException
+     * @throws CipherException CipherException
      */
     public BaseManager(KeeperService keeperService, AquariusService aquariusService) throws IOException, CipherException {
         this.keeperService = keeperService;

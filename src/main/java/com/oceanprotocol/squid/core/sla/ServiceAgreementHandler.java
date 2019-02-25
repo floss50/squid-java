@@ -54,8 +54,8 @@ public class ServiceAgreementHandler {
 
     /**
      * Define and execute a Filter over the Service Agreement Contract to listen for an AgreementInitialized event
-     * @param slaContract
-     * @param serviceAgreementId
+     * @param slaContract the address of the service agreement contract
+     * @param serviceAgreementId the service agreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
     public static Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> listenExecuteAgreement(ServiceExecutionAgreement slaContract, String serviceAgreementId)   {
@@ -77,8 +77,8 @@ public class ServiceAgreementHandler {
 
     /**
      * Define and execute a Filter over the Access Condition Contract to listen for an AccesGranted event
-     * @param accessConditions
-     * @param serviceAgreementId
+     * @param accessConditions the address of the accessConditions contract
+     * @param serviceAgreementId the serviceAgreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
     public static Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
@@ -104,8 +104,8 @@ public class ServiceAgreementHandler {
 
     /**
      * Define and execute a Filter over the Payment Condition Contract to listen for an PaymentRefund event
-     * @param paymentConditions
-     * @param serviceAgreementId
+     * @param paymentConditions the address of the PaymentConditions
+     * @param serviceAgreementId the service Agreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
     public static Flowable<PaymentConditions.PaymentRefundEventResponse> listenForPaymentRefund(PaymentConditions paymentConditions,
@@ -129,11 +129,11 @@ public class ServiceAgreementHandler {
 
     /**
      * Gets and Initializes all the conditions associated with a template
-     * @param templateId
-     * @param addresses
-     * @param params
+     * @param templateId the id of the template
+     * @param addresses the addresses of the contracts
+     * @param params params to fill the conditions
      * @return a List with all the conditions of the template
-     * @throws InitializeConditionsException
+     * @throws InitializeConditionsException InitializeConditionsException
      */
     public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws InitializeConditionsException {
 
@@ -165,6 +165,7 @@ public class ServiceAgreementHandler {
      * Compose the different conditionKey hashes using:
      * (serviceAgreementTemplateId, address, signature)
      * @return Map of (varible name => conditionKeys)
+     * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
     public static Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
 
@@ -211,9 +212,9 @@ public class ServiceAgreementHandler {
 
     /**
      * Calculates the conditionKey
-     * @param templateId
+     * @param templateId the id of the template
      * @param address Checksum address
-     * @param fingerprint
+     * @param fingerprint the fingerprint of the condition
      * @return a String with the condition key
      */
     public static String fetchConditionKey(String templateId, String address, String fingerprint)   {

@@ -20,11 +20,11 @@ public class LockPayment {
 
     /**
      * Executes a lock payment function for a Service Agreement between publisher and consumer
-     * @param paymentConditions
-     * @param serviceAgreementId
-     * @param assetInfo
+     * @param paymentConditions the address of the paymentConditions contract
+     * @param serviceAgreementId the service agreement id
+     * @param assetInfo basic info of the asset
      * @return a flag that indicates if the function was executed correctly
-     * @throws LockPaymentException
+     * @throws LockPaymentException LockPaymentException
      */
     public static Boolean  executeLockPayment(PaymentConditions paymentConditions,
                                               String serviceAgreementId,

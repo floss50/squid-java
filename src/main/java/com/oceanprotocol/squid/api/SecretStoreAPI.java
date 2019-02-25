@@ -10,20 +10,20 @@ public interface SecretStoreAPI {
 
     /**
      * Encrypts a document using Secret Store
-     * @param documentId
-     * @param content
-     * @param threshold
+     * @param documentId the id of the document
+     * @param content the content
+     * @param threshold secret store threshold
      * @return a String with the encrypted content
-     * @throws EncryptionException
+     * @throws EncryptionException EncryptionException
      */
     public String encrypt(String documentId, String content, int threshold) throws EncryptionException;
 
     /**
      * Decrypts a document using Secret Store
-     * @param documentId
-     * @param encryptedContent
+     * @param documentId the id of the document
+     * @param encryptedContent the encrypted content of the document
      * @return a String with the decrypted content
-     * @throws EncryptionException
+     * @throws EncryptionException EncryptionException
      */
     public String decrypt(String documentId, String encryptedContent) throws EncryptionException;
 

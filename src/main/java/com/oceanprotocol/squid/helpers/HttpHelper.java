@@ -102,6 +102,7 @@ public abstract class HttpHelper {
      * @param url url to call
      * @return returned http body
      * @throws HttpException Http error
+     * @throws UnsupportedEncodingException Encoding error
      */
     public static final String httpClientPostBody(String url) throws HttpException, UnsupportedEncodingException {
         return httpClientGenericMethod(new PostMethod(url), new ArrayList<>(), null).getBody();
@@ -113,6 +114,7 @@ public abstract class HttpHelper {
      * @param list parameters
      * @return returned http body
      * @throws HttpException Http error
+     * @throws UnsupportedEncodingException Encoding error
      */
     public static final String httpClientPostBody(String url, ArrayList<NameValuePair> list) throws HttpException, UnsupportedEncodingException {
         return httpClientGenericMethod(new PostMethod(url), list, null).getBody();
@@ -123,6 +125,7 @@ public abstract class HttpHelper {
      * @param url url to call
      * @return HttpResponse returned
      * @throws HttpException Http error
+     * @throws UnsupportedEncodingException Encoding error
      */
     public static final HttpResponse httpClientPost(String url) throws HttpException, UnsupportedEncodingException {
         return httpClientGenericMethod(new PostMethod(url), new ArrayList<>(), null);
@@ -131,8 +134,11 @@ public abstract class HttpHelper {
     /**
      * Send a HTTP POST request and return the HttpResponse object
      * @param url url to call
+     * @param list parameters
+     * @param payload payload to add to the request
      * @return HttpResponse returned
      * @throws HttpException Http error
+     * @throws UnsupportedEncodingException Encoding error
      */
     public static final HttpResponse httpClientPost(String url, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
         return httpClientGenericMethod(new PostMethod(url), list, payload);
@@ -141,8 +147,11 @@ public abstract class HttpHelper {
     /**
      * Send a HTTP PUT request and return the HttpResponse object
      * @param url url to call
+     * @param list parameters
+     * @param payload payload to add to the request
      * @return HttpResponse returned
      * @throws HttpException Http error
+     * @throws UnsupportedEncodingException Encoding error
      */
     public static final HttpResponse httpClientPut(String url, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
         return httpClientGenericMethod(new PutMethod(url), list, payload);
@@ -154,8 +163,8 @@ public abstract class HttpHelper {
      * @param list list of params
      * @param payload payload to add to the request
      * @return HttpResponse
-     * @throws HttpException
-     * @throws UnsupportedEncodingException
+     * @throws HttpException HttpException
+     * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
 
     public static final HttpResponse httpClientGenericMethod(EntityEnclosingMethod method, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
@@ -169,8 +178,8 @@ public abstract class HttpHelper {
      * @param list list of params
      * @param payload payload to add to the request
      * @return HttpResponse
-     * @throws HttpException
-     * @throws UnsupportedEncodingException
+     * @throws HttpException HttpException
+     * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
     public static final HttpResponse httpClientGenericMethod(HttpClient client, EntityEnclosingMethod method, ArrayList<NameValuePair> list, String payload) throws HttpException, UnsupportedEncodingException {
 
@@ -215,9 +224,9 @@ public abstract class HttpHelper {
 
     /**
      * Send a HTTP GET request and return the HttpResponse object
-     * @param url
+     * @param url the url
      * @return HttpResponse
-     * @throws HttpException
+     * @throws HttpException HttpException
      */
     public static final HttpResponse httpClientGet(String url) throws HttpException {
         return httpClientGet(new HttpClient(), new GetMethod(url));
@@ -229,7 +238,7 @@ public abstract class HttpHelper {
      * @param client HttpClient
      * @param getMethod GetMethod
      * @return HttpResponse
-     * @throws HttpException
+     * @throws HttpException HttpException
      */
     public static final HttpResponse httpClientGet(HttpClient client, GetMethod getMethod) throws HttpException {
 
@@ -257,11 +266,11 @@ public abstract class HttpHelper {
 
     /**
      * Download the content of a resource
-     * @param url
-     * @param destinationPath
+     * @param url the url of the resource
+     * @param destinationPath the path where the resource will be downloaded
      * @return Boolean flag
-     * @throws IOException
-     * @throws URISyntaxException
+     * @throws IOException IOException
+     * @throws URISyntaxException URISyntaxException
      */
     public static DownloadResult downloadResource(String url, String destinationPath) throws IOException, URISyntaxException {
 
