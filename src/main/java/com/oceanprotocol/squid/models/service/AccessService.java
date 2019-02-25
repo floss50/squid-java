@@ -73,7 +73,7 @@ public class AccessService extends Service {
      * (templateId, conditionKeys, conditionValues, timeout, serviceAgreementId)
      * @param serviceAgreementId Service Agreement Id
      * @return Hash
-     * @throws IOException
+     * @throws IOException if the hash function fails
      */
     public String generateServiceAgreementHash(String serviceAgreementId) throws IOException  {
         String params=
