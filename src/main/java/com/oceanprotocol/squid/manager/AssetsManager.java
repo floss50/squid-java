@@ -22,29 +22,25 @@ public class AssetsManager extends BaseManager {
 
     static final Logger log= LogManager.getLogger(AssetsManager.class);
 
-    public AssetsManager(KeeperService keeperService, AquariusService aquariusService)
-            throws IOException, CipherException {
+    public AssetsManager(KeeperService keeperService, AquariusService aquariusService){
         super(keeperService, aquariusService);
     }
 
     /**
      * Gets an instance of AssetManager
-     * @param keeperService
-     * @param aquariusService
+     * @param keeperService  instance of keeperService
+     * @param aquariusService instance of aquariusService
      * @return an initialized instance of AssetManager
-     * @throws IOException
-     * @throws CipherException
      */
-    public static AssetsManager getInstance(KeeperService keeperService, AquariusService aquariusService)
-            throws IOException, CipherException {
+    public static AssetsManager getInstance(KeeperService keeperService, AquariusService aquariusService){
         return new AssetsManager(keeperService, aquariusService);
     }
 
     /**
      * Publishes in Aquarius the metadata of a DDO
-     * @param ddo
+     * @param ddo the DDO to publish
      * @return the published DDO
-     * @throws Exception
+     * @throws Exception if Aquarius service fails publishing the DDO
      */
     public DDO publishMetadata(DDO ddo) throws Exception {
         return getAquariusService().createDDO(ddo);
@@ -52,10 +48,10 @@ public class AssetsManager extends BaseManager {
 
     /**
      * Publishes in Aquarius the metadata of a DDO
-     * @param metadata
-     * @param serviceEndpoint
+     * @param metadata the metadata of the DDO
+     * @param serviceEndpoint the endpoint of the service
      * @return the published DDO
-     * @throws Exception
+     * @throws Exception if Aquarius service fails publishing the metadata
      */
     public DDO publishMetadata(AssetMetadata metadata, String serviceEndpoint) throws Exception {
 
@@ -68,9 +64,9 @@ public class AssetsManager extends BaseManager {
 
     /**
      * Gets a DDO from the DID
-     * @param id
+     * @param id the did of the DDO
      * @return an instance of the DDO represented by the DID
-     * @throws Exception
+     * @throws Exception if Aquarius service fails publishing the metadata
      */
     public DDO getByDID(String id) throws Exception {
         return getAquariusService().getDDOUsingId(id);
@@ -78,10 +74,10 @@ public class AssetsManager extends BaseManager {
 
     /**
      * Updates the metadata of a DDO
-     * @param id
-     * @param ddo
+     * @param id the did of the DDO
+     * @param ddo the DDO
      * @return A flag that indicates if the update was executed correctly
-     * @throws Exception
+     * @throws Exception  if Aquarius service fails updating the metadata
      */
     public boolean updateMetadata(String id, DDO ddo) throws Exception  {
         return getAquariusService().updateDDO(id, ddo);
@@ -89,11 +85,11 @@ public class AssetsManager extends BaseManager {
 
     /**
      * Gets all the DDOs that match the search criteria
-     * @param text
-     * @param offset
-     * @param page
+     * @param text contains the criteria
+     * @param offset parameter to paginate the results
+     * @param page parameter to paginate the results
      * @return List of DDOs
-     * @throws DDOException
+     * @throws DDOException if Aquairus fails searching the assets
      */
     public List<DDO> searchAssets(String text, int offset, int page) throws DDOException {
             return getAquariusService().searchDDO(text, offset, page);
@@ -101,12 +97,12 @@ public class AssetsManager extends BaseManager {
 
     /**
      * Gets all the DDOs that match the parameters of the query
-     * @param params
-     * @param offset
-     * @param page
-     * @param sort
+     * @param params contains the criteria
+     * @param offset parameter to paginate the results
+     * @param page parameter to paginate the results
+     * @param sort parameter to sort the results
      * @return a List with all the DDOs found
-     * @throws DDOException
+     * @throws DDOException if Aquairus fails searching the assets
      */
     public List<DDO> searchAssets(Map<String, Object> params, int offset, int page, int sort) throws DDOException  {
         SearchQuery searchQuery= new SearchQuery(params, offset, page, sort);
