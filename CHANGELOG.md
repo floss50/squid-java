@@ -1,6 +1,12 @@
 History
 =======
 
+0.3.6 (February 25th, 2019)
+-------------------------
+
+* Fixed GitHub Releases
+
+
 0.3.5 (February 22th, 2019)
 -------------------------
 

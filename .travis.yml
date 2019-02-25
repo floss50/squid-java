@@ -46,6 +46,17 @@ after_success:
 - maven javadoc:javadoc
 
 deploy:
+- provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: "SUMtbqHpj2Fvf6wM8wTMhj4T8Y6p86w4Ivq/3prSGapAe6BhHo+p2TUbRszTX66psrbkeBPp99Vc+sCWS5Rnz1bGVVrWzDA8sDzWHa/uiUZsuqXu1t4DbTtvhc6JKNN28px5f9vI01Q+FZ9gGhnNTtSIOn5pG+sxPJ4/7hZwBA7JGd74hyDdtX2lChHaM4wMk0vBivT5kZMwlKuuoFgWYaE1oemEFLOPJhmM5ORELB8d+jzCwr8XcUyA2gKHCRuCVEhPhFmLTwaycxiVa04VRNmHhBI7ux9F2YNthR/aSap3A9ud4kET0FCkmUoyi/Q/+o0PlWBsc8hmeprcG+llQYirNMXplZUpzQR4Uwy3VXrESG7KlCTSQ43zObNXROLzGx8qMTnQUdFb72sq9gc07tGQHc1rDNHnzqkNF08BvdZS4wsInmaBrlqXzzMarD1XgcR9UoUZm3BJu87DdVp4NXJCNGe2FMmaWWzcEwbFzbInrYIrN2kmzNOFUPYwLgMhLJ6ulYrePXo7lGDeQ71NV/DXccRw5kLgJ/Y+kOS5rbVvPiAuEODob5cDnLMXFZ6rsNFygZTu1/d2iQIY/TBjUawKuYXAHeMHu2B8YIEWLCg3Kc4NgNSvV8fVgw58NJkxI8IyIhd73cbE8GG/ll7zDm3uFhi1BmKi/7K8JNczv1c="
+  file:
+  - target/squid-$project_version.jar
+  name: "$project_version"
+  on:
+    tags: true
+    all_branches: true
+
 - provider: script
   skip_cleanup: true
   script: mvn clean deploy --settings .maven.xml -B -U -Prelease
@@ -53,13 +64,3 @@ deploy:
     tags: true
     all_branches: true
 
-- provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: "DDtianU1smgYm9npuoLOUjYhov4JFxEe87nclahm+jIW8ibqG30Ray5R8mGzxmeaF36fYP2BoEbB5fnnOWveLNsJRl4d3mHaBsREL11xEUyuDr4gXrYyJQ55mpKB+TxPhRE1ei/U6luT8kVuvwbGShelYvBQCsrhLbrUgCsxzJjisJOmHpDJFZd0gNWv5gFtm5w9+W6LcQMEX6DNdecSYYRP0Drd4wJV3xcVWEcncs0Dwv6N3PCjSamo6G0LaJVuuDVoWvhkOjMkTjXIaFWMBH9W1e/dvmP40AmZe3/Ww1v5FYPB75r8uQt2f53MEmqXLz2ShJ/mw+O+MHwqvENt4ukBA2RUzE78ly5Cf6tgYn543r9JI478tOhk1pUTu8CEQd4X0UrGpJmJnEDpbHDfIhmcGsU+hW49ntxgFFGbScnQMQP+K7SSOzo5SWK8YCsZlNlAN+CZguZw4+ZmpluZNio5jfU8di3vio+Pyxa1kVlW4m/vCKvOHZ/4UNFXzeVvWzPzxYqZg3sgMAuhvUx4nXVUvvB7mLpsiwJk8XL/1fKCloc5mzWUCFObLTcE/5ZuAnP/0aVHKzkVJUBlKRw/yiJ3knIfEK/kCUAi2hgx7nKAwN43G89THzp16IFnvfPbO/f19WEm/t13GXjxtlfvBv7lo7wW05dmoDd0Yh5wvbU="
-  file:
-  - target/squid-$project_version.jar
-  name: "$project_version"
-  on:
-    tags: true
-    all_branches: true
