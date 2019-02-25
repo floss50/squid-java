@@ -87,7 +87,7 @@ public abstract class CryptoHelper {
 
     /**
      * Given an object (byte[], BigInteger, Address, Uint or Number) gets the byte[] with the proper length
-     * @param obj
+     * @param obj the object
      * @return byte[]
      */
     public static byte[] toBytes(Object obj) {

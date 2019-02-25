@@ -49,8 +49,7 @@ public class OceanManager extends BaseManager {
 
     static final Logger log= LogManager.getLogger(OceanManager.class);
 
-    protected OceanManager(KeeperService keeperService, AquariusService aquariusService)
-            throws IOException, CipherException {
+    protected OceanManager(KeeperService keeperService, AquariusService aquariusService) {
         super(keeperService, aquariusService);
     }
 
@@ -61,14 +60,13 @@ public class OceanManager extends BaseManager {
      * @param aquariusService Provider Dto
      * @return OceanManager
      */
-    public static OceanManager getInstance(KeeperService keeperService, AquariusService aquariusService)
-            throws IOException, CipherException {
+    public static OceanManager getInstance(KeeperService keeperService, AquariusService aquariusService) {
         return new OceanManager(keeperService, aquariusService);
     }
 
     /**
      * Given a DDO, returns a DID created using the ddo
-     * @param ddo
+     * @param ddo the DDO
      * @return DID
      * @throws DIDFormatException DIDFormatException
      */
@@ -81,7 +79,8 @@ public class OceanManager extends BaseManager {
      * Metadata API url and return the DDO found
      * @param did the did
      * @return DDO
-     * @throws IOException IOException
+     * @throws EthereumException EthereumException
+     * @throws DDOException  DDOException
      */
     public DDO resolveDID(DID did) throws EthereumException, DDOException {
 
