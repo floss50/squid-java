@@ -108,8 +108,8 @@ public abstract class ManagerHelper {
     }
 
 
-    public static ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
-        return ServiceExecutionAgreement.load(
+    public static EscrowAccessSecretStoreTemplate loadEscrowAccessSecretStoreTemplate(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return EscrowAccessSecretStoreTemplate.load(
                 address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),

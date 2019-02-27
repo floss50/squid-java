@@ -178,14 +178,14 @@ public class OceanInitializationHelper {
     }
 
     /**
-     * Loads the ServiceExecutionAgreement contract from Keeper
+     * Loads the EscrowAccessSecretStoreTemplate contract from Keeper
      * @param keeper the keeper Service
-     * @return an instance of ServiceExecutionAgreement contract deployed in keeper
+     * @return an instance of EscrowAccessSecretStoreTemplate contract deployed in keeper
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public ServiceExecutionAgreement loadServiceExecutionAgreementContract(KeeperService keeper) throws IOException, CipherException {
-        return ServiceExecutionAgreement.load(
+    public EscrowAccessSecretStoreTemplate loadEscrowAccessSecretStoreTemplate(KeeperService keeper) throws IOException, CipherException {
+        return EscrowAccessSecretStoreTemplate.load(
                 oceanConfig.getServiceExecutionAgreementAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),

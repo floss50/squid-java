@@ -29,28 +29,7 @@
 
 This library enables to integrate the Ocean Protocol capabilities from JVM clients.
 
-The list of methods implemented are:
-
-
-**Asset**
-
-* create
-* resolve
-* search
-* query
-* order
-* consume
-
-**Accounts**
-
-* list
-* balance
-* requestTokens
-
-**Secret Store**
-
-* encrypt
-* decrypt
+Currently squid-java implements the last version of the [squid-spec (v0.2)](https://github.com/oceanprotocol/dev-ocean/blob/master/doc/architecture/squid.md).
 
 
 ## Using the API
@@ -167,8 +146,8 @@ Typically in Maven you could add the dependency:
 ```xml
 <dependency>
   <groupId>com.oceanprotocol</groupId>
-  <artifactId>squid</artifactId>
-  <version>0.3.0</version>
+  <artifactId>squid-java</artifactId>
+  <version>0.4.0</version>
 </dependency>
 ```
 
@@ -190,8 +169,10 @@ The execution of the integration tests require to have running the complete Ocea
 After having `barge` in your environment, you can run the components needed running:
 
 ```bash
-./start_ocean.sh --latest --local-spree-node --no-pleuston
+KEEPER_VERSION=v0.8.0 bash start_ocean.sh --latest --no-pleuston --local-spree-node --force-pull
 ```
+
+If you have older versions of the docker images is recommended to delete all them to be sure you are running the last version of the stack.
 
 You can execute the integration tests using the following command:
 

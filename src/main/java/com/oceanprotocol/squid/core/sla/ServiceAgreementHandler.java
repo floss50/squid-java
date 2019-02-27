@@ -2,8 +2,8 @@ package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
-import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
@@ -58,20 +58,20 @@ public class ServiceAgreementHandler {
      * @param serviceAgreementId the service agreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
-    public static Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> listenExecuteAgreement(ServiceExecutionAgreement slaContract, String serviceAgreementId)   {
+    public static Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> listenExecuteAgreement(EscrowAccessSecretStoreTemplate slaContract, String serviceAgreementId)   {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
                 DefaultBlockParameterName.LATEST,
                 slaContract.getContractAddress()
         );
 
-        final Event event= slaContract.AGREEMENTINITIALIZED_EVENT;
+        final Event event= slaContract.AGREEMENTCREATED_EVENT;
         final String eventSignature= EventEncoder.encode(event);
         String slaTopic= "0x" + serviceAgreementId;
         slaFilter.addSingleTopic(eventSignature);
         slaFilter.addOptionalTopics(slaTopic);
 
-        return slaContract.agreementInitializedEventFlowable(slaFilter);
+        return slaContract.agreementCreatedEventFlowable(slaFilter);
     }
 
 

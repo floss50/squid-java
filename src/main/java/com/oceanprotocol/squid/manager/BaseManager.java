@@ -39,7 +39,7 @@ public abstract class BaseManager {
     protected OceanToken tokenContract;
     protected Dispenser dispenser;
     protected DIDRegistry didRegistry;
-    protected ServiceExecutionAgreement serviceExecutionAgreement;
+    protected EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
@@ -275,12 +275,12 @@ public abstract class BaseManager {
     }
 
     /**
-     * It sets the ServiceExecutionAgreement stub instance
-     * @param contract ServiceExecutionAgreement instance
+     * It sets the EscrowAccessSecretStoreTemplate stub instance
+     * @param contract EscrowAccessSecretStoreTemplate instance
      * @return BaseManager instance
      */
-    public BaseManager setServiceExecutionAgreementContract(ServiceExecutionAgreement contract)    {
-        this.serviceExecutionAgreement= contract;
+    public BaseManager setEscrowAccessSecretStoreTemplate(EscrowAccessSecretStoreTemplate contract)    {
+        this.escrowAccessSecretStoreTemplate= contract;
         return this;
     }
 

@@ -2,14 +2,12 @@ package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.api.config.OceanConfig;
-import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.ServiceEndpoints;
-import com.oceanprotocol.squid.core.sla.setup.SetupServiceAgreement;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.reactivex.Flowable;
@@ -25,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AssetsApiIT {
 
@@ -59,10 +55,6 @@ public class AssetsApiIT {
 
         assertNotNull(oceanAPI.getAssetsAPI());
         assertNotNull(oceanAPI.getMainAccount());
-
-        // TODO Enable the access's template registration in future versions
-        //setupServiceAgreement = new SetupServiceAgreement();
-        //setupServiceAgreement.registerTemplate();
 
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
@@ -102,9 +94,9 @@ public class AssetsApiIT {
 
         DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, serviceEndpoints);
         DID did= new DID(ddo.id);
-      
+
         Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
-      
+
         OrderResult result = response.blockingFirst();
         assertNotNull(result.getServiceAgreementId());
         assertEquals(true, result.isAccessGranted());

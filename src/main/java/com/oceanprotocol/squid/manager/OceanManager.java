@@ -1,17 +1,18 @@
 package com.oceanprotocol.squid.manager;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
-import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
+import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.exceptions.*;
-import com.oceanprotocol.squid.helpers.*;
-import com.oceanprotocol.squid.models.Account;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.squid.helpers.HttpHelper;
+import com.oceanprotocol.squid.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
@@ -27,7 +28,6 @@ import org.web3j.abi.EventEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
-import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
@@ -182,7 +182,7 @@ public class OceanManager extends BaseManager {
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (serviceEndpoints.getSecretStoreEndpoint()!=null && !serviceEndpoints.getSecretStoreEndpoint().equals("")){
-                 authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, serviceEndpoints.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+                authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, serviceEndpoints.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
             }
 
             // Initializing DDO
@@ -264,7 +264,7 @@ public class OceanManager extends BaseManager {
 
             // Returns a flowable over an AccessGranted event after calling the lockPayment function
             Flowable<AccessConditions.AccessGrantedEventResponse> accessGrantedFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
-                    .map(event -> EncodingHelper.toHexString(event.agreementId))
+                    .map(event -> EncodingHelper.toHexString(event._agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
                             return Flowable.empty();
@@ -291,8 +291,8 @@ public class OceanManager extends BaseManager {
             return accessGrantedFlowable
                     .withLatestFrom(paymentRefundFlowable, (access, refund) -> {
 
-                        byte[] accessAgreement = access.agreementId;
-                        byte[] refundAgreement = refund.agreementId;
+                        byte[] accessAgreement = access.serviceId; //agreementId;
+                        byte[] refundAgreement = refund.serviceId; //agreementId;
 
                         // The AccessGranted event and the PaymentRefund event are mutually exclusive
                         if (accessAgreement!= null)
@@ -337,8 +337,9 @@ public class OceanManager extends BaseManager {
      * @throws ServiceException ServiceException
      * @throws ServiceAgreementException ServiceAgreementException
      */
-    private Flowable<ServiceExecutionAgreement.AgreementInitializedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
+    private Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
             throws  DDOException, ServiceException, ServiceAgreementException {
+
 
         // We need to unlock the account before calling the purchase method
         // to be able to generate the sign of the serviceAgreement
@@ -390,7 +391,7 @@ public class OceanManager extends BaseManager {
         }
 
         // 4. Listening of events
-       return  ServiceAgreementHandler.listenExecuteAgreement(serviceExecutionAgreement, serviceAgreementId);
+        return  ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
 
     }
 
@@ -550,7 +551,7 @@ public class OceanManager extends BaseManager {
         } catch (UnsupportedEncodingException e) {
             log.error("Exception encoding serviceAgreement " + e.getMessage());
 
-            }
+        }
 
         return assetInfo;
 

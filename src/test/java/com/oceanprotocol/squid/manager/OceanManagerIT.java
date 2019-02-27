@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.DIDRegistry;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
-import com.oceanprotocol.keeper.contracts.ServiceExecutionAgreement;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
@@ -48,7 +47,7 @@ public class OceanManagerIT {
     private static SecretStoreManager secretStore;
 
     private static DIDRegistry didRegistry;
-    private static ServiceExecutionAgreement saContract;
+    //private static ServiceExecutionAgreement saContract;
     private static PaymentConditions paymentConditions;
     private static AccessConditions accessConditions;
 
@@ -91,7 +90,7 @@ public class OceanManagerIT {
         secretStore= ManagerHelper.getSecretStoreController(config, evmDto);
 
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
-        saContract= ManagerHelper.loadServiceExecutionAgreementContract(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
+        //saContract= ManagerHelper.loadEscrowAccessSecretStoreTemplate(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
         accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
         paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
 
@@ -100,7 +99,7 @@ public class OceanManagerIT {
         managerPublisher = OceanManager.getInstance(keeperPublisher, aquarius);
         managerPublisher.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-                .setServiceExecutionAgreementContract(saContract)
+//                .setEscrowAccessSecretStoreTemplate(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions)
                 .setMainAccount(publisherAccount)
@@ -110,7 +109,7 @@ public class OceanManagerIT {
         managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
         managerConsumer.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-                .setServiceExecutionAgreementContract(saContract)
+//                .setEscrowAccessSecretStoreTemplate(saContract)
                 .setPaymentConditionsContract(paymentConditions)
                 .setAccessConditionsContract(accessConditions)
                 .setMainAccount(consumerAccount)
@@ -148,7 +147,7 @@ public class OceanManagerIT {
         String consumeUrl= "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
 
-        String serviceAgreementAddress = saContract.getContractAddress();
+        //String serviceAgreementAddress = saContract.getContractAddress();
 
         ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl);
 
@@ -167,7 +166,7 @@ public class OceanManagerIT {
         String purchaseEndpoint= "http://localhost:8030/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint= config.getString("secretstore.url");
 
-        String serviceAgreementAddress = saContract.getContractAddress();
+        //String serviceAgreementAddress = saContract.getContractAddress();
 
         ServiceEndpoints serviceEndpoints= new ServiceEndpoints(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint);
 

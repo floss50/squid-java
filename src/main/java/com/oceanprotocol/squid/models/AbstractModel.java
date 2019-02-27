@@ -37,8 +37,8 @@ public abstract class AbstractModel {
     }
 
 
-    public static <T> ObjectReader getReaderInstance(Class<T> clazz)    {
-        return getMapperInstance().reader(clazz);
+    private static <T> ObjectReader getReaderInstance(Class<T> clazz)    {
+        return getMapperInstance().readerFor(clazz);
     }
 
     public static <T> Object convertToModel(Class<T> clazz, String json) throws IOException {
@@ -57,7 +57,7 @@ public abstract class AbstractModel {
         return getMapperInstance().writeValueAsString(object);
     }
 
-    public static String getNowFormatted()    {
+    private static String getNowFormatted()    {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 

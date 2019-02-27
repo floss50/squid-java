@@ -46,7 +46,7 @@ public class OceanAPI {
     private OceanToken tokenContract;
     private Dispenser dispenser;
     private DIDRegistry didRegistryContract;
-    private ServiceExecutionAgreement serviceExecutionAgreementContract;
+    private EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
     private PaymentConditions paymentConditionsContract;
     private AccessConditions accessConditionsContract;
 
@@ -111,7 +111,7 @@ public class OceanAPI {
             oceanAPI.secretStoreManager = oceanInitializationHelper.getSecretStoreManager(oceanAPI.secretStoreDto, oceanAPI.evmDto);
 
             oceanAPI.didRegistryContract = oceanInitializationHelper.loadDIDRegistryContract(oceanAPI.keeperService);
-            oceanAPI.serviceExecutionAgreementContract = oceanInitializationHelper.loadServiceExecutionAgreementContract(oceanAPI.keeperService);
+            oceanAPI.escrowAccessSecretStoreTemplate = oceanInitializationHelper.loadEscrowAccessSecretStoreTemplate(oceanAPI.keeperService);
             oceanAPI.paymentConditionsContract = oceanInitializationHelper.loadPaymentConditionsContract(oceanAPI.keeperService);
             oceanAPI.accessConditionsContract = oceanInitializationHelper.loadAccessConditionsContract(oceanAPI.keeperService);
             oceanAPI.dispenser = oceanInitializationHelper.loadDispenserContract(oceanAPI.keeperService);
@@ -120,7 +120,7 @@ public class OceanAPI {
             oceanAPI.oceanManager = oceanInitializationHelper.getOceanManager(oceanAPI.keeperService, oceanAPI.aquariusService);
             oceanAPI.oceanManager.setSecretStoreManager(oceanAPI.secretStoreManager)
                     .setDidRegistryContract(oceanAPI.didRegistryContract)
-                    .setServiceExecutionAgreementContract(oceanAPI.serviceExecutionAgreementContract)
+                    .setEscrowAccessSecretStoreTemplate(oceanAPI.escrowAccessSecretStoreTemplate)
                     .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
                     .setAccessConditionsContract(oceanAPI.accessConditionsContract)
                     .setTokenContract(oceanAPI.tokenContract)

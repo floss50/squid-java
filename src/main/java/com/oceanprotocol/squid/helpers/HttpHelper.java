@@ -287,8 +287,6 @@ public abstract class HttpHelper {
             throw e;
         } catch (URISyntaxException e) {
             throw e;
-        } finally {
-            IOUtils.closeQuietly(httpclient);
         }
 
     }
