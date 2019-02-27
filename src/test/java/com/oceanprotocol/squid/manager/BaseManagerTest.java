@@ -55,7 +55,7 @@ public class BaseManagerTest {
 
     private static final String SERVICE_AGREEMENT_ADDRESS;
     static {
-        SERVICE_AGREEMENT_ADDRESS = config.getString("contract.serviceExecutionAgreement.address");
+        SERVICE_AGREEMENT_ADDRESS = config.getString("contract.AgreementStoreManager.address");
     }
 
 

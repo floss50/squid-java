@@ -51,7 +51,7 @@ public class SetupServiceAgreement {
         accessTemplate= AccessTemplate.fromJSON(new TypeReference<AccessTemplate>() {}, ACCESS_TEMPLATE_JSON_CONTENT);
 
         address= config.getString("account.parity.address");
-        String seaAddress= config.getString("contract.serviceExecutionAgreement.address");
+        String seaAddress= config.getString("contract.AgreementStoreManager.address");
 
         keeper= getKeeper(config);
         sea= loadServiceAgreementContract(keeper, seaAddress);
@@ -108,8 +108,8 @@ public class SetupServiceAgreement {
                     EncodingHelper.hexStringToBytes(ACCESS_SERVICE_TEMPLATE_ID),
                     getContractAddresses(
                             accessTemplate,
-                            config.getString("contract.paymentConditions.address"),
-                            config.getString("contract.accessConditions.address")),
+                            config.getString("contract.LockRewardCondition.address"),
+                            config.getString("contract.AccessSecretStoreCondition.address")),
                     getFingerprints(),
                     ServiceAgreementHandler.getDependenciesBits(),
                     ServiceAgreementHandler.getFullfillmentIndices(accessTemplate.conditions),

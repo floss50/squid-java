@@ -74,12 +74,12 @@ public class AssetsApiIT {
         properties.put(OceanConfig.MAIN_ACCOUNT_ADDRESS, config.getString("account.parity.address2"));
         properties.put(OceanConfig.MAIN_ACCOUNT_PASSWORD,  config.getString("account.parity.password2"));
         properties.put(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, config.getString("account.parity.file2"));
-        properties.put(OceanConfig.DID_REGISTRY_ADDRESS, config.getString("contract.didRegistry.address"));
-        properties.put(OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS, config.getString("contract.serviceExecutionAgreement.address"));
-        properties.put(OceanConfig.PAYMENT_CONDITIONS_ADDRESS,config.getString("contract.paymentConditions.address"));
-        properties.put(OceanConfig.ACCESS_CONDITIONS_ADDRESS, config.getString("contract.accessConditions.address"));
-        properties.put(OceanConfig.TOKEN_ADDRESS, config.getString("contract.token.address"));
-        properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.dispenser.address"));
+        properties.put(OceanConfig.DID_REGISTRY_ADDRESS, config.getString("contract.DIDRegistry.address"));
+        properties.put(OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS, config.getString("contract.AgreementStoreManager.address"));
+        properties.put(OceanConfig.PAYMENT_CONDITIONS_ADDRESS,config.getString("contract.LockRewardCondition.address"));
+        properties.put(OceanConfig.ACCESS_CONDITIONS_ADDRESS, config.getString("contract.AccessSecretStoreCondition.address"));
+        properties.put(OceanConfig.TOKEN_ADDRESS, config.getString("contract.OceanToken.address"));
+        properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
 
         oceanAPIConsumer = OceanAPI.getInstance(properties);
 

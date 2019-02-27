@@ -18,12 +18,12 @@ public class OceanConfig {
     public static final String MAIN_ACCOUNT_ADDRESS = "account.main.address";
     public static final String MAIN_ACCOUNT_PASSWORD = "account.main.password";
     public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
-    public static final String DID_REGISTRY_ADDRESS = "contract.didRegistry.address";
-    public static final String SERVICE_EXECUTION_AGREEMENT_ADDRESS = "contract.serviceExecutionAgreement.address";
-    public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.paymentConditions.address";
-    public static final String ACCESS_CONDITIONS_ADDRESS = "contract.accessConditions.address";
-    public static final String TOKEN_ADDRESS = "contract.token.address";
-    public static final String DISPENSER_ADDRESS = "contract.dispenser.address";
+    public static final String DID_REGISTRY_ADDRESS = "contract.DIDRegistry.address";
+    public static final String SERVICE_EXECUTION_AGREEMENT_ADDRESS = "contract.AgreementStoreManager.address";
+    public static final String PAYMENT_CONDITIONS_ADDRESS = "contract.LockRewardCondition.address";
+    public static final String ACCESS_CONDITIONS_ADDRESS = "contract.AccessSecretStoreCondition.address";
+    public static final String TOKEN_ADDRESS = "contract.OceanToken.address";
+    public static final String DISPENSER_ADDRESS = "contract.Dispenser.address";
     public static final String CONSUME_BASE_PATH = "consume.basePath";
 
 

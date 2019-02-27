@@ -509,8 +509,8 @@ public class OceanManager extends BaseManager {
         Map<String, Object> params= new HashMap<>();
         params.put("parameter.did", did);
         params.put("parameter.price", price);
-        params.put("contract.paymentConditions.address", paymentConditions.getContractAddress());
-        params.put("contract.accessConditions.address", accessConditions.getContractAddress());
+        params.put("contract.LockRewardCondition.address", paymentConditions.getContractAddress());
+        params.put("contract.AccessSecretStoreCondition.address", accessConditions.getContractAddress());
 
         params.put("parameter.assetId", did.replace("did:op:", "0x"));
 

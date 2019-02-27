@@ -31,15 +31,15 @@ public class SetupServiceAgreementTest {
     @Test
     public void getContractAddresses() throws Exception {
         List<String> expected= new ArrayList();
-        expected.add(config.getString("contract.paymentConditions.address"));
-        expected.add(config.getString("contract.accessConditions.address"));
-        expected.add(config.getString("contract.paymentConditions.address"));
-        expected.add(config.getString("contract.paymentConditions.address"));
+        expected.add(config.getString("contract.LockRewardCondition.address"));
+        expected.add(config.getString("contract.AccessSecretStoreCondition.address"));
+        expected.add(config.getString("contract.LockRewardCondition.address"));
+        expected.add(config.getString("contract.LockRewardCondition.address"));
 
         List<String> addresses= SetupServiceAgreement.getContractAddresses(
                 accessTemplate,
-                config.getString("contract.paymentConditions.address"),
-                config.getString("contract.accessConditions.address"));
+                config.getString("contract.LockRewardCondition.address"),
+                config.getString("contract.AccessSecretStoreCondition.address"));
 
         assertEquals(expected.get(0).toLowerCase(), addresses.get(0).toLowerCase());
         assertEquals(expected.get(1).toLowerCase(), addresses.get(1).toLowerCase());

@@ -190,8 +190,8 @@ public class DDOTest {
         Map<String, Object> params= new HashMap<>();
         params.put("parameter.did", did);
         params.put("parameter.price", price);
-        params.put("contract.paymentConditions.address", "0xaaaabbbccc");
-        params.put("contract.accessConditions.address", "0xbbbbccccdddd");
+        params.put("contract.LockRewardCondition.address", "0xaaaabbbccc");
+        params.put("contract.AccessSecretStoreCondition.address", "0xbbbbccccdddd");
 
         params.put("parameter.assetId", did.replace("did:op:", ""));
 

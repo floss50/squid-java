@@ -57,22 +57,22 @@ public class OceanManagerIT {
 
     private static final String DID_REGISTRY_CONTRACT;
     static {
-        DID_REGISTRY_CONTRACT = config.getString("contract.didRegistry.address");
+        DID_REGISTRY_CONTRACT = config.getString("contract.DIDRegistry.address");
     }
 
     private static final String SERVICE_AGREEMENT_CONTRACT;
     static {
-        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.serviceExecutionAgreement.address");
+        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.AgreementStoreManager.address");
     }
 
     private static final String PAYMENT_CONDITIONS_CONTRACT;
     static {
-        PAYMENT_CONDITIONS_CONTRACT = config.getString("contract.paymentConditions.address");
+        PAYMENT_CONDITIONS_CONTRACT = config.getString("contract.LockRewardCondition.address");
     }
 
     private static final String ACCESS_CONDITIONS_CONTRACT;
     static {
-        ACCESS_CONDITIONS_CONTRACT = config.getString("contract.accessConditions.address");
+        ACCESS_CONDITIONS_CONTRACT = config.getString("contract.AccessSecretStoreCondition.address");
     }
 
 
