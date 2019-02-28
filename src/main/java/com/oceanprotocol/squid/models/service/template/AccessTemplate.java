@@ -34,7 +34,7 @@ public class AccessTemplate extends AbstractModel implements FromJsonToModel {
     public List<Condition> conditions= new ArrayList<>();
 
     @JsonProperty
-    public AccessService.ServiceAgreementContract serviceAgreementContract;
+    public AccessService.ServiceAgreementTemplate serviceAgreementTemplate;
 
 
     public AccessTemplate() {

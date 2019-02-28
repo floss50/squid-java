@@ -1,12 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.AccessConditions;
-import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.FullfillLockReward;
-import com.oceanprotocol.squid.core.sla.functions.LockPayment;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
@@ -498,9 +494,9 @@ public class OceanManager extends BaseManager {
         params.put("parameter.price", price);
 
         //config.getString("")
-        params.put("contract.EscrowReward.address", paymentConditions.getContractAddress());
-        params.put("contract.LockRewardCondition.address", paymentConditions.getContractAddress());
-        params.put("contract.AccessSecretStoreCondition.address", accessConditions.getContractAddress());
+        params.put("contract.EscrowReward.address", escrowReward.getContractAddress());
+        params.put("contract.LockRewardCondition.address", lockRewardCondition.getContractAddress());
+        params.put("contract.AccessSecretStoreCondition.address", accessSecretStoreCondition.getContractAddress());
 
         params.put("parameter.assetId", did.replace("did:op:", "0x"));
 
