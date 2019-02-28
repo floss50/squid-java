@@ -1,6 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
@@ -263,7 +264,7 @@ public class OceanManager extends BaseManager {
         try {
 
             // Returns a flowable over an AccessGranted event after calling the lockPayment function
-            Flowable<AccessConditions.AccessGrantedEventResponse> accessGrantedFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
+            Flowable<AccessSecretStoreCondition.FulfilledEventResponse> fulfilledFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
                     .map(event -> EncodingHelper.toHexString(event._agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
@@ -271,7 +272,7 @@ public class OceanManager extends BaseManager {
                         else {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
                             getKeeperService().unlockAccount(getMainAccount());
-                            getKeeperService().tokenApprove(this.tokenContract, paymentConditions.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
+                            getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
                             this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
                             return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId);
                         }

@@ -42,8 +42,7 @@ public abstract class BaseManager {
     protected Dispenser dispenser;
     protected DIDRegistry didRegistry;
     protected EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
-    protected PaymentConditions paymentConditions;
-    protected AccessConditions accessConditions;
+    protected LockRewardCondition lockRewardCondition;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
     protected Config config= ConfigFactory.load();
 
@@ -287,27 +286,6 @@ public abstract class BaseManager {
         return this;
     }
 
-    /**
-     * It sets the PaymentConditions stub instance
-     * @param contract PaymentConditions instance
-     * @return BaseManager instance
-     */
-    public BaseManager setPaymentConditionsContract(PaymentConditions contract)    {
-        this.paymentConditions= contract;
-        this.contractAddresses.setPaymentConditionsAddress(this.paymentConditions.getContractAddress());
-        return this;
-    }
-
-    /**
-     * It sets the AccessConditions stub instance
-     * @param contract AccessConditions instance
-     * @return BaseManager instance
-     */
-    public BaseManager setAccessConditionsContract(AccessConditions contract)    {
-        this.accessConditions= contract;
-        this.contractAddresses.setAccessConditionsAddress(this.accessConditions.getContractAddress());
-        return this;
-    }
 
     /**
      * It sets the DIDRegistry stub instance
@@ -317,6 +295,22 @@ public abstract class BaseManager {
     public BaseManager setDidRegistryContract(DIDRegistry contract)    {
         this.didRegistry= contract;
         return this;
+    }
+
+    /**
+     * It gets the lockRewardCondition stub instance
+     * @return LockRewardCondition instance
+     */
+    public LockRewardCondition getLockRewardCondition() {
+        return lockRewardCondition;
+    }
+
+    /**
+     * It sets the LockRewardCondition instance
+     * @param lockRewardCondition instance
+     */
+    public void setLockRewardCondition(LockRewardCondition lockRewardCondition) {
+        this.lockRewardCondition = lockRewardCondition;
     }
 
     public Account getMainAccount() {
