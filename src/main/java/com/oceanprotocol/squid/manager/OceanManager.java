@@ -1,12 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.AccessConditions;
-import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.FullfillLockReward;
-import com.oceanprotocol.squid.core.sla.functions.LockPayment;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
@@ -191,9 +187,9 @@ public class OceanManager extends BaseManager {
             DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Definition of a DEFAULT ServiceAgreement Contract
-            AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
-            serviceAgreementContract.contractName = "ServiceExecutionAgreement";
-            serviceAgreementContract.fulfillmentOperator = 1;
+            AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
+            serviceAgreementTemplate.contractName = "ServiceExecutionAgreement";
+            serviceAgreementTemplate.fulfillmentOperator = 1;
 
             // Execute Agreement Event
             Condition.Event executeAgreementEvent = new Condition.Event();
@@ -206,11 +202,11 @@ public class OceanManager extends BaseManager {
             handler.version = "0.1";
             executeAgreementEvent.handler = handler;
 
-            serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
+            serviceAgreementTemplate.events = Arrays.asList(executeAgreementEvent);
 
             AccessService accessService = new AccessService(serviceEndpoints.getAccessEndpoint(),
                     Service.DEFAULT_ACCESS_SERVICE_ID,
-                    serviceAgreementContract);
+                    serviceAgreementTemplate);
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
 
             // Initializing conditions and adding to Access service
@@ -486,9 +482,9 @@ public class OceanManager extends BaseManager {
         params.put("parameter.price", price);
 
         //config.getString("")
-        params.put("contract.EscrowReward.address", paymentConditions.getContractAddress());
-        params.put("contract.LockRewardCondition.address", paymentConditions.getContractAddress());
-        params.put("contract.AccessSecretStoreCondition.address", accessConditions.getContractAddress());
+        params.put("contract.EscrowReward.address", escrowReward.getContractAddress());
+        params.put("contract.LockRewardCondition.address", lockRewardCondition.getContractAddress());
+        params.put("contract.AccessSecretStoreCondition.address", accessSecretStoreCondition.getContractAddress());
 
         params.put("parameter.assetId", did.replace("did:op:", "0x"));
 

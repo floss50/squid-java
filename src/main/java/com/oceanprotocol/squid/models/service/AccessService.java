@@ -25,14 +25,23 @@ public class AccessService extends Service {
     public String purchaseEndpoint;
 
     @JsonProperty
+    public String name;
+
+    @JsonProperty
+    public String description;
+
+    @JsonProperty
+    public String creator;
+
+    @JsonProperty
     public List<Condition> conditions= new ArrayList<>();
 
     @JsonProperty
-    public ServiceAgreementContract serviceAgreementContract;
+    public ServiceAgreementTemplate serviceAgreementTemplate;
 
     //@JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
-    public static class ServiceAgreementContract {
+    public static class ServiceAgreementTemplate {
 
         @JsonProperty
         public String contractName;
@@ -43,7 +52,7 @@ public class AccessService extends Service {
         @JsonProperty
         public List<Condition.Event> events= new ArrayList<>();
 
-        public ServiceAgreementContract() {}
+        public ServiceAgreementTemplate() {}
     }
 
 
@@ -59,11 +68,11 @@ public class AccessService extends Service {
 
 
     public AccessService(String serviceEndpoint, String serviceDefinitionId,
-                         ServiceAgreementContract serviceAgreementContract
+                         ServiceAgreementTemplate serviceAgreementTemplate
     )  {
         super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
         this.templateId= ACCESS_TEMPLATE_ID;
-        this.serviceAgreementContract = serviceAgreementContract;
+        this.serviceAgreementTemplate = serviceAgreementTemplate;
 
     }
 
