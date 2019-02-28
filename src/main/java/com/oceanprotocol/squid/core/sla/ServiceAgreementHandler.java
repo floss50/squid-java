@@ -1,10 +1,8 @@
 package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.keeper.contracts.AccessConditions;
 import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
@@ -103,12 +101,13 @@ public class ServiceAgreementHandler {
     }
 
 
-    /**
+    /*
      * Define and execute a Filter over the Payment Condition Contract to listen for an PaymentRefund event
      * @param paymentConditions the address of the PaymentConditions
      * @param serviceAgreementId the service Agreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
+    /*
     public static Flowable<PaymentConditions.PaymentRefundEventResponse> listenForPaymentRefund(PaymentConditions paymentConditions,
                                                                                                            String serviceAgreementId)   {
         EthFilter refundFilter = new EthFilter(
@@ -127,6 +126,7 @@ public class ServiceAgreementHandler {
         return paymentConditions.paymentRefundEventFlowable(refundFilter);
 
     }
+    */
 
     /**
      * Gets and Initializes all the conditions associated with a template

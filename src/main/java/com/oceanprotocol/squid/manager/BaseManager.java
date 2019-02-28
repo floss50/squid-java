@@ -43,6 +43,7 @@ public abstract class BaseManager {
     protected DIDRegistry didRegistry;
     protected EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
     protected LockRewardCondition lockRewardCondition;
+    protected EscrowReward escrowReward;
     protected AccessSecretStoreCondition accessSecretStoreCondition;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
     protected Config config= ConfigFactory.load();
@@ -310,12 +311,31 @@ public abstract class BaseManager {
      * It sets the LockRewardCondition instance
      * @param lockRewardCondition instance
      */
-    public void setLockRewardCondition(LockRewardCondition lockRewardCondition) {
+    public BaseManager setLockRewardCondition(LockRewardCondition lockRewardCondition) {
         this.lockRewardCondition = lockRewardCondition;
+        return this;
     }
 
     /**
-     *  It gets the AccessSecretStoreCondition stub instance
+     * It gets the EscrowReward stub instance
+     * @return EscrowReward instance
+     */
+    public EscrowReward getEscrowReward() {
+        return escrowReward;
+    }
+
+    /**
+     * It sets the EscrowReward instance
+     * @param escrowReward
+     * @return
+     */
+    public BaseManager setEscrowReward(EscrowReward escrowReward) {
+        this.escrowReward = escrowReward;
+        return this;
+    }
+
+    /**
+     * It gets the AccessSecretStoreCondition stub instance
      * @return AccessSecretStoreCondition instance
      */
     public AccessSecretStoreCondition getAccessSecretStoreCondition() {
@@ -323,12 +343,15 @@ public abstract class BaseManager {
     }
 
     /**
-     * It sets the AccessSecretStoreCondition instance
-     * @param accessSecretStoreCondition instance
+     * It sets the EscrowReward instance
+     * @param accessSecretStoreCondition
+     * @return
      */
-    public void setAccessSecretStoreCondition(AccessSecretStoreCondition accessSecretStoreCondition) {
+    public BaseManager setAccessSecretStoreCondition(AccessSecretStoreCondition accessSecretStoreCondition) {
         this.accessSecretStoreCondition = accessSecretStoreCondition;
+        return this;
     }
+
 
     public Account getMainAccount() {
         return mainAccount;
