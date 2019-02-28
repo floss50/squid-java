@@ -118,8 +118,8 @@ public abstract class ManagerHelper {
 
 
 
-    public static PaymentConditions loadPaymentConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
-        return PaymentConditions.load(
+    public static EscrowReward loadEscrowRewardContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return EscrowReward.load(
                 address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),
@@ -127,10 +127,16 @@ public abstract class ManagerHelper {
         );
     }
 
+    public static LockRewardCondition loadLockRewardCondition(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return LockRewardCondition.load(address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
 
-
-    public static AccessConditions loadAccessConditionsContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
-        return AccessConditions.load(address,
+    public static AccessSecretStoreCondition loadAccessSecretStoreConditionContract(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return AccessSecretStoreCondition.load(address,
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()

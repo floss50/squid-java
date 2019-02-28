@@ -1,9 +1,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.keeper.contracts.AccessConditions;
-import com.oceanprotocol.keeper.contracts.DIDRegistry;
-import com.oceanprotocol.keeper.contracts.PaymentConditions;
+import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
@@ -47,9 +45,10 @@ public class OceanManagerIT {
     private static SecretStoreManager secretStore;
 
     private static DIDRegistry didRegistry;
-    //private static ServiceExecutionAgreement saContract;
-    private static PaymentConditions paymentConditions;
-    private static AccessConditions accessConditions;
+    private static EscrowReward escrowReward;
+    private static AccessSecretStoreCondition accessSecretStoreCondition;
+    private static LockRewardCondition lockRewardCondition;
+    private static EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
 
 
     private static final Config config = ConfigFactory.load();
@@ -59,19 +58,25 @@ public class OceanManagerIT {
         DID_REGISTRY_CONTRACT = config.getString("contract.DIDRegistry.address");
     }
 
-    private static final String SERVICE_AGREEMENT_CONTRACT;
+    private static final String ESCROW_REWARD_CONTRACT;
     static {
-        SERVICE_AGREEMENT_CONTRACT = config.getString("contract.AgreementStoreManager.address");
+        ESCROW_REWARD_CONTRACT = config.getString("contract.EscrowReward.address");
     }
 
-    private static final String PAYMENT_CONDITIONS_CONTRACT;
+    private static final String LOCK_REWARD_CONTRACT;
     static {
-        PAYMENT_CONDITIONS_CONTRACT = config.getString("contract.LockRewardCondition.address");
+        LOCK_REWARD_CONTRACT = config.getString("contract.LockRewardCondition.address");
     }
 
-    private static final String ACCESS_CONDITIONS_CONTRACT;
+
+    private static final String ACCESS_SS_CONDITION_CONTRACT;
     static {
-        ACCESS_CONDITIONS_CONTRACT = config.getString("contract.AccessSecretStoreCondition.address");
+        ACCESS_SS_CONDITION_CONTRACT = config.getString("contract.AccessSecretStoreCondition.address");
+    }
+
+    private static final String ESCROW_ACCESS_CONTRACT;
+    static {
+        ESCROW_ACCESS_CONTRACT = config.getString("contract.EscrowAccessSecretStoreTemplate.address");
     }
 
 
@@ -90,18 +95,20 @@ public class OceanManagerIT {
         secretStore= ManagerHelper.getSecretStoreController(config, evmDto);
 
         didRegistry= ManagerHelper.loadDIDRegistryContract(keeperPublisher, DID_REGISTRY_CONTRACT);
-        //saContract= ManagerHelper.loadEscrowAccessSecretStoreTemplate(keeperPublisher, SERVICE_AGREEMENT_CONTRACT);
-        accessConditions= ManagerHelper.loadAccessConditionsContract(keeperPublisher, ACCESS_CONDITIONS_CONTRACT);
-        paymentConditions= ManagerHelper.loadPaymentConditionsContract(keeperPublisher, PAYMENT_CONDITIONS_CONTRACT);
+        escrowReward= ManagerHelper.loadEscrowRewardContract(keeperPublisher, ESCROW_REWARD_CONTRACT);
+        accessSecretStoreCondition= ManagerHelper.loadAccessSecretStoreConditionContract(keeperPublisher, ACCESS_SS_CONDITION_CONTRACT);
+        lockRewardCondition= ManagerHelper.loadLockRewardCondition(keeperPublisher, LOCK_REWARD_CONTRACT);
+        escrowAccessSecretStoreTemplate= ManagerHelper.loadEscrowAccessSecretStoreTemplate(keeperPublisher, ESCROW_ACCESS_CONTRACT);
 
 
         // Initializing the OceanManager for the Publisher
         managerPublisher = OceanManager.getInstance(keeperPublisher, aquarius);
         managerPublisher.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-//                .setEscrowAccessSecretStoreTemplate(saContract)
-                .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions)
+                .setEscrowReward(escrowReward)
+                .setAccessSecretStoreCondition(accessSecretStoreCondition)
+                .setLockRewardCondition(lockRewardCondition)
+                .setEscrowAccessSecretStoreTemplate(escrowAccessSecretStoreTemplate)
                 .setMainAccount(publisherAccount)
                 .setEvmDto(evmDto);
 
@@ -109,9 +116,10 @@ public class OceanManagerIT {
         managerConsumer = OceanManager.getInstance(keeperConsumer, aquarius);
         managerConsumer.setSecretStoreManager(secretStore)
                 .setDidRegistryContract(didRegistry)
-//                .setEscrowAccessSecretStoreTemplate(saContract)
-                .setPaymentConditionsContract(paymentConditions)
-                .setAccessConditionsContract(accessConditions)
+                .setEscrowReward(escrowReward)
+                .setAccessSecretStoreCondition(accessSecretStoreCondition)
+                .setLockRewardCondition(lockRewardCondition)
+                .setEscrowAccessSecretStoreTemplate(escrowAccessSecretStoreTemplate)
                 .setMainAccount(consumerAccount)
                 .setEvmDto(evmDto);
 
