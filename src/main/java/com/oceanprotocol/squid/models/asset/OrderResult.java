@@ -3,14 +3,14 @@ package com.oceanprotocol.squid.models.asset;
 public class OrderResult {
 
     private String serviceAgreementId;
-    private Boolean accessGranted = false;
-    private Boolean paymentRefund = false;
+    private Boolean accessFullfilled = false;
+    private Boolean timeout = false;
 
-    public OrderResult(String serviceAgreementId, Boolean accessGranted, Boolean paymentRefund) {
+    public OrderResult(String serviceAgreementId, Boolean accessFullfilled, Boolean timeout) {
 
         this.serviceAgreementId = serviceAgreementId;
-        this.accessGranted = accessGranted;
-        this.paymentRefund = paymentRefund;
+        this.accessFullfilled = accessFullfilled;
+        this.timeout = timeout;
     }
 
     public String getServiceAgreementId() {
@@ -22,18 +22,18 @@ public class OrderResult {
     }
 
     public Boolean isAccessGranted() {
-        return accessGranted;
+        return accessFullfilled;
     }
 
-    public void setAccessGranted(Boolean accessGranted) {
-        this.accessGranted = accessGranted;
+    public void setAccessFullfilled(Boolean accessFullfilled) {
+        this.accessFullfilled = accessFullfilled;
     }
 
     public Boolean isPaymentRefund() {
-        return paymentRefund;
+        return timeout;
     }
 
-    public void setPaymentRefund(Boolean paymentRefund) {
-        this.paymentRefund = paymentRefund;
+    public void setTimeout(Boolean timeout) {
+        this.timeout = timeout;
     }
 }

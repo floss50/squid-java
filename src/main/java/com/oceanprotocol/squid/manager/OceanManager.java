@@ -5,6 +5,7 @@ import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.functions.FullfillLockReward;
 import com.oceanprotocol.squid.core.sla.functions.LockPayment;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
@@ -263,8 +264,7 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            // Returns a flowable over an AccessGranted event after calling the lockPayment function
-            Flowable<AccessSecretStoreCondition.FulfilledEventResponse> fulfilledFlowable = this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
+            return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
                     .map(event -> EncodingHelper.toHexString(event._agreementId))
                     .switchMap(eventServiceAgreementId -> {
                         if (eventServiceAgreementId.isEmpty())
@@ -273,51 +273,35 @@ public class OceanManager extends BaseManager {
                             log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
                             getKeeperService().unlockAccount(getMainAccount());
                             getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
-                            this.lockPayment(ddo, serviceDefinitionId, eventServiceAgreementId);
-                            return ServiceAgreementHandler.listenForGrantedAccess(accessConditions, serviceAgreementId);
+                            this.fullfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
+                            return ServiceAgreementHandler.listenForFullfilledEvent(accessSecretStoreCondition, serviceAgreementId);
                         }
-                    });
-
-            // We add an initial (empty) event to the flowable
-            accessGrantedFlowable = accessGrantedFlowable.startWith(new AccessConditions.AccessGrantedEventResponse());
-
-            // We initialize a Flowable over an PaymentRefund Event
-            Flowable<PaymentConditions.PaymentRefundEventResponse> paymentRefundFlowable = ServiceAgreementHandler.listenForPaymentRefund(paymentConditions, serviceAgreementId)
-                    // We also add an initial (empty) event to the flowable
-                    .startWith(new PaymentConditions.PaymentRefundEventResponse());
-
-            // We compose both events with a withLatestFrom function
-            // this function triggers only if both flowables has at least one event
-            // That's the reason we add an initial event to the flowables
-            return accessGrantedFlowable
-                    .withLatestFrom(paymentRefundFlowable, (access, refund) -> {
-
-                        byte[] accessAgreement = access.serviceId; //agreementId;
-                        byte[] refundAgreement = refund.serviceId; //agreementId;
-
-                        // The AccessGranted event and the PaymentRefund event are mutually exclusive
-                        if (accessAgreement!= null)
-                            return new OrderResult(EncodingHelper.toHexString(accessAgreement), true, false);
-                        else if (refundAgreement!= null)
-                            return new OrderResult(EncodingHelper.toHexString(refundAgreement), false, true);
-
-                        // If both agreements are null, it means we are processing the initial events
-                        return new OrderResult("", false, false);
-
                     })
-                    // We add a filter to ignore the result of processing the initial events
-                    .filter( result -> result.isPaymentRefund() || result.isAccessGranted())
-                    .timeout(60, TimeUnit.SECONDS
-                    )
+                    .map( event ->  new OrderResult(serviceAgreementId, true, false))
+                    // TODO timout of the condition
+                    .timeout(60, TimeUnit.SECONDS)
+                    .onErrorReturn(throwable -> {
+
+                        String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
+                        if (throwable instanceof TimeoutException){
+                            msg = "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId;
+                            return new OrderResult(serviceAgreementId, false, true);
+                        }
+
+                        throw new ServiceAgreementException(serviceAgreementId, msg, throwable);
+                    });
+                    /*
                     .doOnError(throwable -> {
 
                         String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
                         if (throwable instanceof TimeoutException){
                             msg = "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId;
+                            return new OrderResult(serviceAgreementId, false, true);
                         }
 
-                        throw new ServiceAgreementException(serviceAgreementId, msg);
-                    });
+                        throw new ServiceAgreementException(serviceAgreementId, msg, throwable);
+                    });*/
+
 
         }catch (DDOException|ServiceException|ServiceAgreementException e){
             String msg = "Error processing Order with DID " + did.getDid() + "and ServiceAgreementID " + serviceAgreementId;
@@ -396,21 +380,22 @@ public class OceanManager extends BaseManager {
 
     }
 
+
     /**
-     * Executes the lock payment
+     * Executes the fullfill of the LockRewardCondition
      * @param ddo the ddo
      * @param serviceDefinitionId the serviceDefinition id
      * @param serviceAgreementId service agreement id
      * @return a flag that indicates if the function was executed correctly
      * @throws ServiceException ServiceException
-     * @throws LockPaymentException LockPaymentException
+     * @throws LockRewardFullfillException LockRewardFullfillException
      */
-    private boolean lockPayment(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockPaymentException {
+    private boolean fullfillLockReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFullfillException {
 
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        return LockPayment.executeLockPayment(paymentConditions, serviceAgreementId, assetInfo);
+        return FullfillLockReward.executeFullfill(lockRewardCondition, serviceAgreementId, assetInfo);
     }
 
 
