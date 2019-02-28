@@ -190,9 +190,9 @@ public class OceanManager extends BaseManager {
             DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Definition of a DEFAULT ServiceAgreement Contract
-            AccessService.ServiceAgreementContract serviceAgreementContract = new AccessService.ServiceAgreementContract();
-            serviceAgreementContract.contractName = "ServiceExecutionAgreement";
-            serviceAgreementContract.fulfillmentOperator = 1;
+            AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
+            serviceAgreementTemplate.contractName = "ServiceExecutionAgreement";
+            serviceAgreementTemplate.fulfillmentOperator = 1;
 
             // Execute Agreement Event
             Condition.Event executeAgreementEvent = new Condition.Event();
@@ -205,11 +205,11 @@ public class OceanManager extends BaseManager {
             handler.version = "0.1";
             executeAgreementEvent.handler = handler;
 
-            serviceAgreementContract.events = Arrays.asList(executeAgreementEvent);
+            serviceAgreementTemplate.events = Arrays.asList(executeAgreementEvent);
 
             AccessService accessService = new AccessService(serviceEndpoints.getAccessEndpoint(),
                     Service.DEFAULT_ACCESS_SERVICE_ID,
-                    serviceAgreementContract);
+                    serviceAgreementTemplate);
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
 
             // Initializing conditions and adding to Access service
