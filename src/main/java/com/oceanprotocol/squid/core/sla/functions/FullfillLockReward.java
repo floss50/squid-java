@@ -6,6 +6,7 @@ import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
@@ -24,20 +25,20 @@ public class FullfillLockReward {
      */
     public static Boolean  executeFullfill(LockRewardCondition lockRewardCondition,
                                               String serviceAgreementId,
+                                              String escrowRewardAddress,
                                               BasicAssetInfo assetInfo) throws LockRewardFullfillException {
 
         byte[] serviceId;
-        byte[] assetId;
         Integer price = -1;
 
         try {
 
+            escrowRewardAddress = Keys.toChecksumAddress(escrowRewardAddress);
             serviceId = EncodingHelper.hexStringToBytes(serviceAgreementId);
 
-            // TODO Parameters
             TransactionReceipt receipt= lockRewardCondition.fulfill(
                     serviceId,
-                    assetInfo.getAssetId(),
+                    escrowRewardAddress,
                     BigInteger.valueOf(assetInfo.getPrice())
             ).send();
 

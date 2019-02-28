@@ -270,7 +270,7 @@ public class OceanManager extends BaseManager {
                         if (eventServiceAgreementId.isEmpty())
                             return Flowable.empty();
                         else {
-                            log.debug("Received ExecuteServiceAgreement Event with Id: " + eventServiceAgreementId);
+                            log.debug("Received AgreementCreated Event with Id: " + eventServiceAgreementId);
                             getKeeperService().unlockAccount(getMainAccount());
                             getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
                             this.fullfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
@@ -284,24 +284,12 @@ public class OceanManager extends BaseManager {
 
                         String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
                         if (throwable instanceof TimeoutException){
-                            msg = "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId;
+                            msg = "Timeout waiting for Fulfilled Event for service agreement " + serviceAgreementId;
                             return new OrderResult(serviceAgreementId, false, true);
                         }
 
                         throw new ServiceAgreementException(serviceAgreementId, msg, throwable);
                     });
-                    /*
-                    .doOnError(throwable -> {
-
-                        String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
-                        if (throwable instanceof TimeoutException){
-                            msg = "Timeout waiting for AccessGranted or PaymentRefund events for service agreement " + serviceAgreementId;
-                            return new OrderResult(serviceAgreementId, false, true);
-                        }
-
-                        throw new ServiceAgreementException(serviceAgreementId, msg, throwable);
-                    });*/
-
 
         }catch (DDOException|ServiceException|ServiceAgreementException e){
             String msg = "Error processing Order with DID " + did.getDid() + "and ServiceAgreementID " + serviceAgreementId;
@@ -395,7 +383,7 @@ public class OceanManager extends BaseManager {
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        return FullfillLockReward.executeFullfill(lockRewardCondition, serviceAgreementId, assetInfo);
+        return FullfillLockReward.executeFullfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), assetInfo);
     }
 
 
