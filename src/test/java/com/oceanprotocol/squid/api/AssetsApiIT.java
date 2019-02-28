@@ -67,9 +67,9 @@ public class AssetsApiIT {
         properties.put(OceanConfig.MAIN_ACCOUNT_PASSWORD,  config.getString("account.parity.password2"));
         properties.put(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, config.getString("account.parity.file2"));
         properties.put(OceanConfig.DID_REGISTRY_ADDRESS, config.getString("contract.DIDRegistry.address"));
-        properties.put(OceanConfig.SERVICE_EXECUTION_AGREEMENT_ADDRESS, config.getString("contract.AgreementStoreManager.address"));
-        properties.put(OceanConfig.PAYMENT_CONDITIONS_ADDRESS,config.getString("contract.LockRewardCondition.address"));
-        properties.put(OceanConfig.ACCESS_CONDITIONS_ADDRESS, config.getString("contract.AccessSecretStoreCondition.address"));
+        properties.put(OceanConfig.AGREEMENT_STORE_MANAGER_ADDRESS, config.getString("contract.AgreementStoreManager.address"));
+        properties.put(OceanConfig.LOCKREWARD_CONDITIONS_ADDRESS,config.getString("contract.LockRewardCondition.address"));
+        properties.put(OceanConfig.ACCESS_SS_CONDITIONS_ADDRESS, config.getString("contract.AccessSecretStoreCondition.address"));
         properties.put(OceanConfig.TOKEN_ADDRESS, config.getString("contract.OceanToken.address"));
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
 

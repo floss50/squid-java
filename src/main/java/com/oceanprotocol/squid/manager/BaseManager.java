@@ -18,6 +18,8 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Sign;
@@ -43,6 +45,7 @@ public abstract class BaseManager {
     protected PaymentConditions paymentConditions;
     protected AccessConditions accessConditions;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
+    protected Config config= ConfigFactory.load();
 
     protected Account mainAccount;
 

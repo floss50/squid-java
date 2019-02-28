@@ -510,6 +510,9 @@ public class OceanManager extends BaseManager {
         Map<String, Object> params= new HashMap<>();
         params.put("parameter.did", did);
         params.put("parameter.price", price);
+
+        //config.getString("")
+        params.put("contract.EscrowReward.address", paymentConditions.getContractAddress());
         params.put("contract.LockRewardCondition.address", paymentConditions.getContractAddress());
         params.put("contract.AccessSecretStoreCondition.address", accessConditions.getContractAddress());
 

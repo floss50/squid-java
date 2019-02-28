@@ -186,22 +186,22 @@ public class OceanInitializationHelper {
      */
     public EscrowAccessSecretStoreTemplate loadEscrowAccessSecretStoreTemplate(KeeperService keeper) throws IOException, CipherException {
         return EscrowAccessSecretStoreTemplate.load(
-                oceanConfig.getServiceExecutionAgreementAddress(),
+                oceanConfig.getEscrowRewardConditionsAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());
     }
 
     /**
-     * Loads the PaymentConditions contract from Keeper
+     * Loads the LockRewardCondition contract from Keeper
      * @param keeper the keeper Service
-     * @return an instance of PaymentConditions contract deployed in keeper
+     * @return an instance of LockRewardCondition contract deployed in keeper
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public PaymentConditions loadPaymentConditionsContract(KeeperService keeper) throws  IOException, CipherException {
-        return PaymentConditions.load(
-                oceanConfig.getPaymentConditionsAddress(),
+    public LockRewardCondition loadLockRewardCondition(KeeperService keeper) throws  IOException, CipherException {
+        return LockRewardCondition.load(
+                oceanConfig.getLockrewardConditionsAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()
@@ -209,15 +209,47 @@ public class OceanInitializationHelper {
     }
 
     /**
-     *  Loads the AccessConditions contract from Keeper
+     * Loads the EscrowReward contract from Keeper
      * @param keeper the keeper Service
-     * @return an instance of AccessConditions contract deployed in keeper
+     * @return an instance of EscrowReward contract deployed in keeper
      * @throws IOException IOException
      * @throws CipherException CipherException
      */
-    public AccessConditions loadAccessConditionsContract(KeeperService keeper) throws IOException, CipherException {
-        return AccessConditions.load(
-                oceanConfig.getAccessConditionsAddress(),
+    public EscrowReward loadEscrowReward(KeeperService keeper) throws  IOException, CipherException {
+        return EscrowReward.load(
+                oceanConfig.getEscrowRewardConditionsAddress(),
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
+
+    /**
+     * Loads the AgreementStoreManager contract from Keeper
+     * @param keeper the keeper Service
+     * @return an instance of AgreementStoreManager contract deployed in keeper
+     * @throws IOException IOException
+     * @throws CipherException CipherException
+     */
+    public AgreementStoreManager loadAgreementStoreManager(KeeperService keeper) throws  IOException, CipherException {
+        return AgreementStoreManager.load(
+                oceanConfig.getAgreementStoreManagerAddress(),
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
+
+    /**
+     *  Loads the AccessSecretStoreCondition contract from Keeper
+     * @param keeper the keeper Service
+     * @return an instance of AccessSecretStoreCondition contract deployed in keeper
+     * @throws IOException IOException
+     * @throws CipherException CipherException
+     */
+    public AccessSecretStoreCondition loadAccessSecretStoreCondition(KeeperService keeper) throws IOException, CipherException {
+        return AccessSecretStoreCondition.load(
+                oceanConfig.getAccessSsConditionsAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider()

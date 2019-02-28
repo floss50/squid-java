@@ -47,8 +47,9 @@ public class OceanAPI {
     private Dispenser dispenser;
     private DIDRegistry didRegistryContract;
     private EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
-    private PaymentConditions paymentConditionsContract;
-    private AccessConditions accessConditionsContract;
+    private LockRewardCondition lockRewardCondition;
+    private AccessSecretStoreCondition accessSecretStoreCondition;
+    private EscrowReward escrowReward;
 
     private AccountsAPI accountsAPI;
     private AssetsAPI assetsAPI;
@@ -112,8 +113,9 @@ public class OceanAPI {
 
             oceanAPI.didRegistryContract = oceanInitializationHelper.loadDIDRegistryContract(oceanAPI.keeperService);
             oceanAPI.escrowAccessSecretStoreTemplate = oceanInitializationHelper.loadEscrowAccessSecretStoreTemplate(oceanAPI.keeperService);
-            oceanAPI.paymentConditionsContract = oceanInitializationHelper.loadPaymentConditionsContract(oceanAPI.keeperService);
-            oceanAPI.accessConditionsContract = oceanInitializationHelper.loadAccessConditionsContract(oceanAPI.keeperService);
+            oceanAPI.lockRewardCondition = oceanInitializationHelper.loadLockRewardCondition(oceanAPI.keeperService);
+            oceanAPI.accessSecretStoreCondition = oceanInitializationHelper.loadAccessSecretStoreCondition(oceanAPI.keeperService);
+            oceanAPI.escrowReward = oceanInitializationHelper.loadEscrowReward(oceanAPI.keeperService);
             oceanAPI.dispenser = oceanInitializationHelper.loadDispenserContract(oceanAPI.keeperService);
             oceanAPI.tokenContract = oceanInitializationHelper.loadOceanTokenContract(oceanAPI.keeperService);
 
@@ -121,8 +123,9 @@ public class OceanAPI {
             oceanAPI.oceanManager.setSecretStoreManager(oceanAPI.secretStoreManager)
                     .setDidRegistryContract(oceanAPI.didRegistryContract)
                     .setEscrowAccessSecretStoreTemplate(oceanAPI.escrowAccessSecretStoreTemplate)
-                    .setPaymentConditionsContract(oceanAPI.paymentConditionsContract)
-                    .setAccessConditionsContract(oceanAPI.accessConditionsContract)
+                    .setLockRewardCondition(oceanAPI.lockRewardCondition)
+                    .setEscrowReward(oceanAPI.escrowReward)
+                    .setAccessSecretStoreCondition(oceanAPI.accessSecretStoreCondition)
                     .setTokenContract(oceanAPI.tokenContract)
                     .setMainAccount(oceanAPI.mainAccount)
                     .setEvmDto(oceanAPI.evmDto);
