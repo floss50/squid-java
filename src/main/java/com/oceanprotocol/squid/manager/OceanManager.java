@@ -189,7 +189,7 @@ public class OceanManager extends BaseManager {
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
             serviceAgreementTemplate.contractName = "ServiceExecutionAgreement";
-            serviceAgreementTemplate.fulfillmentOperator = 1;
+
 
             // Execute Agreement Event
             Condition.Event executeAgreementEvent = new Condition.Event();
@@ -211,7 +211,7 @@ public class OceanManager extends BaseManager {
 
             // Initializing conditions and adding to Access service
             ServiceAgreementHandler sla = new ServiceAgreementHandler();
-            accessService.conditions = sla.initializeConditions(
+            accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
                     accessService.templateId,
                     getContractAddresses(),
                     getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
@@ -503,7 +503,7 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            List<Condition> conditions = accessService.conditions;
+            List<Condition> conditions = accessService.serviceAgreementTemplate.conditions;
             Condition lockCondition = conditions.stream()
                     .filter(condition -> condition.name.equalsIgnoreCase("lockPayment"))
                     .findFirst()

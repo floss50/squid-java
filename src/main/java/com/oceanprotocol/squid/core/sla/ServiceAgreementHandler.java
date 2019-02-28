@@ -238,8 +238,8 @@ public class ServiceAgreementHandler {
         BigInteger counter= BigInteger.ZERO;
 
         for (Condition condition: conditions)    {
-            if (condition.isTerminalCondition == 1)
-                dependenciesBits.add(counter);
+            //if (condition.isTerminalCondition == 1)
+            //    dependenciesBits.add(counter);
             counter= counter.add(BigInteger.ONE);
         }
         return dependenciesBits;
@@ -254,32 +254,6 @@ public class ServiceAgreementHandler {
         return compressedDeps;
     }
 
-   /* public static List<BigInteger> getDependenciesBits(List<Condition> conditions)   {
-        List<BigInteger> compressedDeps= new ArrayList<>();
-        List<Integer> deps= new ArrayList<>();
-        List<Integer> timeout= new ArrayList<>();
 
-        int counterConditions= 0;
-
-        int conditionsNumber= conditions.size();
-        for (Condition condition: conditions)    {
-
-            for (int internalCounter= 0; internalCounter< conditionsNumber; internalCounter++) {
-                String condName = condition.name;
-                if (counterConditions != internalCounter && condition.dependencies.contains(condName))   {
-                    deps.add(1);
-                    timeout.add(condition.timeout);
-                    //tout_flags.append(cond.timeout_flags[cond.dependencies.index(other_cond_name)])
-                }   else {
-                    deps.add(0);
-                    timeout.add(0);
-                }
-            }
-
-            counterConditions++;
-        }
-
-        return compressedDeps;
-    }*/
 
 }

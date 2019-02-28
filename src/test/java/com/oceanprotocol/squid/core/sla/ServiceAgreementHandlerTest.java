@@ -66,13 +66,13 @@ public class ServiceAgreementHandlerTest {
         String signature= accessService.generateServiceAgreementSignatureFromHash(keeper.getWeb3(), keeper.getAddress(), hash);
 
         final String hashTemplateId= Hash.sha3(TEMPLATE_ID);
-        final String hashConditionKeys= Hash.sha3(accessService.fetchConditionKeys());
+        //final String hashConditionKeys= Hash.sha3(accessService.fetchConditionKeys());
         final String hashConditionValues= Hash.sha3(accessService.fetchConditionValues());
         final String hashTimeouts= Hash.sha3(accessService.fetchTimeout());
         final String hashServiceAgreementId= Hash.sha3(SERVICEAGREEMENT_ID);
 
         log.debug("Hash templateId: " + hashTemplateId);
-        log.debug("Hash conditionKeys: " + hashConditionKeys);
+        //log.debug("Hash conditionKeys: " + hashConditionKeys);
         log.debug("Hash conditionValues: " + hashConditionValues);
         log.debug("Hash Timeouts: " + hashTimeouts);
         log.debug("Hash ServiceAgreementId: " + hashServiceAgreementId);
@@ -85,7 +85,7 @@ public class ServiceAgreementHandlerTest {
         log.debug("Signature: " + signature);
 
         assertEquals("hashTemplateId doesn't match", "0x40105d5bc10105c17fd72b93a8f73369e2ee6eee4d4714b7bf7bf3c2f156e601", hashTemplateId);
-        assertEquals("hashConditionKeys Hash doesn't match", "0x5b0fbb997b36bcc10d1543e071c2a859fe21ad8a9f18af6bdeb366a584d091b3", hashConditionKeys);
+        //assertEquals("hashConditionKeys Hash doesn't match", "0x5b0fbb997b36bcc10d1543e071c2a859fe21ad8a9f18af6bdeb366a584d091b3", hashConditionKeys);
         assertEquals("hashConditionValues doesn't match", "0xfbb8894170e025ff7aaf7c5278c16fa17f4ea3d1126623ebdac87bd91e70acc2", hashConditionValues);
         assertEquals("hashTimeouts doesn't match", "0x4a0dd5c0cd0686c8feff15f4ec2ff2b3b7009451ee56eb3d10d75d8a7da95c7f", hashTimeouts);
         assertEquals("hashServiceAgreementId doesn't match", "0x922c3379f6140ee422c40a900f23479d22737270ec1439ca87fcb321c6c0c692", hashServiceAgreementId);

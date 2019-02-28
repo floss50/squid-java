@@ -13,6 +13,7 @@ import org.web3j.protocol.Web3j;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,8 +34,7 @@ public class AccessService extends Service {
     @JsonProperty
     public String creator;
 
-    @JsonProperty
-    public List<Condition> conditions= new ArrayList<>();
+
 
     @JsonProperty
     public ServiceAgreementTemplate serviceAgreementTemplate;
@@ -47,12 +47,37 @@ public class AccessService extends Service {
         public String contractName;
 
         @JsonProperty
-        public int fulfillmentOperator;
-
-        @JsonProperty
         public List<Condition.Event> events= new ArrayList<>();
 
+        @JsonProperty
+        public List<String> fulfillmentOrder=  Arrays.asList(
+                "lockReward.fulfill",
+                "accessSecretStore.fulfill",
+                "escrowReward.fulfill");
+
+        @JsonProperty
+        public ConditionDependency conditionDependency;
+
+        @JsonProperty
+        public List<Condition> conditions= new ArrayList<>();
+
         public ServiceAgreementTemplate() {}
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic=true)
+    public static class ConditionDependency {
+
+        @JsonProperty
+        public List<String> lockReward=  Arrays.asList();
+
+        @JsonProperty
+        public List<String> grantSecretStoreAccess=  Arrays.asList();
+
+        @JsonProperty
+        public List<String> releaseReward=  Arrays.asList("lockReward", "accessSecretStore");
+
+        public ConditionDependency() {}
     }
 
 
@@ -87,7 +112,7 @@ public class AccessService extends Service {
     public String generateServiceAgreementHash(String serviceAgreementId) throws IOException  {
         String params=
                 templateId
-                        + fetchConditionKeys()
+                        //+ fetchConditionKeys()
                         + fetchConditionValues()
                         + fetchTimeout()
                         + serviceAgreementId;
@@ -105,22 +130,11 @@ public class AccessService extends Service {
     }
 
 
-    public String fetchConditionKeys()  {
-        String conditionKeys= "";
-
-        int counter= 0;
-        for (Condition condition: conditions)   {
-            conditionKeys= conditionKeys + EthereumHelper.remove0x(condition.conditionKey);
-            counter++;
-        }
-        return conditionKeys;
-    }
-
 
     public String fetchConditionValues() throws UnsupportedEncodingException {
         String data= "";
 
-        for (Condition condition: conditions)   {
+        for (Condition condition: serviceAgreementTemplate.conditions)   {
             String token= "";
             for (Condition.ConditionParameter param: condition.parameters) {
 
@@ -145,7 +159,7 @@ public class AccessService extends Service {
     public String fetchTimeout() throws IOException {
         String data= "";
 
-        for (Condition condition: conditions)   {
+        for (Condition condition: serviceAgreementTemplate.conditions)   {
             data= data + EthereumHelper.remove0x(
                     EncodingHelper.hexEncodeAbiType("uint256", condition.timeout));
         }
