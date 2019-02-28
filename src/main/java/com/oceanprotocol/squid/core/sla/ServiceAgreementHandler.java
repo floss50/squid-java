@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessConditions;
+import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.PaymentConditions;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
@@ -76,21 +77,21 @@ public class ServiceAgreementHandler {
 
 
     /**
-     * Define and execute a Filter over the Access Condition Contract to listen for an AccesGranted event
-     * @param accessConditions the address of the accessConditions contract
+     * Define and execute a Filter over the AccessSecretStoreCondition Contract to listen for an Fulfilled event
+     * @param accessCondition the address of the AccessSecretStoreCondition contract
      * @param serviceAgreementId the serviceAgreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
-    public static Flowable<AccessConditions.AccessGrantedEventResponse> listenForGrantedAccess(AccessConditions accessConditions,
-                                                                                                  String serviceAgreementId)   {
+    public static Flowable<AccessSecretStoreCondition.FulfilledEventResponse> listenForFullfilledEvent(AccessSecretStoreCondition accessCondition,
+                                                                                                     String serviceAgreementId)   {
 
         EthFilter grantedFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
                 DefaultBlockParameterName.LATEST,
-                accessConditions.getContractAddress()
+                accessCondition.getContractAddress()
         );
 
-        final Event event= AccessConditions.ACCESSGRANTED_EVENT;
+        final Event event= AccessSecretStoreCondition.FULFILLED_EVENT;
         final String eventSignature= EventEncoder.encode(event);
         String slaTopic= "0x" + serviceAgreementId;
 
@@ -98,7 +99,7 @@ public class ServiceAgreementHandler {
         grantedFilter.addOptionalTopics(slaTopic);
 
 
-        return accessConditions.accessGrantedEventFlowable(grantedFilter);
+        return accessCondition.fulfilledEventFlowable(grantedFilter);
     }
 
 

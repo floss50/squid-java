@@ -43,6 +43,7 @@ public abstract class BaseManager {
     protected DIDRegistry didRegistry;
     protected EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate;
     protected LockRewardCondition lockRewardCondition;
+    protected AccessSecretStoreCondition accessSecretStoreCondition;
     protected ContractAddresses contractAddresses  = new ContractAddresses();
     protected Config config= ConfigFactory.load();
 
@@ -311,6 +312,22 @@ public abstract class BaseManager {
      */
     public void setLockRewardCondition(LockRewardCondition lockRewardCondition) {
         this.lockRewardCondition = lockRewardCondition;
+    }
+
+    /**
+     *  It gets the AccessSecretStoreCondition stub instance
+     * @return AccessSecretStoreCondition instance
+     */
+    public AccessSecretStoreCondition getAccessSecretStoreCondition() {
+        return accessSecretStoreCondition;
+    }
+
+    /**
+     * It sets the AccessSecretStoreCondition instance
+     * @param accessSecretStoreCondition instance
+     */
+    public void setAccessSecretStoreCondition(AccessSecretStoreCondition accessSecretStoreCondition) {
+        this.accessSecretStoreCondition = accessSecretStoreCondition;
     }
 
     public Account getMainAccount() {
