@@ -52,25 +52,25 @@ public abstract class BaseManager {
 
     public static class ContractAddresses {
 
-        private String paymentConditionsAddress;
-        private String accessConditionsAddress;
+        private String lockRewardConditionAddress;
+        private String accessSecretStoreConditionAddress;
 
         public ContractAddresses(){}
 
-        public String getPaymentConditionsAddress() {
-            return paymentConditionsAddress;
+        public String getLockRewardConditionAddress() {
+            return lockRewardConditionAddress;
         }
 
-        public void setPaymentConditionsAddress(String paymentConditionsAddress) {
-            this.paymentConditionsAddress = paymentConditionsAddress;
+        public void setLockRewardConditionAddress(String address) {
+            this.lockRewardConditionAddress = address;
         }
 
-        public String getAccessConditionsAddress() {
-            return accessConditionsAddress;
+        public String getAccessSecretStoreConditionAddress() {
+            return accessSecretStoreConditionAddress;
         }
 
-        public void setAccessConditionsAddress(String accessConditionsAddress) {
-            this.accessConditionsAddress = accessConditionsAddress;
+        public void setAccessSecretStoreConditionAddress(String address) {
+            this.accessSecretStoreConditionAddress = address;
         }
     }
 

@@ -9,7 +9,7 @@
       {
         "name": "_rewardAddress",
         "type": "address",
-        "value": "{parameter.rewardAddress}"
+        "value": "{contract.EscrowReward.address}"
       },
       {
         "name": "_amount",
@@ -83,22 +83,22 @@
       {
         "name": "_receiver",
         "type": "address",
-        "value": "{parameter.receiver}"
+        "value": ""
       },
       {
         "name": "_sender",
         "type": "address",
-        "value": "{parameter.sender}"
+        "value": ""
       },
       {
         "name": "_lockCondition",
         "type": "bytes32",
-        "value": ""
+        "value": "{contract.LockRewardCondition.address}"
       },
       {
         "name": "_releaseCondition",
         "type": "bytes32",
-        "value": ""
+        "value": "{contract.AccessSecretStoreCondition.address}"
       }
     ],
     "events": [

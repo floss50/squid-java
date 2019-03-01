@@ -212,8 +212,8 @@ public class OceanManager extends BaseManager {
             // Initializing conditions and adding to Access service
             ServiceAgreementHandler sla = new ServiceAgreementHandler();
             accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
-                    accessService.templateId,
-                    getContractAddresses(),
+                    //accessService.templateId,
+                    //getContractAddresses(),
                     getAccessConditionParams(ddo.getDid().toString(), Integer.parseInt(metadata.base.price)));
 
             // Adding services to DDO

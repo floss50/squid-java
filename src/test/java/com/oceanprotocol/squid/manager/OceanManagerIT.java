@@ -187,7 +187,7 @@ public class OceanManagerIT {
 
         assertEquals(ddo.id, resolvedDDO.id);
         assertEquals(metadataUrl, resolvedDDO.services.get(0).serviceEndpoint);
-        assertTrue( resolvedDDO.services.size() == 2);
+        assertTrue( resolvedDDO.services.size() == 3);
 
     }
 

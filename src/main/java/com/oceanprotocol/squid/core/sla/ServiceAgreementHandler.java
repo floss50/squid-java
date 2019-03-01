@@ -130,16 +130,14 @@ public class ServiceAgreementHandler {
 
     /**
      * Gets and Initializes all the conditions associated with a template
-     * @param templateId the id of the template
-     * @param addresses the addresses of the contracts
      * @param params params to fill the conditions
      * @return a List with all the conditions of the template
      * @throws InitializeConditionsException InitializeConditionsException
      */
-    public List<Condition> initializeConditions(String templateId, BaseManager.ContractAddresses addresses, Map<String, Object> params) throws InitializeConditionsException {
+    public List<Condition> initializeConditions(Map<String, Object> params) throws InitializeConditionsException {
 
         try {
-            params.putAll(getFunctionsFingerprints(templateId, addresses));
+            params.putAll(getFunctionsFingerprints());
 
             if (conditionsTemplate == null)
                 conditionsTemplate = new String(Files.readAllBytes(Paths.get(ACCESS_CONDITIONS_FILE_TEMPLATE)));
@@ -156,25 +154,22 @@ public class ServiceAgreementHandler {
                     .readValue(conditionsTemplate, new TypeReference<List<Condition>>() {
                     });
         }catch (Exception e) {
-            String msg = "Error initializing conditions for template: " +  templateId;
+            String msg = "Error initializing conditions for template";
             log.error(msg);
             throw new InitializeConditionsException(msg, e);
         }
     }
 
     /**
-     * Compose the different conditionKey hashes using:
-     * (serviceAgreementTemplateId, address, signature)
-     * @param templateId id of the template
-     * @param  addresses addresses of the contracts
-     * @return Map of (varible name, conditionKeys)
+     * Compose the different function fingerprint hashes
+     * @return Map of (varible name, function fingerprint)
      * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
-    public static Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
+    public static Map<String, Object> getFunctionsFingerprints() throws UnsupportedEncodingException {
 
 
-        String checksumLockConditionsAddress = Keys.toChecksumAddress(addresses.getLockRewardConditionAddress());
-        String checksumAccessSecretStoreConditionsAddress = Keys.toChecksumAddress(addresses.getAccessSecretStoreConditionAddress());
+        //String checksumLockConditionsAddress = Keys.toChecksumAddress(addresses.getLockRewardConditionAddress());
+        //String checksumAccessSecretStoreConditionsAddress = Keys.toChecksumAddress(addresses.getAccessSecretStoreConditionAddress());
 
         Map<String, Object> fingerprints= new HashMap<>();
 
