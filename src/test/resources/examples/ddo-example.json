@@ -88,7 +88,8 @@
         "curation": {
           "numVotes": 123,
           "rating": 0.0,
-          "schema": "Binary Votting"
+          "schema": "Binary Votting",
+          "isListed": true
         }
       },
       "serviceDefinitionId": "0",

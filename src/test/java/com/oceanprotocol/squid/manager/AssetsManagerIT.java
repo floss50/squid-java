@@ -37,7 +37,6 @@ public class AssetsManagerIT {
     private static AssetMetadata metadataBase;
     private static DDO ddoBase;
     private static final Config config = ConfigFactory.load();
-    private static String TEST_ADDRESS;
 
 
     @BeforeClass
@@ -57,7 +56,6 @@ public class AssetsManagerIT {
         metadataBase = (AssetMetadata) ddoBase.metadata;
         objectMapper = new ObjectMapper();
 
-        TEST_ADDRESS = config.getString("account.ganache.address");
     }
 
 
