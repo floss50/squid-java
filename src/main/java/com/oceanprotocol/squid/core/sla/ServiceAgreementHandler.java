@@ -6,7 +6,6 @@ import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.helpers.CryptoHelper;
 import com.oceanprotocol.squid.helpers.EthereumHelper;
-import com.oceanprotocol.squid.manager.BaseManager;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
@@ -15,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.crypto.Hash;
-import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
@@ -36,9 +34,9 @@ public class ServiceAgreementHandler {
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
 
-    public static final String FUNCTION_LOCKREWARD_DEF= "lockPayment(bytes32,bytes32,uint256)";
-    public static final String FUNCTION_ACCESSSECRETSTORE_DEF= "grantAccess(bytes32,bytes32)";
-    public static final String FUNCTION_ESCROWREWARD_DEF= "escrowReward(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_LOCKREWARD_DEF= "fulfill(bytes32,address,uint256)";
+    public static final String FUNCTION_ACCESSSECRETSTORE_DEF= "grantAccess(bytes32,bytes32,address)";
+    public static final String FUNCTION_ESCROWREWARD_DEF= "escrowReward(bytes32,uint256,address,address,bytes32,bytes32)";
 
 
 
@@ -192,7 +190,7 @@ public class ServiceAgreementHandler {
      * @param address Checksum address
      * @param fingerprint the fingerprint of the condition
      * @return a String with the condition key
-     */
+
     public static String fetchConditionKey(String templateId, String address, String fingerprint)   {
 
         templateId = templateId.replaceAll("0x", "");
@@ -205,8 +203,9 @@ public class ServiceAgreementHandler {
 
         return Hash.sha3(params);
     }
+     */
 
-    public static List<BigInteger> getFullfillmentIndices(List<Condition> conditions)   {
+/*    public static List<BigInteger> getFullfillmentIndices(List<Condition> conditions)   {
         List<BigInteger> dependenciesBits= new ArrayList<>();
         BigInteger counter= BigInteger.ZERO;
 
@@ -216,7 +215,9 @@ public class ServiceAgreementHandler {
             counter= counter.add(BigInteger.ONE);
         }
         return dependenciesBits;
-    }
+    }*/
+
+/*
 
     public static List<BigInteger> getDependenciesBits()   {
         List<BigInteger> compressedDeps= new ArrayList<>();
@@ -227,6 +228,7 @@ public class ServiceAgreementHandler {
         return compressedDeps;
     }
 
+*/
 
 
 }
