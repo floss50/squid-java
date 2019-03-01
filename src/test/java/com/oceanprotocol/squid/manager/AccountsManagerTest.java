@@ -102,6 +102,6 @@ public class AccountsManagerTest {
         Balance balance= manager.getAccountBalance(address);
 
         assertEquals(ethBalance, balance.getEth());
-        assertEquals(oceanBalance, balance.getOcean());
+        assertEquals(oceanBalance, balance.getDrops());
     }
 }

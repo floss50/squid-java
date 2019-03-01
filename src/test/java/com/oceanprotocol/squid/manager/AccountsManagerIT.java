@@ -93,11 +93,11 @@ public class AccountsManagerIT {
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
 
-        log.debug("OCEAN Balance is " + balance.getOcean().toString());
+        log.debug("OCEAN Balance is " + balance.getDrops().toString());
         log.debug("ETH balance is " + balance.getEth().toString());
 
         assertEquals(1, balance.getEth().compareTo(BigInteger.ZERO));
-        assertEquals(1, balance.getOcean().compareTo(BigInteger.ZERO));
+        assertEquals(1, balance.getDrops().compareTo(BigInteger.ZERO));
 
     }
 

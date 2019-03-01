@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -48,14 +49,14 @@ public class AccountsApiIT {
 
         Balance balance = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
         assertNotNull(balance);
-        assertTrue(balance.getEth().compareTo(BigInteger.ZERO)>0);
-        assertTrue(balance.getOcean().intValue()>0);
+        assertEquals(1, balance.getEth().compareTo(BigInteger.ZERO));
+        assertEquals(1, balance.getDrops().compareTo(BigInteger.ZERO));
     }
 
     @Test
     public void requestTokens() throws Exception {
 
-        BigInteger tokens = BigInteger.valueOf(1);
+        BigInteger tokens = BigInteger.ONE;
 
         Balance balanceBefore = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
         TransactionReceipt receipt = oceanAPI.getAccountsAPI().requestTokens(tokens);
@@ -63,7 +64,9 @@ public class AccountsApiIT {
         assertTrue(receipt.isStatusOK());
 
         Balance balanceAfter = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
-        assertEquals(balanceBefore.getOcean().add(BigInteger.valueOf(1)), balanceAfter.getOcean());
+        BigDecimal before= balanceBefore.getOceanTokens();
+        BigDecimal after= balanceAfter.getOceanTokens();
+        assertEquals(0, after.compareTo(before.add(BigDecimal.ONE)));
     }
 
 }
