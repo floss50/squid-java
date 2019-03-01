@@ -2,7 +2,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
-import com.oceanprotocol.squid.core.sla.functions.FullfillLockReward;
+import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
@@ -269,7 +269,7 @@ public class OceanManager extends BaseManager {
                             log.debug("Received AgreementCreated Event with Id: " + eventServiceAgreementId);
                             getKeeperService().unlockAccount(getMainAccount());
                             getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
-                            this.fullfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
+                            this.fulfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
                             return ServiceAgreementHandler.listenForFullfilledEvent(accessSecretStoreCondition, serviceAgreementId);
                         }
                     })
@@ -366,20 +366,20 @@ public class OceanManager extends BaseManager {
 
 
     /**
-     * Executes the fullfill of the LockRewardCondition
+     * Executes the fulfill of the LockRewardCondition
      * @param ddo the ddo
      * @param serviceDefinitionId the serviceDefinition id
      * @param serviceAgreementId service agreement id
      * @return a flag that indicates if the function was executed correctly
      * @throws ServiceException ServiceException
-     * @throws LockRewardFullfillException LockRewardFullfillException
+     * @throws LockRewardFulfillException LockRewardFulfillException
      */
-    private boolean fullfillLockReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFullfillException {
+    private boolean fulfillLockReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFulfillException {
 
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        return FullfillLockReward.executeFullfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), assetInfo);
+        return FulfillLockReward.executeFulfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), assetInfo);
     }
 
 

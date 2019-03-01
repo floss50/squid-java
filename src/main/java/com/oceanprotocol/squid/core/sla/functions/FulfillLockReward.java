@@ -1,7 +1,7 @@
 package com.oceanprotocol.squid.core.sla.functions;
 
 import com.oceanprotocol.keeper.contracts.LockRewardCondition;
-import com.oceanprotocol.squid.exceptions.LockRewardFullfillException;
+import com.oceanprotocol.squid.exceptions.LockRewardFulfillException;
 import com.oceanprotocol.squid.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
@@ -11,22 +11,22 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 
-public class FullfillLockReward {
+public class FulfillLockReward {
 
-    static final Logger log= LogManager.getLogger(FullfillLockReward.class);
+    static final Logger log= LogManager.getLogger(FulfillLockReward.class);
 
     /**
-     * Executes a lock payment function for a Service Agreement between publisher and consumer
+     * Executes a fulfill function of a LockReward Condition
      * @param lockRewardCondition the address of the LockRewardCondition contract
      * @param serviceAgreementId the service agreement id
      * @param assetInfo basic info of the asset
      * @return a flag that indicates if the function was executed correctly
-     * @throws LockRewardFullfillException LockRewardFullfillException
+     * @throws LockRewardFulfillException LockRewardFulfillException
      */
-    public static Boolean  executeFullfill(LockRewardCondition lockRewardCondition,
-                                              String serviceAgreementId,
-                                              String escrowRewardAddress,
-                                              BasicAssetInfo assetInfo) throws LockRewardFullfillException {
+    public static Boolean executeFulfill(LockRewardCondition lockRewardCondition,
+                                         String serviceAgreementId,
+                                         String escrowRewardAddress,
+                                         BasicAssetInfo assetInfo) throws LockRewardFulfillException {
 
         byte[] serviceId;
         Integer price = -1;
@@ -43,19 +43,19 @@ public class FullfillLockReward {
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {
-                String msg = "The Status received is not valid executing LockRewardCondition.Fullfill: " + receipt.getStatus() + " for serviceAgreement " + serviceAgreementId;
+                String msg = "The Status received is not valid executing LockRewardCondition.Fulfill: " + receipt.getStatus() + " for serviceAgreement " + serviceAgreementId;
                 log.error(msg);
-                throw new LockRewardFullfillException(msg);
+                throw new LockRewardFulfillException(msg);
             }
 
-            log.debug("LockRewardCondition.Fullfill transactionReceipt OK for serviceAgreement " + serviceAgreementId);
+            log.debug("LockRewardCondition.Fulfill transactionReceipt OK for serviceAgreement " + serviceAgreementId);
             return true;
 
         } catch (Exception e) {
 
-            String msg = "Error executing LockRewardCondition.Fullfill for serviceAgreement " + serviceAgreementId;
+            String msg = "Error executing LockRewardCondition.Fulfill for serviceAgreement " + serviceAgreementId;
             log.error(msg+ ": " + e.getMessage());
-            throw new LockRewardFullfillException(msg, e);
+            throw new LockRewardFulfillException(msg, e);
         }
 
     }
