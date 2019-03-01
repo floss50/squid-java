@@ -80,8 +80,8 @@ public class ServiceAgreementHandler {
      * @param serviceAgreementId the serviceAgreement Id
      * @return a Flowable over the Event to handle it in an asynchronous fashion
      */
-    public static Flowable<AccessSecretStoreCondition.FulfilledEventResponse> listenForFullfilledEvent(AccessSecretStoreCondition accessCondition,
-                                                                                                     String serviceAgreementId)   {
+    public static Flowable<AccessSecretStoreCondition.FulfilledEventResponse> listenForFulfilledEvent(AccessSecretStoreCondition accessCondition,
+                                                                                                      String serviceAgreementId)   {
 
         EthFilter grantedFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,

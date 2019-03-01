@@ -270,7 +270,7 @@ public class OceanManager extends BaseManager {
                             getKeeperService().unlockAccount(getMainAccount());
                             getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), Integer.valueOf(ddo.metadata.base.price));
                             this.fulfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
-                            return ServiceAgreementHandler.listenForFullfilledEvent(accessSecretStoreCondition, serviceAgreementId);
+                            return ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
                         }
                     })
                     .map( event ->  new OrderResult(serviceAgreementId, true, false))
