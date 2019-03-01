@@ -7,31 +7,31 @@ public class Balance {
 
     private BigInteger eth;
 
-    private BigInteger ocn;
+    private BigInteger ocean;
 
     public Balance() {
         this.eth= BigInteger.valueOf(0);
-        this.ocn= BigInteger.valueOf(0);
+        this.ocean = BigInteger.valueOf(0);
     }
 
-    public Balance(BigInteger eth, BigInteger ocn) {
+    public Balance(BigInteger eth, BigInteger ocean) {
         this.eth = eth;
-        this.ocn = ocn;
+        this.ocean = ocean;
     }
 
     public BigInteger getEth() {
         return eth;
     }
 
-    public BigInteger getOcn() {
-        return ocn;
+    public BigInteger getOcean() {
+        return ocean;
     }
 
     @Override
     public String toString() {
         return "Balance{" +
                 "eth=" + eth +
-                ", ocn=" + ocn +
+                ", ocean=" + ocean +
                 '}';
     }
 }

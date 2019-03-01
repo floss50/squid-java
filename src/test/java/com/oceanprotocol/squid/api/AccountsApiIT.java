@@ -49,7 +49,7 @@ public class AccountsApiIT {
         Balance balance = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
         assertNotNull(balance);
         assertTrue(balance.getEth().compareTo(BigInteger.ZERO)>0);
-        assertTrue(balance.getOcn().intValue()>0);
+        assertTrue(balance.getOcean().intValue()>0);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class AccountsApiIT {
         assertTrue(receipt.isStatusOK());
 
         Balance balanceAfter = oceanAPI.getAccountsAPI().balance(oceanAPI.getMainAccount());
-        assertEquals(balanceBefore.getOcn().add(BigInteger.valueOf(1)), balanceAfter.getOcn());
+        assertEquals(balanceBefore.getOcean().add(BigInteger.valueOf(1)), balanceAfter.getOcean());
     }
 
 }

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AccountsManagerIT {
@@ -92,11 +93,11 @@ public class AccountsManagerIT {
 
         Balance balance= manager.getAccountBalance(TEST_ADDRESS);
 
-        log.debug("Balance is " + balance.toString());
-        log.debug("Eth balance is " + balance.getEth().toString());
+        log.debug("OCEAN Balance is " + balance.getOcean().toString());
+        log.debug("ETH balance is " + balance.getEth().toString());
 
-        assertTrue(balance.getEth().compareTo(BigInteger.ZERO)>0);
-        assertTrue(balance.getOcn().intValue() > 0);
+        assertEquals(1, balance.getEth().compareTo(BigInteger.ZERO));
+        assertEquals(1, balance.getOcean().compareTo(BigInteger.ZERO));
 
     }
 
