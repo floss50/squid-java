@@ -36,10 +36,10 @@ public class ServiceAgreementHandler {
     private static final String ACCESS_CONDITIONS_FILE_TEMPLATE= "src/main/resources/sla/sla-access-conditions-template.json";
     private String conditionsTemplate= null;
 
-    public static final String FUNCTION_LOCKPAYMENT_DEF= "lockPayment(bytes32,bytes32,uint256)";
-    public static final String FUNCTION_GRANTACCESS_DEF= "grantAccess(bytes32,bytes32)";
-    public static final String FUNCTION_RELEASEPAYMENT_DEF= "releasePayment(bytes32,bytes32,uint256)";
-    public static final String FUNCTION_REFUNDPAYMENT_DEF= "refundPayment(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_LOCKREWARD_DEF= "lockPayment(bytes32,bytes32,uint256)";
+    public static final String FUNCTION_ACCESSSECRETSTORE_DEF= "grantAccess(bytes32,bytes32)";
+    public static final String FUNCTION_ESCROWREWARD_DEF= "escrowReward(bytes32,bytes32,uint256)";
+
 
 
     /**
@@ -173,41 +173,19 @@ public class ServiceAgreementHandler {
     public static Map<String, Object> getFunctionsFingerprints(String templateId, BaseManager.ContractAddresses addresses) throws UnsupportedEncodingException {
 
 
-        String checksumPaymentConditionsAddress = Keys.toChecksumAddress(addresses.getPaymentConditionsAddress());
-        String checksumAccessConditionsAddress = Keys.toChecksumAddress(addresses.getAccessConditionsAddress());
+        String checksumLockConditionsAddress = Keys.toChecksumAddress(addresses.getLockRewardConditionAddress());
+        String checksumAccessSecretStoreConditionsAddress = Keys.toChecksumAddress(addresses.getAccessSecretStoreConditionAddress());
 
         Map<String, Object> fingerprints= new HashMap<>();
-        fingerprints.put("function.lockPayment.fingerprint", EthereumHelper.getFunctionSelector(
-                FUNCTION_LOCKPAYMENT_DEF));
 
-        log.debug("lockPayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF));
+        fingerprints.put("function.lockReward.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_LOCKREWARD_DEF));
+        log.debug("lockReward fingerprint: " + fingerprints.get("function.lockReward.fingerprint"));
 
-        fingerprints.put("function.grantAccess.fingerprint", EthereumHelper.getFunctionSelector(
-                FUNCTION_GRANTACCESS_DEF));
+        fingerprints.put("function.accessSecretStore.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_ACCESSSECRETSTORE_DEF));
+        log.debug("accessSecretStore fingerprint: " + fingerprints.get("function.accessSecretStore.fingerprint"));
 
-        log.debug("grantAccess fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF));
-
-        fingerprints.put("function.releasePayment.fingerprint", EthereumHelper.getFunctionSelector(
-                FUNCTION_RELEASEPAYMENT_DEF));
-
-        log.debug("releasePayment fingerprint: " + EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF));
-
-        fingerprints.put("function.refundPayment.fingerprint", EthereumHelper.getFunctionSelector(
-                FUNCTION_REFUNDPAYMENT_DEF));
-
-        log.debug("grantAccess refundPayment: " + EthereumHelper.getFunctionSelector( FUNCTION_REFUNDPAYMENT_DEF));
-
-        fingerprints.put("function.lockPayment.conditionKey",
-                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_LOCKPAYMENT_DEF)));
-
-        fingerprints.put("function.grantAccess.conditionKey",
-                fetchConditionKey(templateId, checksumAccessConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_GRANTACCESS_DEF)));
-
-        fingerprints.put("function.releasePayment.conditionKey",
-                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_RELEASEPAYMENT_DEF)));
-
-        fingerprints.put("function.refundPayment.conditionKey",
-                fetchConditionKey(templateId, checksumPaymentConditionsAddress, EthereumHelper.getFunctionSelector(FUNCTION_REFUNDPAYMENT_DEF)));
+        fingerprints.put("function.escrowReward.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_ESCROWREWARD_DEF));
+        log.debug("escrowReward fingerprint: " + fingerprints.get("function.escrowReward.fingerprint"));
 
 
         return fingerprints;
