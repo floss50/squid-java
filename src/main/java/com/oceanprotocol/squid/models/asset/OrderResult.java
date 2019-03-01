@@ -4,13 +4,13 @@ public class OrderResult {
 
     private String serviceAgreementId;
     private Boolean accessFullfilled = false;
-    private Boolean timeout = false;
+    private Boolean refund = false;
 
-    public OrderResult(String serviceAgreementId, Boolean accessFullfilled, Boolean timeout) {
+    public OrderResult(String serviceAgreementId, Boolean accessFullfilled, Boolean refund) {
 
         this.serviceAgreementId = serviceAgreementId;
         this.accessFullfilled = accessFullfilled;
-        this.timeout = timeout;
+        this.refund = refund;
     }
 
     public String getServiceAgreementId() {
@@ -29,11 +29,11 @@ public class OrderResult {
         this.accessFullfilled = accessFullfilled;
     }
 
-    public Boolean isPaymentRefund() {
-        return timeout;
+    public Boolean isRefund() {
+        return refund;
     }
 
-    public void setTimeout(Boolean timeout) {
-        this.timeout = timeout;
+    public void setRefund(Boolean refund) {
+        this.refund = refund;
     }
 }

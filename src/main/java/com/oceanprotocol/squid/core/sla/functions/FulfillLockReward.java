@@ -17,8 +17,9 @@ public class FulfillLockReward {
 
     /**
      * Executes a fulfill function of a LockReward Condition
-     * @param lockRewardCondition the address of the LockRewardCondition contract
+     * @param lockRewardCondition  LockRewardCondition contract
      * @param serviceAgreementId the service agreement id
+     * @param escrowRewardAddress the address of the EscrowReward Contract
      * @param assetInfo basic info of the asset
      * @return a flag that indicates if the function was executed correctly
      * @throws LockRewardFulfillException LockRewardFulfillException

@@ -1,0 +1,74 @@
+package com.oceanprotocol.squid.core.sla.functions;
+
+import com.oceanprotocol.keeper.contracts.EscrowReward;
+import com.oceanprotocol.squid.exceptions.EscrowRewardException;
+import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.squid.models.Account;
+import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.Keys;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.math.BigInteger;
+
+public class FulfillEscrowReward {
+
+    static final Logger log= LogManager.getLogger(FulfillEscrowReward.class);
+
+    /**
+     * Executes a fulfill function of a EscrowReward Condition
+     * @param escrowReward  the EscrowReward contract
+     * @param serviceAgreementId the service agreement id
+     * @param lockRewardAddress the address of the lockReward contract
+     * @param assetInfo basic info of the asset
+     * @param consumerAddress the Address of the consumer
+     * @return a flag that indicates if the function was executed correctly
+     * @throws EscrowRewardException EscrowRewardException
+     */
+    public static Boolean executeFulfill(EscrowReward escrowReward,
+                                         String serviceAgreementId,
+                                         String lockRewardAddress,
+                                         BasicAssetInfo assetInfo,
+                                         String consumerAddress) throws EscrowRewardException {
+
+
+        byte[] serviceId;
+        byte[] lockConditionId = null;
+        byte[] releaseConditionId = null;
+        Integer price = -1;
+
+        try {
+
+            lockRewardAddress = Keys.toChecksumAddress(lockRewardAddress);
+            serviceId = EncodingHelper.hexStringToBytes(serviceAgreementId);
+
+            // TODO Calculate lockConditionId and releaseConditionId
+
+            TransactionReceipt receipt= escrowReward.fulfill(
+                    serviceId,
+                    BigInteger.valueOf(assetInfo.getPrice()),
+                    lockRewardAddress,
+                    consumerAddress,
+                    lockConditionId,
+                    releaseConditionId
+            ).send();
+
+            if (!receipt.getStatus().equals("0x1")) {
+                String msg = "The Status received is not valid executing EscrowReward.Fulfill: " + receipt.getStatus() + " for serviceAgreement " + serviceAgreementId;
+                log.error(msg);
+                throw new EscrowRewardException(msg);
+            }
+
+            log.debug("EscrowReward.Fulfill transactionReceipt OK for serviceAgreement " + serviceAgreementId);
+            return true;
+
+        } catch (Exception e) {
+
+            String msg = "Error executing EscrowReward.Fulfill for serviceAgreement " + serviceAgreementId;
+            log.error(msg+ ": " + e.getMessage());
+            throw new EscrowRewardException(msg, e);
+        }
+
+    }
+}

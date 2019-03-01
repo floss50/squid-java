@@ -2,6 +2,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
@@ -278,12 +279,14 @@ public class OceanManager extends BaseManager {
                     .timeout(60, TimeUnit.SECONDS)
                     .onErrorReturn(throwable -> {
 
-                        String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
                         if (throwable instanceof TimeoutException){
-                            msg = "Timeout waiting for Fulfilled Event for service agreement " + serviceAgreementId;
+                            // If we get a timeout listening for an AccessSecretStoreCondition Fulfilled Event,
+                            // we must perform a refund executing escrowReward.fulfill
+                            this.fulfillEscrowReward(ddo, serviceDefinitionId, serviceAgreementId);
                             return new OrderResult(serviceAgreementId, false, true);
                         }
 
+                        String msg = "There was a problem executing the Service Agreement " + serviceAgreementId;
                         throw new ServiceAgreementException(serviceAgreementId, msg, throwable);
                     });
 
@@ -292,6 +295,13 @@ public class OceanManager extends BaseManager {
             log.error(msg  + ": " + e.getMessage());
             throw new OrderException(msg, e);
         }
+
+    }
+
+    private void refundReward(String serviceAgreementId, Integer price) {
+
+
+
 
     }
 
@@ -381,6 +391,24 @@ public class OceanManager extends BaseManager {
 
         return FulfillLockReward.executeFulfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), assetInfo);
     }
+
+    /**
+     * Executes the fulfill of the EscrowReward
+     * @param ddo the ddo
+     * @param serviceDefinitionId the serviceDefinition id
+     * @param serviceAgreementId service agreement id
+     * @return a flag that indicates if the function was executed correctly
+     * @throws ServiceException ServiceException
+     * @throws EscrowRewardException EscrowRewardException
+     */
+    private boolean fulfillEscrowReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, EscrowRewardException {
+
+        AccessService accessService= ddo.getAccessService(serviceDefinitionId);
+        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+
+        return FulfillEscrowReward.executeFulfill(escrowReward, serviceAgreementId, this.lockRewardCondition.getContractAddress(), assetInfo, this.getMainAccount().address);
+    }
+
 
 
     /**
