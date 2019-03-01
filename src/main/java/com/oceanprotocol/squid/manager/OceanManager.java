@@ -298,13 +298,6 @@ public class OceanManager extends BaseManager {
 
     }
 
-    private void refundReward(String serviceAgreementId, Integer price) {
-
-
-
-
-    }
-
     /**
      * Initialize a new ServiceExecutionAgreement between a publisher and a consumer
      * @param did the did
