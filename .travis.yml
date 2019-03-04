@@ -29,7 +29,7 @@ before_install:
     done
     ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
 
-    /bin/sh src/test/resources/scripts/updateConfAddresses.sh
+    /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 
 install:
 - mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
