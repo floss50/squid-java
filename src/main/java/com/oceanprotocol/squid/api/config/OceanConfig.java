@@ -179,7 +179,7 @@ public class OceanConfig {
         return secretStoreUrl;
     }
 
-    public OceanConfig setSecretStoreUrl(String address) {
+    public OceanConfig setSecretStoreUrl(String secretStoreUrl) {
         this.secretStoreUrl = secretStoreUrl;
         return this;
     }
