@@ -88,5 +88,14 @@ public class Condition extends AbstractModel implements FromJsonToModel {
     }
 
 
+    public ConditionParameter getParameterByName(String name){
+
+        return this.parameters.stream()
+                .filter(parameter -> parameter.name.equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+
 
 }

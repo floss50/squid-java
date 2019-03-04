@@ -8,10 +8,7 @@ import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.EthereumHelper;
-import com.oceanprotocol.squid.helpers.HttpHelper;
-import com.oceanprotocol.squid.helpers.UrlHelper;
+import com.oceanprotocol.squid.helpers.*;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
@@ -399,7 +396,67 @@ public class OceanManager extends BaseManager {
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        return FulfillEscrowReward.executeFulfill(escrowReward, serviceAgreementId, this.lockRewardCondition.getContractAddress(), assetInfo, this.getMainAccount().address);
+        byte[] lockRewardConditionId = this.generateLockRewardId(ddo, serviceAgreementId, serviceDefinitionId);
+        byte[] accessSecretStoreConditionId = this.generateAccessSecretStoreConditionId(ddo, serviceAgreementId, serviceDefinitionId, this.getMainAccount().address);
+
+        return FulfillEscrowReward.executeFulfill(escrowReward,
+                serviceAgreementId,
+                this.lockRewardCondition.getContractAddress(),
+                assetInfo,
+                this.getMainAccount().address,
+                lockRewardConditionId,
+                accessSecretStoreConditionId);
+    }
+
+
+    /**
+     * Calculates the id of the lockReward Condition for a service Agreement
+     * @param ddo the ddo
+     * @param serviceAgreementId the service Agreement id
+     * @param serviceDefinitionId the service Definition
+     * @return the byte[] value of the id
+     * @throws ServiceException ServiceException
+     */
+    private byte[] generateLockRewardId(DDO ddo, String serviceAgreementId,  String serviceDefinitionId) throws ServiceException {
+
+        Condition lockRewardCondition = ddo.getAccessService(serviceDefinitionId).getConditionbyName("lockReward");
+
+        Condition.ConditionParameter rewardAddress = lockRewardCondition.getParameterByName("_rewardAddress");
+        Condition.ConditionParameter amount = lockRewardCondition.getParameterByName("_amount");
+
+        byte[] valuesHash = CryptoHelper.soliditySha3(rewardAddress.type,
+                amount.type,
+                this.escrowReward.getContractAddress(),
+                (Integer)amount.value);
+
+        return CryptoHelper.soliditySha3("bytes32", "address", "bytes32", serviceAgreementId, this.lockRewardCondition.getContractAddress(), valuesHash);
+
+    }
+
+
+    /**
+     * Calculates the id of the lockReward Condition for a service Agreement
+     * @param ddo the ddo
+     * @param serviceAgreementId the service agreement id
+     * @param serviceDefinitionId the service definition
+     * @param consumerAddress the consumer address
+     * @return the byte[] value of the id
+     * @throws ServiceException ServiceException
+     */
+    private byte[] generateAccessSecretStoreConditionId(DDO ddo, String serviceAgreementId,  String serviceDefinitionId, String consumerAddress) throws ServiceException {
+
+        Condition accessSecretStoreCondition = ddo.getAccessService(serviceDefinitionId).getConditionbyName("accessSecretStore");
+
+        Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
+        Condition.ConditionParameter grantee = accessSecretStoreCondition.getParameterByName("_grantee");
+
+        byte[] valuesHash = CryptoHelper.soliditySha3(documentId.type,
+                grantee.type,
+                documentId.value,
+                consumerAddress);
+
+        return CryptoHelper.soliditySha3("bytes32", "address", "bytes32", serviceAgreementId, this.accessSecretStoreCondition.getContractAddress(), valuesHash);
+
     }
 
 
@@ -524,24 +581,16 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            List<Condition> conditions = accessService.serviceAgreementTemplate.conditions;
-            Condition lockCondition = conditions.stream()
-                    .filter(condition -> condition.name.equalsIgnoreCase("lockPayment"))
-                    .findFirst()
-                    .get();
+            Condition lockRewardCondition = accessService.getConditionbyName("lockReward");
+            Condition.ConditionParameter amount = lockRewardCondition.getParameterByName("_amount");
+
+            Condition accessSecretStoreCondition = accessService.getConditionbyName("accessSecretStore");
+            Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
+
+            assetInfo.setPrice((Integer) amount.value);
+            assetInfo.setAssetId(EncodingHelper.hexStringToBytes((String) documentId.value));
 
 
-            for (Condition.ConditionParameter parameter : lockCondition.parameters) {
-
-                if (parameter.name.equalsIgnoreCase("assetId")) {
-                    assetInfo.setAssetId(EncodingHelper.hexStringToBytes((String) parameter.value));
-                }
-
-                if (parameter.name.equalsIgnoreCase("price")) {
-
-                    assetInfo.setPrice((Integer) parameter.value);
-                }
-            }
         } catch (UnsupportedEncodingException e) {
             log.error("Exception encoding serviceAgreement " + e.getMessage());
 

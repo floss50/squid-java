@@ -168,4 +168,13 @@ public class AccessService extends Service {
     }
 
 
+    public Condition getConditionbyName(String name) {
+
+        return this.serviceAgreementTemplate.conditions.stream()
+                .filter(condition -> condition.name.equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+
 }

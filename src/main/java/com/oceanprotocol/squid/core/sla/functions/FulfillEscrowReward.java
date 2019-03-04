@@ -23,6 +23,8 @@ public class FulfillEscrowReward {
      * @param lockRewardAddress the address of the lockReward contract
      * @param assetInfo basic info of the asset
      * @param consumerAddress the Address of the consumer
+     * @param lockConditionId the id of the lock condition
+     * @param releaseConditionId the id of the release condition
      * @return a flag that indicates if the function was executed correctly
      * @throws EscrowRewardException EscrowRewardException
      */
@@ -30,12 +32,12 @@ public class FulfillEscrowReward {
                                          String serviceAgreementId,
                                          String lockRewardAddress,
                                          BasicAssetInfo assetInfo,
-                                         String consumerAddress) throws EscrowRewardException {
+                                         String consumerAddress,
+                                         byte[] lockConditionId,
+                                         byte[] releaseConditionId) throws EscrowRewardException {
 
 
         byte[] serviceId;
-        byte[] lockConditionId = null;
-        byte[] releaseConditionId = null;
         Integer price = -1;
 
         try {
