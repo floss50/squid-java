@@ -396,6 +396,7 @@ public class OceanManager extends BaseManager {
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
+        // TODO check the correctness of the ids
         byte[] lockRewardConditionId = this.generateLockRewardId(ddo, serviceAgreementId, serviceDefinitionId);
         byte[] accessSecretStoreConditionId = this.generateAccessSecretStoreConditionId(ddo, serviceAgreementId, serviceDefinitionId, this.getMainAccount().address);
 
