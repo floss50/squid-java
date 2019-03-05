@@ -56,7 +56,7 @@ public class AccessService extends Service {
                 "escrowReward.fulfill");
 
         @JsonProperty
-        public ConditionDependency conditionDependency;
+        public ConditionDependency conditionDependency = new ConditionDependency();
 
         @JsonProperty
         public List<Condition> conditions= new ArrayList<>();
