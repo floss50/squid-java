@@ -186,17 +186,16 @@ public class OceanManager extends BaseManager {
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
-            serviceAgreementTemplate.contractName = "ServiceExecutionAgreement";
+            serviceAgreementTemplate.contractName = "EscrowAccessSecretStoreTemplate";
 
-
-            // Execute Agreement Event
+            // AgreementCreated Event
             Condition.Event executeAgreementEvent = new Condition.Event();
-            executeAgreementEvent.name = "ExecuteAgreement";
+            executeAgreementEvent.name = "AgreementCreated";
             executeAgreementEvent.actorType = "consumer";
             // Handler
             Condition.Handler handler = new Condition.Handler();
-            handler.moduleName = "payment";
-            handler.functionName = "lockPayment";
+            handler.moduleName = "escrowAccessSecretStoreTemplate";
+            handler.functionName = "escrowAccessSecretStoreTemplate";
             handler.version = "0.1";
             executeAgreementEvent.handler = handler;
 
@@ -206,6 +205,7 @@ public class OceanManager extends BaseManager {
                     Service.DEFAULT_ACCESS_SERVICE_ID,
                     serviceAgreementTemplate);
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
+            accessService.name = "dataAssetAccessServiceAgreement";
 
             // Initializing conditions and adding to Access service
             ServiceAgreementHandler sla = new ServiceAgreementHandler();
