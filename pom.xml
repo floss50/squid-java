@@ -21,8 +21,8 @@
         <java.version>1.8</java.version>
         <final-name>squid</final-name>
         <web3j.version>4.1.1</web3j.version>
-        <drops.keeper.version>0.8.0</drops.keeper.version>
-        <drops.secretstore.version>0.1.4</drops.secretstore.version>
+        <ocean.keeper.version>0.8.1</ocean.keeper.version>
+        <ocean.secretstore.version>0.1.4</ocean.secretstore.version>
         <eddsa.version>0.3.0</eddsa.version>
         <jackson.version>2.9.8</jackson.version>
         <log4j.version>2.11.1</log4j.version>
@@ -381,7 +381,7 @@
         <dependency>
             <groupId>com.oceanprotocol</groupId>
             <artifactId>keeper-contracts</artifactId>
-            <version>${drops.keeper.version}</version>
+            <version>${ocean.keeper.version}</version>
         </dependency>
         <!-- Crypto libraries -->
         <dependency>
@@ -403,7 +403,7 @@
         <dependency>
             <groupId>com.oceanprotocol</groupId>
             <artifactId>secret-store-client</artifactId>
-            <version>${drops.secretstore.version}</version>
+            <version>${ocean.secretstore.version}</version>
         </dependency>
         <!-- HTTP Client -->
         <dependency>
