@@ -136,7 +136,7 @@ public class AssetMetadata extends Metadata {
         public String schema;
 
         @JsonProperty
-        public boolean isListed= true;
+        public boolean isListed;
 
         public Curation() {}
     }
