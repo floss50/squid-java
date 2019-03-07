@@ -132,24 +132,16 @@ public class AccessService extends Service {
 
 
     public String fetchConditionValues() throws UnsupportedEncodingException {
+
         String data= "";
 
         for (Condition condition: serviceAgreementTemplate.conditions)   {
             String token= "";
+
             for (Condition.ConditionParameter param: condition.parameters) {
-
-                if (param.type.equals("string"))
-                    token= token + EthereumHelper.remove0x((String) param.value);
-                else if (param.type.contains("bytes32"))
-                    token= token + EthereumHelper.remove0x((String) param.value);
-                else if (param.type.contains("int"))
-                    // token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
-                    if (param.value instanceof String)
-                        token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", Integer.parseInt((String)param.value)));
-                    else
-                        token= token + EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", param.value));
-
+                token = token + EthereumHelper.encodeParameterValue(param.type, param.value);
             }
+
             data= data + EthereumHelper.remove0x(Hash.sha3(token));
         }
 
