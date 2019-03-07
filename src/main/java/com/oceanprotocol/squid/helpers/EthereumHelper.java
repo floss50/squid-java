@@ -6,6 +6,7 @@ import org.web3j.protocol.core.methods.response.EthSign;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +150,22 @@ public abstract class EthereumHelper {
     public static String getFunctionSelector(String functionDefinition)    {
         return Hash.sha3String(functionDefinition)
                 .substring(0, 10);
+    }
+
+    public static String encodeParameterValue(String type, Object value) throws UnsupportedEncodingException {
+
+        if (type.equals("string"))
+           return EthereumHelper.remove0x((String) value);
+        else if (type.contains("bytes32"))
+            return EthereumHelper.remove0x((String) value);
+        else if (type.contains("int"))
+            if (value instanceof String)
+                return EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", Integer.parseInt((String) value)));
+            else
+                return EthereumHelper.remove0x(EncodingHelper.hexEncodeAbiType("uint", value));
+
+        return "";
+
     }
 
 
