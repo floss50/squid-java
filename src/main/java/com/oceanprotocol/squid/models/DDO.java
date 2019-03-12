@@ -28,7 +28,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     static final Logger log= LogManager.getLogger(DDO.class);
 
     private static final String DDO_PROOF_TYPE= "DDODataSHA3Signature";
-    private static final String UUID_PROOF_TYPE= "UUIDSignature";
+    private static final String UUID_PROOF_TYPE= "DDOIntegritySignature";
 
     private static final String MODEL_CHARSET= "UTF-8";
 
