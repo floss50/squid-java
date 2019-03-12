@@ -336,7 +336,11 @@ public class OceanManager extends BaseManager {
             agreementSignature = accessService.generateServiceAgreementSignature(
                     getKeeperService().getWeb3(),
                     getMainAccount().getAddress(),
-                    serviceAgreementId
+                    ddo.proof.creator,
+                    serviceAgreementId,
+                    lockRewardCondition.getContractAddress(),
+                    accessSecretStoreCondition.getContractAddress(),
+                    escrowReward.getContractAddress()
             );
         }catch(IOException e){
             String msg = "Error generating signature for Service Agreement: " + serviceAgreementId;
@@ -396,9 +400,18 @@ public class OceanManager extends BaseManager {
         AccessService accessService= ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
 
-        // TODO check the correctness of the ids
-        byte[] lockRewardConditionId = this.generateLockRewardId(ddo, serviceAgreementId, serviceDefinitionId);
-        byte[] accessSecretStoreConditionId = this.generateAccessSecretStoreConditionId(ddo, serviceAgreementId, serviceDefinitionId, this.getMainAccount().address);
+        String lockRewardConditionId = "";
+        String accessSecretStoreConditionId = "";
+
+        try {
+
+            lockRewardConditionId = accessService.generateLockRewardId(serviceAgreementId, escrowReward.getContractAddress(), lockRewardCondition.getContractAddress());
+            accessSecretStoreConditionId = accessService.generateAccessSecretStoreConditionId(serviceAgreementId, getMainAccount().getAddress(), accessSecretStoreCondition.getContractAddress());
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new EscrowRewardException("Error generating the condition Ids ", e);
+        }
+
 
         return FulfillEscrowReward.executeFulfill(escrowReward,
                 serviceAgreementId,
@@ -408,58 +421,6 @@ public class OceanManager extends BaseManager {
                 lockRewardConditionId,
                 accessSecretStoreConditionId);
     }
-
-
-    /**
-     * Calculates the id of the lockReward Condition for a service Agreement
-     * @param ddo the ddo
-     * @param serviceAgreementId the service Agreement id
-     * @param serviceDefinitionId the service Definition
-     * @return the byte[] value of the id
-     * @throws ServiceException ServiceException
-     */
-    private byte[] generateLockRewardId(DDO ddo, String serviceAgreementId,  String serviceDefinitionId) throws ServiceException {
-
-        Condition lockRewardCondition = ddo.getAccessService(serviceDefinitionId).getConditionbyName("lockReward");
-
-        Condition.ConditionParameter rewardAddress = lockRewardCondition.getParameterByName("_rewardAddress");
-        Condition.ConditionParameter amount = lockRewardCondition.getParameterByName("_amount");
-
-        byte[] valuesHash = CryptoHelper.soliditySha3(rewardAddress.type,
-                amount.type,
-                this.escrowReward.getContractAddress(),
-                (Integer)amount.value);
-
-        return CryptoHelper.soliditySha3("bytes32", "address", "bytes32", serviceAgreementId, this.lockRewardCondition.getContractAddress(), valuesHash);
-
-    }
-
-
-    /**
-     * Calculates the id of the lockReward Condition for a service Agreement
-     * @param ddo the ddo
-     * @param serviceAgreementId the service agreement id
-     * @param serviceDefinitionId the service definition
-     * @param consumerAddress the consumer address
-     * @return the byte[] value of the id
-     * @throws ServiceException ServiceException
-     */
-    private byte[] generateAccessSecretStoreConditionId(DDO ddo, String serviceAgreementId,  String serviceDefinitionId, String consumerAddress) throws ServiceException {
-
-        Condition accessSecretStoreCondition = ddo.getAccessService(serviceDefinitionId).getConditionbyName("accessSecretStore");
-
-        Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
-        Condition.ConditionParameter grantee = accessSecretStoreCondition.getParameterByName("_grantee");
-
-        byte[] valuesHash = CryptoHelper.soliditySha3(documentId.type,
-                grantee.type,
-                documentId.value,
-                consumerAddress);
-
-        return CryptoHelper.soliditySha3("bytes32", "address", "bytes32", serviceAgreementId, this.accessSecretStoreCondition.getContractAddress(), valuesHash);
-
-    }
-
 
 
     /**

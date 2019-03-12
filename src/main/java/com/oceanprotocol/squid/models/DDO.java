@@ -113,7 +113,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic=true)
-    static class Proof {
+    static public class Proof {
 
         @JsonProperty
         public String type;
