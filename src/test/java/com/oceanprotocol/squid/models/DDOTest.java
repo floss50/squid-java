@@ -369,7 +369,7 @@ public class DDOTest {
 
         MetadataService metadataService = new MetadataService(metadata, "http://disney.com", "0");
 
-        AccessService accessService = new AccessService("http://ocean.com", "1");
+        AccessService accessService = new AccessService("http://ocean.com", "1", "0x00000000");
 
         ddo.services.add(metadataService);
         ddo.services.add(accessService);

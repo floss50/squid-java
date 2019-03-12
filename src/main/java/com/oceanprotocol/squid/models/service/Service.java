@@ -228,9 +228,6 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public enum serviceTypes {Access, Metadata, Authorization, FitchainCompute, CloudCompute};
 
     @JsonIgnore
-    protected final String ACCESS_TEMPLATE_ID= "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
-
-    @JsonIgnore
     public static final String DEFAULT_METADATA_SERVICE_ID = "0";
     @JsonIgnore
     public static final String DEFAULT_ACCESS_SERVICE_ID = "1";

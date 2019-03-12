@@ -406,9 +406,12 @@ public class OceanManager extends BaseManager {
 
             serviceAgreementTemplate.events = Arrays.asList(executeAgreementEvent);
 
+            // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
+            String accessServiceTemplateId = escrowAccessSecretStoreTemplate.getContractAddress();
             AccessService accessService = new AccessService(serviceEndpoints.getAccessEndpoint(),
                     Service.DEFAULT_ACCESS_SERVICE_ID,
-                    serviceAgreementTemplate);
+                    serviceAgreementTemplate,
+                    accessServiceTemplateId);
             accessService.purchaseEndpoint = serviceEndpoints.getPurchaseEndpoint();
             accessService.name = "dataAssetAccessServiceAgreement";
 
