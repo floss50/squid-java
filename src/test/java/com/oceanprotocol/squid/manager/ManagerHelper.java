@@ -148,5 +148,13 @@ public abstract class ManagerHelper {
                 );
     }
 
+    public static TemplateStoreManager loadTemplateStoreManager(KeeperService keeper, String address) throws Exception, IOException, CipherException {
+        return TemplateStoreManager.load(address,
+                keeper.getWeb3(),
+                keeper.getCredentials(),
+                keeper.getContractGasProvider()
+        );
+    }
+
 
 }

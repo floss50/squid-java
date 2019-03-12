@@ -28,6 +28,7 @@ public class OceanConfig {
     public static final String LOCKREWARD_CONDITIONS_ADDRESS = "contract.LockRewardCondition.address";
     public static final String ESCROWREWARD_CONDITIONS_ADDRESS = "contract.EscrowReward.address";
     public static final String ESCROW_ACCESS_SS_CONDITIONS_ADDRESS = "contract.EscrowAccessSecretStoreTemplate.address";
+    public static final String TEMPLATE_STORE_MANAGER_ADDRESS = "contract.TemplateStoreManager.address";
     public static final String ACCESS_SS_CONDITIONS_ADDRESS = "contract.AccessSecretStoreCondition.address";
     public static final String TOKEN_ADDRESS = "contract.OceanToken.address";
     public static final String DISPENSER_ADDRESS = "contract.Dispenser.address";

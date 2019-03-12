@@ -6,7 +6,11 @@
 package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
+import com.oceanprotocol.keeper.contracts.TemplateStoreManager;
 import com.oceanprotocol.squid.api.config.OceanConfig;
+import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -21,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -40,6 +45,8 @@ public class AssetsApiIT {
     private static ServiceEndpoints serviceEndpoints;
     private static OceanAPI oceanAPI;
     private static OceanAPI oceanAPIConsumer;
+
+    private static KeeperService keeper;
 
     private static  Config config;
 
@@ -82,6 +89,18 @@ public class AssetsApiIT {
 
         oceanAPIConsumer = OceanAPI.getInstance(properties);
 
+        keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
+        EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate = ManagerHelper.loadEscrowAccessSecretStoreTemplate(keeper, config.getString("contract.EscrowAccessSecretStoreTemplate.address"));
+        TemplateStoreManager templateManager = ManagerHelper.loadTemplateStoreManager(keeper, config.getString("contract.TemplateStoreManager.address"));
+
+        log.debug("Proposing escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
+        templateManager.proposeTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
+
+        log.debug("Approving escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
+        templateManager.approveTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
+
+        BigInteger listSize= templateManager.getTemplateListSize().send();
+        log.debug("TemplateManager.listSize: " + listSize);
     }
 
     @Test
