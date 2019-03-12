@@ -238,17 +238,22 @@ public class FulfillEscrowReward {
                                          String lockRewardAddress,
                                          BasicAssetInfo assetInfo,
                                          String consumerAddress,
-                                         byte[] lockConditionId,
-                                         byte[] releaseConditionId) throws EscrowRewardException {
+                                         String lockConditionId,
+                                         String releaseConditionId) throws EscrowRewardException {
 
 
         byte[] serviceId;
+        byte[] lockConditionIdBytes;
+        byte[] releaseConditionIdBytes;
         Integer price = -1;
 
         try {
 
             lockRewardAddress = Keys.toChecksumAddress(lockRewardAddress);
             serviceId = EncodingHelper.hexStringToBytes(serviceAgreementId);
+
+            lockConditionIdBytes = EncodingHelper.hexStringToBytes(lockConditionId);
+            releaseConditionIdBytes = EncodingHelper.hexStringToBytes(releaseConditionId);
 
             // TODO Calculate lockConditionId and releaseConditionId
 
@@ -257,8 +262,8 @@ public class FulfillEscrowReward {
                     BigInteger.valueOf(assetInfo.getPrice()),
                     lockRewardAddress,
                     consumerAddress,
-                    lockConditionId,
-                    releaseConditionId
+                    lockConditionIdBytes,
+                    releaseConditionIdBytes
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {
