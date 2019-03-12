@@ -37,6 +37,7 @@ public class OceanConfigFactory {
         oceanConfig.setSecretStoreUrl((String)properties.getOrDefault(OceanConfig.SECRETSTORE_URL, DEFAULT_SECRET_STORE_URL));
         oceanConfig.setDidRegistryAddress((String)properties.getOrDefault(OceanConfig.DID_REGISTRY_ADDRESS, ""));
         oceanConfig.setEscrowRewardConditionsAddress((String)properties.getOrDefault(OceanConfig.ESCROWREWARD_CONDITIONS_ADDRESS, ""));
+        oceanConfig.setEscrowAccessSecretStoreTemplateAddress((String)properties.getOrDefault(OceanConfig.ESCROW_ACCESS_SS_CONDITIONS_ADDRESS, ""));
         oceanConfig.setLockrewardConditionsAddress((String)properties.getOrDefault(OceanConfig.LOCKREWARD_CONDITIONS_ADDRESS, ""));
         oceanConfig.setAccessSsConditionsAddress((String)properties.getOrDefault(OceanConfig.ACCESS_SS_CONDITIONS_ADDRESS, ""));
         oceanConfig.setAgreementStoreManagerAddress((String)properties.getOrDefault(OceanConfig.AGREEMENT_STORE_MANAGER_ADDRESS, ""));

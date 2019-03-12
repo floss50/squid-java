@@ -186,7 +186,7 @@ public class OceanInitializationHelper {
      */
     public EscrowAccessSecretStoreTemplate loadEscrowAccessSecretStoreTemplate(KeeperService keeper) throws IOException, CipherException {
         return EscrowAccessSecretStoreTemplate.load(
-                oceanConfig.getEscrowRewardConditionsAddress(),
+                oceanConfig.getEscrowAccessSecretStoreTemplateAddress(),
                 keeper.getWeb3(),
                 keeper.getCredentials(),
                 keeper.getContractGasProvider());

@@ -22,6 +22,7 @@ public class OceanConfig {
     public static final String AGREEMENT_STORE_MANAGER_ADDRESS = "contract.AgreementStoreManager.address";
     public static final String LOCKREWARD_CONDITIONS_ADDRESS = "contract.LockRewardCondition.address";
     public static final String ESCROWREWARD_CONDITIONS_ADDRESS = "contract.EscrowReward.address";
+    public static final String ESCROW_ACCESS_SS_CONDITIONS_ADDRESS = "contract.EscrowAccessSecretStoreTemplate.address";
     public static final String ACCESS_SS_CONDITIONS_ADDRESS = "contract.AccessSecretStoreCondition.address";
     public static final String TOKEN_ADDRESS = "contract.OceanToken.address";
     public static final String DISPENSER_ADDRESS = "contract.Dispenser.address";
@@ -39,6 +40,7 @@ public class OceanConfig {
     private String didRegistryAddress;
     private String agreementStoreManagerAddress;
     private String escrowRewardAddress;
+    private String escrowAccessSecretStoreTemplateAddress;
     private String lockRewardAddress;
     private String accessSsConditionsAddress;
     private String tokenAddress;
@@ -103,6 +105,12 @@ public class OceanConfig {
             validation.setValid(false);
             validation.addErrorMessage("The Address of EscrowReward Contract must be set with the property "
                     + OceanConfig.ESCROWREWARD_CONDITIONS_ADDRESS);
+        }
+
+        if (oceanConfig.getEscrowAccessSecretStoreTemplateAddress() == null || oceanConfig.getEscrowAccessSecretStoreTemplateAddress().isEmpty()) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Address of EscrowAccessSecretStoreTemplate Contract must be set with the property "
+                    + OceanConfig.ESCROW_ACCESS_SS_CONDITIONS_ADDRESS);
         }
 
         if (oceanConfig.getLockrewardConditionsAddress() == null || oceanConfig.getLockrewardConditionsAddress().isEmpty()) {
@@ -281,5 +289,13 @@ public class OceanConfig {
     public OceanConfig setDispenserAddress(String dispenserAddress) {
         this.dispenserAddress = dispenserAddress;
         return this;
+    }
+
+    public String getEscrowAccessSecretStoreTemplateAddress() {
+        return escrowAccessSecretStoreTemplateAddress;
+    }
+
+    public void setEscrowAccessSecretStoreTemplateAddress(String escrowAccessSecretStoreTemplateAddress) {
+        this.escrowAccessSecretStoreTemplateAddress = escrowAccessSecretStoreTemplateAddress;
     }
 }

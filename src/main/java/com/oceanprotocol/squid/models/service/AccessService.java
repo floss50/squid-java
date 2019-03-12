@@ -86,17 +86,18 @@ public class AccessService extends Service {
         this.type= serviceTypes.Access.toString();
     }
 
-    public AccessService(String serviceEndpoint, String serviceDefinitionId)  {
+    public AccessService(String serviceEndpoint, String serviceDefinitionId, String templateId)  {
         super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
-        this.templateId= ACCESS_TEMPLATE_ID;
+        this.templateId= templateId;
     }
 
 
     public AccessService(String serviceEndpoint, String serviceDefinitionId,
-                         ServiceAgreementTemplate serviceAgreementTemplate
+                         ServiceAgreementTemplate serviceAgreementTemplate,
+                         String templateId
     )  {
         super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
-        this.templateId= ACCESS_TEMPLATE_ID;
+        this.templateId= templateId;
         this.serviceAgreementTemplate = serviceAgreementTemplate;
 
     }
@@ -106,6 +107,11 @@ public class AccessService extends Service {
      * The Hash is having the following parameters:
      * (templateId, conditionKeys, conditionValues, timeout, serviceAgreementId)
      * @param serviceAgreementId Service Agreement Id
+     * @param consumerAddress the address of the consumer of the service
+     * @param publisherAddress the address of the publisher of the asset
+     * @param lockRewardConditionAddress the address of the lockRewardCondition contract
+     * @param accessSecretStoreConditionAddress the address of the accessSecretStoreCondition contract
+     * @param escrowRewardAddress the address of the escrowReward Contract
      * @return Hash
      * @throws IOException if the hash function fails
      */
@@ -118,8 +124,7 @@ public class AccessService extends Service {
 
         String params=
                 EthereumHelper.remove0x(
-                //templateId
-                        "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d"
+                        templateId
                         + accessSecretStoreId
                         + lockRewardId
                         + escrowRewardId
