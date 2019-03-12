@@ -93,14 +93,21 @@ public class AssetsApiIT {
         EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate = ManagerHelper.loadEscrowAccessSecretStoreTemplate(keeper, config.getString("contract.EscrowAccessSecretStoreTemplate.address"));
         TemplateStoreManager templateManager = ManagerHelper.loadTemplateStoreManager(keeper, config.getString("contract.TemplateStoreManager.address"));
 
-        log.debug("Proposing escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
-        templateManager.proposeTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
-
-        log.debug("Approving escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
-        templateManager.approveTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
-
         BigInteger listSize= templateManager.getTemplateListSize().send();
-        log.debug("TemplateManager.listSize: " + listSize);
+
+        if (listSize.compareTo(BigInteger.ZERO) == 0) {
+            log.debug("Proposing escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
+            templateManager.proposeTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
+
+            log.debug("Approving escrowAccessSecretStoreTemplate: " + escrowAccessSecretStoreTemplate.getContractAddress());
+            templateManager.approveTemplate(escrowAccessSecretStoreTemplate.getContractAddress()).send();
+
+            listSize= templateManager.getTemplateListSize().send();
+            log.debug("TemplateManager.listSize: " + listSize);
+        }
+
+        boolean isTemplateApproved= templateManager.isTemplateApproved(escrowAccessSecretStoreTemplate.getContractAddress()).send();
+        log.debug("Is escrowAccessSecretStoreTemplate approved? " + isTemplateApproved);
     }
 
     @Test
